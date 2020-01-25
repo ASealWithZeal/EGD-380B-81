@@ -6,6 +6,7 @@ public class CombatManager : MonoBehaviour
 {
     public GameObject playerChars;
     public GameObject enemyChars;
+    public TurnTracker tracker;
     [HideInInspector] public List<GameObject> playerCharsList = null;
     [HideInInspector] public List<GameObject> enemyCharsList = null;
     [HideInInspector] public List<GameObject> combatChars = null;
@@ -60,6 +61,13 @@ public class CombatManager : MonoBehaviour
             else
                 sorting = false;
         }
+
+        tracker.SetUpTrackers(combatChars);
+    }
+
+    private void TurnTrackerVisuals()
+    {
+
     }
 
     private void DealDamage()
