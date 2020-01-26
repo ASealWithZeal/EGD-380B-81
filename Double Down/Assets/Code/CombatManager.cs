@@ -2,176 +2,79 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CombatManager : MonoBehaviour
+namespace Managers
 {
-    public GameObject playerChars;
-    public GameObject enemyChars;
-    public TurnTracker tracker;
-    public Transform moveTarget;
-    private Vector3 origPos;
-    private bool endingTurn = false;
-    [HideInInspector] public List<GameObject> playerCharsList = null;
-    [HideInInspector] public List<GameObject> enemyCharsList = null;
-    [HideInInspector] public List<GameObject> combatChars = null;
-    [HideInInspector] public List<GameObject> t1 = null;
-    [HideInInspector] public List<GameObject> t2 = null;
-
-    private void Start()
+    public class CombatManager : Singleton<CombatManager>
     {
-        for (int i = 0; i < playerChars.transform.childCount; ++i)
+        public GameObject combatMenu;
+        public Transform moveTarget;
+        private Vector3 origPos;
+        private bool endingTurn = false;
+
+        // Starts each character's round of combat
+        public void StartRound()
         {
-            playerCharsList.Add(playerChars.transform.GetChild(i).gameObject);
-            combatChars.Add(playerChars.transform.GetChild(i).gameObject);
-        }
-
-        for (int i = 0; i < enemyChars.transform.childCount; ++i)
-        {
-            enemyCharsList.Add(enemyChars.transform.GetChild(i).gameObject);
-            combatChars.Add(enemyChars.transform.GetChild(i).gameObject);
-        }
-
-        for (int i = 0; i < combatChars.Count; ++i)
-        {
-            t1.Add(combatChars[i]);
-            t2.Add(combatChars[i]);
-        }
-
-        SetTurnOrder();
-    }
-
-    public void StartRound()
-    {
-        tracker.MoveTracker(0);
-
-        if (t1[0].tag == "Player")
-        {
-            origPos = t1[0].transform.position;
-            StartCoroutine(MovePlayerCharacter(moveTarget.position));
-        }
-
-        else
-        {
-            Act();
-        }
-    }
-
-    public void Act()
-    {
-        endingTurn = true;
-        if (t1[0].tag == "Player")
-        {
-            StartCoroutine(MovePlayerCharacter(origPos));
-        }
-
-        else
-        {
-            EndRound();
-        }
-    }
-
-    public void EndRound()
-    {
-        t1.Remove(t1[0]);
-        endingTurn = false;
-
-        if (t1.Count > 0)
-        {
-            StartRound();
-        }
-
-        else
-            EndGlobalTurn();
-    }
-
-    public void EndGlobalTurn()
-    {
-        for (int i = 0; i < t2.Count; ++i)
-            t1.Add(t2[i]);
-
-        tracker.MoveTracker(1);
-
-        //SetTurnOrder();
-        StartRound();
-    }
-
-    private void MoveActingPlayerChar()
-    {
-        t1[0].transform.position = Vector3.MoveTowards(t1[0].transform.position, moveTarget.position, 0.5f);
-    }
-
-    // Sorts the character order for each turn
-    // Can be used to re-sort the order mid-turn
-    private void SetTurnOrder()
-    {
-        bool sorted = false;
-        bool sorting = true;
-        GameObject temp = null;
-        
-        while (sorting)
-        {
-            for (int i = 0; i < combatChars.Count; ++i)
+            endingTurn = false;
+            if (TurnManager.Instance.t1[0].tag == "Player")
             {
-                if (t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed())
-                {
-                    sorted = false;
-
-                    temp = t1[i];
-                    t1[i] = t1[i - 1];
-                    t1[i - 1] = temp;
-                }
-
-                if (t2.Count > 0 && i != 0 && t2[i].GetComponent<Stats>().Speed() > t2[i - 1].GetComponent<Stats>().Speed())
-                {
-                    sorted = false;
-
-                    temp = t2[i];
-                    t2[i] = t2[i - 1];
-                    t2[i - 1] = temp;
-                }
+                origPos = TurnManager.Instance.t1[0].transform.position;
+                StartCoroutine(MovePlayerCharacter(moveTarget.position));
             }
 
-            if (!sorted)
-                sorted = true;
+            else
+            {
+                Act();
+            }
+        }
+
+        // Performs an action
+        public void Act()
+        {
+            endingTurn = true;
+            if (TurnManager.Instance.t1[0].tag == "Player")
+            {
+                combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(false);
+                StartCoroutine(MovePlayerCharacter(origPos));
+            }
 
             else
-                sorting = false;
+            {
+                TurnManager.Instance.EndRound();
+            }
         }
 
-        tracker.SetUpTrackers(t1, t2);
-        StartRound();
-    }
-
-    private void TurnTrackerVisuals()
-    {
-
-    }
-
-    private void DealDamage()
-    {
-        //target.ReduceHP(DamageFormula(chara, target, 1));
-        //Debug.Log(target.HP());
-    }
-
-    private int DamageFormula(Stats a, Stats t, float mod)
-    {
-        int i = (int)(((a.Attack() * a.Attack()) / t.Defense()) * mod * Random.Range(0.8f, 1.0f));
-        return i;
-    }
-
-    IEnumerator MovePlayerCharacter(Vector3 targetPos)
-    {
-        while (t1[0].transform.position != targetPos)
+        private void DealDamage()
         {
-            t1[0].transform.position = Vector3.MoveTowards(t1[0].transform.position, targetPos, 0.09f);
-            yield return new WaitForSeconds(0.01f);
+            //target.ReduceHP(DamageFormula(chara, target, 1));
+            //Debug.Log(target.HP());
         }
 
-        // IN FUTURE CHANGE
-        if (endingTurn)
+        private int DamageFormula(Stats a, Stats t, float mod)
         {
-            EndRound();
+            int i = (int)(((a.Attack() * a.Attack()) / t.Defense()) * mod * Random.Range(0.8f, 1.0f));
+            return i;
         }
 
-        yield return null;
+        IEnumerator MovePlayerCharacter(Vector3 targetPos)
+        {
+            while (TurnManager.Instance.t1[0].transform.position != targetPos)
+            {
+                TurnManager.Instance.t1[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.t1[0].transform.position, targetPos, 0.125f);
+                yield return new WaitForSeconds(0.01f);
+            }
+
+            // IN FUTURE CHANGE
+            if (endingTurn)
+            {
+                TurnManager.Instance.EndRound();
+            }
+
+            else
+            {
+                combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(true);
+            }
+
+            yield return null;
+        }
     }
 }
