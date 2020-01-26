@@ -7,9 +7,14 @@ public class CombatManager : MonoBehaviour
     public GameObject playerChars;
     public GameObject enemyChars;
     public TurnTracker tracker;
+    public Transform moveTarget;
+    private Vector3 origPos;
+    private bool endingTurn = false;
     [HideInInspector] public List<GameObject> playerCharsList = null;
     [HideInInspector] public List<GameObject> enemyCharsList = null;
     [HideInInspector] public List<GameObject> combatChars = null;
+    [HideInInspector] public List<GameObject> t1 = null;
+    [HideInInspector] public List<GameObject> t2 = null;
 
     private void Start()
     {
@@ -25,12 +30,73 @@ public class CombatManager : MonoBehaviour
             combatChars.Add(enemyChars.transform.GetChild(i).gameObject);
         }
 
+        for (int i = 0; i < combatChars.Count; ++i)
+        {
+            t1.Add(combatChars[i]);
+            t2.Add(combatChars[i]);
+        }
+
         SetTurnOrder();
     }
 
-    private void StartTurn()
+    public void StartRound()
     {
+        tracker.MoveTracker(0);
 
+        if (t1[0].tag == "Player")
+        {
+            origPos = t1[0].transform.position;
+            StartCoroutine(MovePlayerCharacter(moveTarget.position));
+        }
+
+        else
+        {
+            Act();
+        }
+    }
+
+    public void Act()
+    {
+        endingTurn = true;
+        if (t1[0].tag == "Player")
+        {
+            StartCoroutine(MovePlayerCharacter(origPos));
+        }
+
+        else
+        {
+            EndRound();
+        }
+    }
+
+    public void EndRound()
+    {
+        t1.Remove(t1[0]);
+        endingTurn = false;
+
+        if (t1.Count > 0)
+        {
+            StartRound();
+        }
+
+        else
+            EndGlobalTurn();
+    }
+
+    public void EndGlobalTurn()
+    {
+        for (int i = 0; i < t2.Count; ++i)
+            t1.Add(t2[i]);
+
+        tracker.MoveTracker(1);
+
+        //SetTurnOrder();
+        StartRound();
+    }
+
+    private void MoveActingPlayerChar()
+    {
+        t1[0].transform.position = Vector3.MoveTowards(t1[0].transform.position, moveTarget.position, 0.5f);
     }
 
     // Sorts the character order for each turn
@@ -45,13 +111,22 @@ public class CombatManager : MonoBehaviour
         {
             for (int i = 0; i < combatChars.Count; ++i)
             {
-                if (i != 0 && combatChars[i].GetComponent<Stats>().Speed() > combatChars[i - 1].GetComponent<Stats>().Speed())
+                if (t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed())
                 {
                     sorted = false;
 
-                    temp = combatChars[i];
-                    combatChars[i] = combatChars[i - 1];
-                    combatChars[i - 1] = temp;
+                    temp = t1[i];
+                    t1[i] = t1[i - 1];
+                    t1[i - 1] = temp;
+                }
+
+                if (t2.Count > 0 && i != 0 && t2[i].GetComponent<Stats>().Speed() > t2[i - 1].GetComponent<Stats>().Speed())
+                {
+                    sorted = false;
+
+                    temp = t2[i];
+                    t2[i] = t2[i - 1];
+                    t2[i - 1] = temp;
                 }
             }
 
@@ -62,7 +137,8 @@ public class CombatManager : MonoBehaviour
                 sorting = false;
         }
 
-        tracker.SetUpTrackers(combatChars);
+        tracker.SetUpTrackers(t1, t2);
+        StartRound();
     }
 
     private void TurnTrackerVisuals()
@@ -80,5 +156,22 @@ public class CombatManager : MonoBehaviour
     {
         int i = (int)(((a.Attack() * a.Attack()) / t.Defense()) * mod * Random.Range(0.8f, 1.0f));
         return i;
+    }
+
+    IEnumerator MovePlayerCharacter(Vector3 targetPos)
+    {
+        while (t1[0].transform.position != targetPos)
+        {
+            t1[0].transform.position = Vector3.MoveTowards(t1[0].transform.position, targetPos, 0.09f);
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        // IN FUTURE CHANGE
+        if (endingTurn)
+        {
+            EndRound();
+        }
+
+        yield return null;
     }
 }
