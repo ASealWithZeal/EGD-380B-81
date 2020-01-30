@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2789118545476507597}
   - component: {fileID: 2789118545476507598}
   m_Layer: 5
-  m_Name: Tracker1
+  m_Name: UI_Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -740, y: -450}
-  m_SizeDelta: {x: 64, y: 64}
+  m_SizeDelta: {x: 24, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2789118545476507597
 CanvasRenderer:

@@ -8,6 +8,10 @@ namespace Managers
     {
         public GameObject combatMenu;
         public Transform moveTarget;
+        public DamageTextUI dText = null;
+
+        private List<GameObject> moveTargets = new List<GameObject>();
+
         private Vector3 origPos;
         private bool endingTurn = false;
 
@@ -23,17 +27,31 @@ namespace Managers
 
             else
             {
-                Act();
+                FollowUpAction();
             }
         }
 
         // Performs an action
-        public void Act()
+        public void Act(int action)
+        {
+            if (TurnManager.Instance.t1[0].tag == "Player")
+            {
+                combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(false);
+                SetTarget(0);
+                TurnManager.Instance.t1[0].GetComponent<PlayerActions>().CheckAction(action);
+            }
+
+            else
+            {
+                //
+            }
+        }
+
+        private void FollowUpAction()
         {
             endingTurn = true;
             if (TurnManager.Instance.t1[0].tag == "Player")
             {
-                combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(false);
                 StartCoroutine(MovePlayerCharacter(origPos));
             }
 
@@ -43,10 +61,35 @@ namespace Managers
             }
         }
 
-        private void DealDamage()
+        public void SetTarget(int targetType)
         {
-            //target.ReduceHP(DamageFormula(chara, target, 1));
-            //Debug.Log(target.HP());
+            switch (targetType)
+            {
+                case 0:
+                    moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
+                    break;
+                case 1:
+                    // target all enemies
+                    break;
+                case 2:
+                    // target an ally
+                    break;
+                case 3:
+                    // target all allies
+                    break;
+            }
+        }
+
+        // Deals damage to the current target(s) based on a shared modifier
+        public void DealDamage(float modifier)
+        {
+            for (int i = 0; i < moveTargets.Count; ++i)
+            {
+                int damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
+
+                moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                dText.DamageNumbers(damage, moveTargets[i].transform);
+            }
         }
 
         private int DamageFormula(Stats a, Stats t, float mod)
