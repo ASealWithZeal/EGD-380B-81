@@ -39,14 +39,33 @@ namespace Managers
             }
 
             SetTurnOrder();
-            tracker.SetUpTrackers(t1, 1);
-            tracker.SetUpTrackers(t2, 2);
+            tracker.SetUpTrackers(t1, 1, true);
+            tracker.SetUpTrackers(t2, 2, false);
+        }
+
+        // Resets the turn order to account for dead enemies
+        public void ResetTurns()
+        {
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                if (t1[i] == null)
+                    t1.Remove(t1[i]);
+            }
+
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                if (t2[i] == null)
+                    t2.Remove(t2[i]);
+            }
+
+            Debug.Log(t2.Count);
+            tracker.ResetTrackers(t1, t2);
         }
 
         public void StartGlobalTurn()
         {
             SetTurnOrder();
-            tracker.SetUpTrackers(t2, 2);
+            tracker.SetUpTrackers(t2, 2, false);
         }
 
         // Starts a turn of gameplay
@@ -69,13 +88,19 @@ namespace Managers
         // Ends the current round of combat
         public void EndRound()
         {
-            t1.Remove(t1[0]);
-
-            if (t1.Count > 0)
-                StartRound();
+            if (combatChars.Count != t2.Count)
+                ResetTurns();
 
             else
-                EndGlobalTurn();
+            {
+                t1.Remove(t1[0]);
+
+                if (t1.Count > 0)
+                    StartRound();
+
+                else
+                    EndGlobalTurn();
+            }
         }
 
         // Ends the overall global turn of combat

@@ -52,7 +52,8 @@ public class DamageTextUI : MonoBehaviour
 
             // Set the position and remove the screen offset
             newText.GetComponent<TextMeshProUGUI>().rectTransform.localPosition = proportionalPosition - uiOffset;
-            newText.GetComponent<TextMeshProUGUI>().rectTransform.localPosition += new Vector3(offset * (i - textOffset), 0, 0);
+            if (dam.Length > 1)
+                newText.GetComponent<TextMeshProUGUI>().rectTransform.localPosition += new Vector3(offset * (i - textOffset), 0, 0);
 
             buttons.Add(newText);
 
@@ -74,6 +75,8 @@ public class DamageTextUI : MonoBehaviour
         }
 
         buttons.Clear();
+        Debug.Log("NOW");
+        Managers.CombatManager.Instance.FollowUpAction();
 
         yield return null;
     }

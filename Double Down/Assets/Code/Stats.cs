@@ -6,7 +6,7 @@ public class Stats : MonoBehaviour
 {
     [Header("Main Stats")]
     [SerializeField] private int maxHP = 100;
-    private int currentHP = 100;
+    public int currentHP = 100;
     [SerializeField] private int maxTP = 25;
     private int currentTP = 25;
 
@@ -39,7 +39,8 @@ public class Stats : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        currentHP = maxHP;
+        currentTP = maxTP;
     }
 
     // Update is called once per frame
@@ -57,6 +58,12 @@ public class Stats : MonoBehaviour
     public int HP()
     {
         return currentHP;
+    }
+
+    // Returns the character's current HP out of their Max HP
+    public float HPPercent()
+    {
+        return ((float)currentHP / maxHP);
     }
 
     // Returns the character's current TP

@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Targeting
+{
+    One_Enemy = 0,
+    All_Enemies = 1,
+    One_Ally = 2,
+    All_Allies = 3,
+    User = 4
+}
+
 namespace Managers
 {
     public class CombatManager : Singleton<CombatManager>
@@ -27,7 +36,7 @@ namespace Managers
 
             else
             {
-                FollowUpAction();
+                Act(0);
             }
         }
 
@@ -43,12 +52,31 @@ namespace Managers
 
             else
             {
-                //
+                for (int i = 0; i < moveTargets.Count; ++i)
+                    moveTargets.Remove(moveTargets[i]);
+                moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+
+                DealDamage(1.0f);
             }
         }
 
-        private void FollowUpAction()
+        public void FollowUpAction()
         {
+            for (int i = 0; i < moveTargets.Count; ++i)
+                if (moveTargets[i].GetComponent<Stats>().HP() <= 0)
+                {
+                    if (moveTargets[i].tag == "Player")
+                        TurnManager.Instance.playerCharsList.Remove(moveTargets[i]);
+                    else
+                        TurnManager.Instance.enemyCharsList.Remove(moveTargets[i]);
+
+                    TurnManager.Instance.combatChars.Remove(moveTargets[i]);
+                    Destroy(moveTargets[i]);
+                }
+
+            for (int i = 0; i < moveTargets.Count; ++i)
+                moveTargets.Remove(moveTargets[i]);
+
             endingTurn = true;
             if (TurnManager.Instance.t1[0].tag == "Player")
             {
@@ -63,21 +91,36 @@ namespace Managers
 
         public void SetTarget(int targetType)
         {
+            for (int i = 0; i < moveTargets.Count; ++i)
+                moveTargets.Remove(moveTargets[i]);
+
             switch (targetType)
             {
-                case 0:
+                case (int)Targeting.One_Enemy:
                     moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
                     break;
-                case 1:
+                case (int)Targeting.All_Enemies:
                     // target all enemies
                     break;
-                case 2:
+                case (int)Targeting.One_Ally:
                     // target an ally
                     break;
-                case 3:
+                case (int)Targeting.All_Allies:
                     // target all allies
                     break;
+                case (int)Targeting.User:
+                    // target the user
+                    break;
             }
+        }
+
+        private void AddEnemyTargets(Targeting t)
+        {
+            if (t == Targeting.One_Enemy)
+                moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
+            else if (t == Targeting.All_Enemies)
+                for (int i = 0; i < TurnManager.Instance.enemyCharsList.Count; ++i)
+                    moveTargets.Add(TurnManager.Instance.enemyCharsList[i]);
         }
 
         // Deals damage to the current target(s) based on a shared modifier
@@ -88,6 +131,8 @@ namespace Managers
                 int damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
 
                 moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                moveTargets[i].GetComponent<CharData>().ChangeHP();
+
                 dText.DamageNumbers(damage, moveTargets[i].transform);
             }
         }
@@ -109,6 +154,7 @@ namespace Managers
             // IN FUTURE CHANGE
             if (endingTurn)
             {
+                endingTurn = false;
                 TurnManager.Instance.EndRound();
             }
 

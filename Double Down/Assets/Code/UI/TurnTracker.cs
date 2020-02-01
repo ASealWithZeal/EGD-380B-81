@@ -21,12 +21,12 @@ public class TurnTracker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
-    public void SetUpTrackers(List<GameObject> l, int j)
+    public void SetUpTrackers(List<GameObject> l, int j, bool addNull)
     {
-        if (t1.Count == 0)
+        if (addNull)
             t1.Add(null);
 
         if (j == 1)
@@ -34,6 +34,30 @@ public class TurnTracker : MonoBehaviour
 
         else if (j == 2)
             StartCoroutine(CreateT2TrackerUI(l));
+    }
+
+    public void ResetTrackers(List<GameObject> l1, List<GameObject> l2)
+    {
+        int c = t1.Count;
+        if (l1.Count > 1 && l1[0] != null)
+        {
+            for (int i = 0; i < c; ++i)
+            {
+                if (t1[0] != null)
+                    Destroy(t1[0]);
+                t1.Remove(t1[0]);
+            }
+            SetUpTrackers(l1, 1, true);
+        }
+
+        c = t2.Count;
+        for (int i = 0; i < c; ++i)
+        {
+            if (t2[0] != null)
+                Destroy(t2[0]);
+            t2.Remove(t2[0]);
+        }
+        SetUpTrackers(l2, 2, false);
     }
 
     // Creates a tracker at a specific index
@@ -144,7 +168,10 @@ public class TurnTracker : MonoBehaviour
             t2[i].transform.localScale = t2Tracker[i].rectTransform.localScale;
         }
 
-        Managers.TurnManager.Instance.StartRound();
+        if (t1.Count > 0)
+            Managers.TurnManager.Instance.StartRound();
+        else
+            Managers.TurnManager.Instance.EndRound();
 
         yield return null;
     }
@@ -193,7 +220,7 @@ public class TurnTracker : MonoBehaviour
                 moving = false;
             }
 
-            else if (t1.Count <= 1 && t1[0].GetComponent<Image>().color.a <= 0.1f)
+            else if (t1.Count == 1 && t1[0].GetComponent<Image>().color.a <= 0.1f)
             {
                 moving = false;
             }
@@ -201,6 +228,8 @@ public class TurnTracker : MonoBehaviour
         
         Destroy(t1[0]);
         t1.Remove(t1[0]);
+
+        Debug.Log("Here");
 
         // Depending on the input, either starts the next round of gameplay
         // OR waits for the tracker to finish moving
@@ -233,7 +262,7 @@ public class TurnTracker : MonoBehaviour
                 if (t2[i].transform.position.x <= t1Tracker[i + 1].transform.position.x)
                     t2[i].transform.position = t1Tracker[i + 1].transform.position;
             }
-
+            
             yield return new WaitForSeconds(timeIncrements);
 
             if (t2.Count > 1 && t2[0].transform.position.x <= t1Tracker[1].transform.position.x)
