@@ -21,8 +21,8 @@ public class DamageTextSpawnUI : MonoBehaviour
         
         while (!temp)
         {
-            gameObject.transform.position += new Vector3(0, 4, 0);
-            yield return new WaitForSeconds(0.005f);
+            gameObject.transform.position += new Vector3(0, 8, 0);
+            yield return new WaitForSeconds(0.0125f);
 
             if (gameObject.transform.position.y >= targetPos)
                 temp = true;
@@ -30,8 +30,8 @@ public class DamageTextSpawnUI : MonoBehaviour
 
         while (temp)
         {
-            gameObject.transform.position -= new Vector3(0, 4, 0);
-            yield return new WaitForSeconds(0.005f);
+            gameObject.transform.position -= new Vector3(0, 8, 0);
+            yield return new WaitForSeconds(0.0125f);
 
             if (gameObject.transform.position.y <= startPos)
                 temp = false;

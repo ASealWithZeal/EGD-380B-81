@@ -10,9 +10,9 @@ public class Stats : MonoBehaviour
     public int maxTP = 25;
     public int currentTP = 25;
 
-    [SerializeField] private int atk = 10;
-    [SerializeField] private int def = 10;
-    [SerializeField] private int spd = 10;
+    public int atk = 10;
+    public int def = 10;
+    public int spd = 10;
     
     // Stat Modifiers
     private float atkMod = 1;
@@ -25,16 +25,17 @@ public class Stats : MonoBehaviour
     private float spdModTurns = 0;
 
     [Header("Level Gains")]
-    [SerializeField] private int HPGain = 25;
-    [SerializeField] private int TPGain = 25;
+    public int HPGain = 25;
+    public int TPGain = 25;
 
-    [SerializeField] private int atkGain = 3;
-    [SerializeField] private int defGain = 3;
-    [SerializeField] private int spdGain = 3;
+    public int atkGain = 3;
+    public int defGain = 3;
+    public int spdGain = 3;
 
     [Header("Level and Experience")]
-    [SerializeField] private int level = 1;
-    [SerializeField] private int exp = 0;
+    public int level = 1;
+    public int exp = 0;
+    public int nextLevelExp = 50;
 
     // Start is called before the first frame update
     void Start()

@@ -75,7 +75,6 @@ public class DamageTextUI : MonoBehaviour
         }
 
         buttons.Clear();
-        Debug.Log("NOW");
         Managers.CombatManager.Instance.FollowUpAction();
 
         yield return null;

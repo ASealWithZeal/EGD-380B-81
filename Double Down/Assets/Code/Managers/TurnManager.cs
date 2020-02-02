@@ -11,7 +11,6 @@ namespace Managers
         public GameObject playerChars;
         public GameObject enemyChars;
         public TurnTracker tracker;
-        private bool endingTurn = false;
         [HideInInspector] public List<GameObject> playerCharsList = null;
         [HideInInspector] public List<GameObject> enemyCharsList = null;
         [HideInInspector] public List<GameObject> combatChars = null;
@@ -58,7 +57,6 @@ namespace Managers
                     t2.Remove(t2[i]);
             }
 
-            Debug.Log(t2.Count);
             tracker.ResetTrackers();
         }
 

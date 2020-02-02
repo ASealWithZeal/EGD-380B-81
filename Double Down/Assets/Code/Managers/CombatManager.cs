@@ -18,6 +18,7 @@ namespace Managers
         public GameObject combatMenu;
         public Transform moveTarget;
         public DamageTextUI dText = null;
+        public OverallWinCanvasScript winCanvas = null;
 
         private List<GameObject> moveTargets = new List<GameObject>();
 
@@ -65,6 +66,7 @@ namespace Managers
         public void FollowUpAction()
         {
             endingTurn = true;
+            bool canMoveOn = true;
             for (int i = 0; i < moveTargets.Count; ++i)
                 if (moveTargets[i].GetComponent<Stats>().HP() <= 0)
                 {
@@ -80,21 +82,32 @@ namespace Managers
                 }
 
             if (TurnManager.Instance.enemyCharsList.Count == 0)
-                SceneChangeManager.Instance.ChangeScene("WinScene");
-            else if (TurnManager.Instance.playerCharsList.Count == 0)
-                SceneChangeManager.Instance.ChangeScene("LoseScene");
-
-            for (int i = 0; i < moveTargets.Count; ++i)
-                moveTargets.Remove(moveTargets[i]);
-            
-            if (TurnManager.Instance.t1[0].tag == "Player")
             {
-                StartCoroutine(MovePlayerCharacter(origPos));
+                canMoveOn = false;
+                for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+                    TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().exp += 50;
+                winCanvas.ShowWinCanvas();
+            }
+            else if (TurnManager.Instance.playerCharsList.Count == 0)
+            {
+                canMoveOn = false;
+                SceneChangeManager.Instance.ChangeScene("LoseScene");
             }
 
-            else
+            if (canMoveOn)
             {
-                TurnManager.Instance.EndRound();
+                for (int i = 0; i < moveTargets.Count; ++i)
+                    moveTargets.Remove(moveTargets[i]);
+
+                if (TurnManager.Instance.t1[0].tag == "Player")
+                {
+                    StartCoroutine(MovePlayerCharacter(origPos));
+                }
+
+                else
+                {
+                    TurnManager.Instance.EndRound();
+                }
             }
         }
 

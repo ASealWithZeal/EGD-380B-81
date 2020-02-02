@@ -58,6 +58,7 @@ public class TurnTracker : MonoBehaviour
         //    t2.Remove(t2[0]);
         //}
 
+        Debug.Log("DED");
         StartCoroutine(ShiftNonDestroyedTrackers());
 
         //SetUpTrackers(l2, 2, false);
@@ -263,12 +264,12 @@ public class TurnTracker : MonoBehaviour
 
     IEnumerator DestroyTracker(GameObject t)
     {
-        Image i = t.GetComponent<Image>();
-        while (i.color.a > 0)
-        {
-            i.color -= new Color(0, 0, 0, 0.1f);
-            yield return new WaitForSeconds(timeIncrements);
-        }
+        //Image i = t.GetComponent<Image>();
+        //while (i.color.a > 0)
+        //{
+        //    i.color -= new Color(0, 0, 0, 0.5f);
+        //    yield return new WaitForSeconds(timeIncrements);
+        //}
 
         Destroy(t);
 
@@ -285,8 +286,6 @@ public class TurnTracker : MonoBehaviour
 
             for (int i = 0; i < t.Count; ++i)
             {
-                Debug.Log(t[i]);
-
                 if (t[i] == null && i != t.Count - 1 && t[i + 1] != null)
                 {
                     t[i] = t[i + 1];
@@ -364,8 +363,6 @@ public class TurnTracker : MonoBehaviour
         Destroy(t1[0]);
         t1.Remove(t1[0]);
 
-        Debug.Log("Here");
-
         // Depending on the input, either starts the next round of gameplay
         // OR waits for the tracker to finish moving
         if (j == 0)
@@ -420,7 +417,7 @@ public class TurnTracker : MonoBehaviour
         int c = t2.Count;
         for (int i = 0; i < c; ++i)
         {
-            t2Storage.transform.GetChild(0).parent = t1Storage.transform;
+            t2Storage.transform.GetChild(0).SetParent(t1Storage.transform);
             t2.Remove(t2[0]);
         }
 
