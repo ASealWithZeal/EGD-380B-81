@@ -30,6 +30,8 @@ namespace Managers
             endingTurn = false;
             if (TurnManager.Instance.t1[0].tag == "Player")
             {
+                // Ticks down the characters modifier changes
+                TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
                 origPos = TurnManager.Instance.t1[0].transform.position;
                 StartCoroutine(MovePlayerCharacter(moveTarget.position));
             }
@@ -62,6 +64,7 @@ namespace Managers
 
         public void FollowUpAction()
         {
+            endingTurn = true;
             for (int i = 0; i < moveTargets.Count; ++i)
                 if (moveTargets[i].GetComponent<Stats>().HP() <= 0)
                 {
@@ -72,12 +75,18 @@ namespace Managers
 
                     TurnManager.Instance.combatChars.Remove(moveTargets[i]);
                     Destroy(moveTargets[i]);
+
+                    //endingTurn = false;
                 }
+
+            if (TurnManager.Instance.enemyCharsList.Count == 0)
+                SceneChangeManager.Instance.ChangeScene("WinScene");
+            else if (TurnManager.Instance.playerCharsList.Count == 0)
+                SceneChangeManager.Instance.ChangeScene("LoseScene");
 
             for (int i = 0; i < moveTargets.Count; ++i)
                 moveTargets.Remove(moveTargets[i]);
-
-            endingTurn = true;
+            
             if (TurnManager.Instance.t1[0].tag == "Player")
             {
                 StartCoroutine(MovePlayerCharacter(origPos));

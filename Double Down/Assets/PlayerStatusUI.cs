@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerStatusUI : MonoBehaviour
 {
     public Image healthBar = null;
     public Image tpBar = null;
     public List<Color> colors = null;
+    private float lastHealth = 0;
+
+    public TextMeshProUGUI cHP;
+    public TextMeshProUGUI mHP;
+
+    public TextMeshProUGUI cTP;
+    public TextMeshProUGUI mTP;
 
     // Start is called before the first frame update
     void Start()
@@ -15,12 +23,22 @@ public class PlayerStatusUI : MonoBehaviour
         healthBar.color = colors[0];
     }
 
-    public void ChangeHealth(float newHealthPercent)
+    public void SetNewHP(int nCHP, int nMHP, int nCTP, int nMTP)
     {
-        StartCoroutine(AlterHealthBar(newHealthPercent));
+        lastHealth = nCHP;
+        cHP.SetText(nCHP.ToString());
+        mHP.SetText(nMHP.ToString());
+
+        cTP.SetText(nCTP.ToString());
+        mTP.SetText(nMTP.ToString());
     }
 
-    IEnumerator AlterHealthBar(float newHealthPercent)
+    public void ChangeHealth(float newHealthPercent, int currentHealth)
+    {
+        StartCoroutine(AlterHealthBar(newHealthPercent, currentHealth));
+    }
+
+    IEnumerator AlterHealthBar(float newHealthPercent, int currentHealth)
     {
         bool decrease = true;
         float multiplier = 1;
@@ -30,10 +48,21 @@ public class PlayerStatusUI : MonoBehaviour
             multiplier = -1;
         }
 
+        if (currentHealth < 0)
+            currentHealth = 0;
+
         while ((decrease && healthBar.fillAmount > newHealthPercent) 
             || (!decrease && healthBar.fillAmount < newHealthPercent))
         {
             healthBar.fillAmount -= 0.005f * multiplier;
+
+            if ((decrease && lastHealth > currentHealth)
+                || (!decrease && lastHealth < currentHealth))
+            {
+                lastHealth -= (0.5f * multiplier);
+                int newLastHealth = (int)lastHealth;
+                cHP.SetText(newLastHealth.ToString());
+            }
 
             if (healthBar.fillAmount > 0.5f)
                 healthBar.color = colors[0];
@@ -44,6 +73,8 @@ public class PlayerStatusUI : MonoBehaviour
         }
 
         healthBar.fillAmount = newHealthPercent;
+        cHP.SetText(currentHealth.ToString());
+        lastHealth = currentHealth;
 
         yield return null;
     }

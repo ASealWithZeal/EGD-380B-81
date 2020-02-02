@@ -36,28 +36,31 @@ public class TurnTracker : MonoBehaviour
             StartCoroutine(CreateT2TrackerUI(l));
     }
 
-    public void ResetTrackers(List<GameObject> l1, List<GameObject> l2)
+    public void ResetTrackers()
     {
-        int c = t1.Count;
-        if (l1.Count > 1 && l1[0] != null)
-        {
-            for (int i = 0; i < c; ++i)
-            {
-                if (t1[0] != null)
-                    Destroy(t1[0]);
-                t1.Remove(t1[0]);
-            }
-            SetUpTrackers(l1, 1, true);
-        }
+        //int c = t1.Count;
+        //if (l1.Count > 1 && l1[0] != null)
+        //{
+        //    for (int i = 0; i < c; ++i)
+        //    {
+        //        if (t1[0] != null)
+        //            Destroy(t1[0]);
+        //        t1.Remove(t1[0]);
+        //    }
+        //    SetUpTrackers(l1, 1, true);
+        //}
+        //
+        //c = t2.Count;
+        //for (int i = 0; i < c; ++i)
+        //{
+        //    if (t2[0] != null)
+        //        Destroy(t2[0]);
+        //    t2.Remove(t2[0]);
+        //}
 
-        c = t2.Count;
-        for (int i = 0; i < c; ++i)
-        {
-            if (t2[0] != null)
-                Destroy(t2[0]);
-            t2.Remove(t2[0]);
-        }
-        SetUpTrackers(l2, 2, false);
+        StartCoroutine(ShiftNonDestroyedTrackers());
+
+        //SetUpTrackers(l2, 2, false);
     }
 
     // Creates a tracker at a specific index
@@ -68,6 +71,7 @@ public class TurnTracker : MonoBehaviour
         GameObject g = Instantiate(image, t1Storage);
         //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
         g.GetComponent<Image>().color = theImage.GetComponent<SpriteRenderer>().color;
+        g.GetComponent<TurnTrackerObj>().obj = theImage;
         g.transform.position = t1Tracker[i + 1].rectTransform.position;
         g.transform.localScale = t1Tracker[i + 1].rectTransform.localScale;
 
@@ -79,6 +83,7 @@ public class TurnTracker : MonoBehaviour
         GameObject g = Instantiate(image, t2Storage);
         //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
         g.GetComponent<Image>().color = theImage.GetComponent<SpriteRenderer>().color;
+        g.GetComponent<TurnTrackerObj>().obj = theImage;
         g.transform.position = t2Tracker[i].rectTransform.position;
         g.transform.localScale = t2Tracker[i].rectTransform.localScale;
 
@@ -106,6 +111,7 @@ public class TurnTracker : MonoBehaviour
             //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
             g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
+            g.GetComponent<TurnTrackerObj>().obj = l[i];
 
             g.transform.position = t1Tracker[i + 1].rectTransform.position;
             g.transform.localScale = t1Tracker[i + 1].rectTransform.localScale * 2;
@@ -144,6 +150,7 @@ public class TurnTracker : MonoBehaviour
             //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
             g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
+            g.GetComponent<TurnTrackerObj>().obj = l[i];
 
             g.transform.position = t2Tracker[i].rectTransform.position;
             g.transform.localScale = t2Tracker[i].rectTransform.localScale * 2;
@@ -174,6 +181,134 @@ public class TurnTracker : MonoBehaviour
             Managers.TurnManager.Instance.EndRound();
 
         yield return null;
+    }
+
+    // Moves the turn order to the LEFT whenever a character performs an action
+    IEnumerator ShiftNonDestroyedTrackers()
+    {
+        // Destroy all T1 trackers
+        for (int i = 0; i < t1.Count; ++i)
+        {
+            if (t1[i].GetComponent<TurnTrackerObj>().obj == null)
+                StartCoroutine(DestroyTracker(t1[i]));
+        }
+
+        // Destroy all T2 trackers
+        for (int i = 0; i < t2.Count; ++i)
+        {
+            if (t2[i].GetComponent<TurnTrackerObj>().obj == null)
+                StartCoroutine(DestroyTracker(t2[i]));
+        }
+
+        yield return new WaitForSeconds(0.125f + (1 / 0.1f) * timeIncrements);
+
+        float mainInc = (240 / seconds) * timeIncrements;
+        float incs = (200 / seconds) * timeIncrements;
+        
+        CheckTs(t1);
+        CheckTs(t2);
+
+        bool moving = true;
+        while (moving)
+        {
+            // Moves T1 into position
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                if (i > 0 && t1[i].transform.position.x > t1Tracker[i].transform.position.x)
+                {
+                    t1[i].transform.position -= new Vector3(incs, 0);
+                }
+
+                else if (i == 0 && t1[0].transform.position.x > t1Tracker[0].transform.position.x)
+                {
+                    t1[0].transform.position -= new Vector3(mainInc, 0);
+                    if (t1[0].transform.localScale.x < 1.5f)
+                        t1[0].transform.localScale += new Vector3(0.005f * mainInc, 0.005f * mainInc, 0.005f * mainInc);
+                }
+            }
+
+            // Moves T2 into position
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                if (t2[i].transform.position.x > t2Tracker[i].transform.position.x)
+                {
+                    t2[i].transform.position -= new Vector3(incs, 0);
+                }
+            }
+
+            yield return new WaitForSeconds(timeIncrements);
+
+            // Sets T1 and T2 to make sure the new positions are accurate
+            if (t1[t1.Count - 1].transform.position.x <= t1Tracker[t1.Count - 1].transform.position.x &&
+                t2[t2.Count - 1].transform.position.x <= t2Tracker[t2.Count - 1].transform.position.x)
+            {
+                for (int i = 0; i < t1.Count; ++i)
+                {
+                    t1[i].transform.position = t1Tracker[i].transform.position;
+                }
+
+                for (int i = 0; i < t2.Count; ++i)
+                {
+                    t2[i].transform.position = t2Tracker[i].transform.position;
+                }
+                moving = false;
+            }
+        }
+
+        // Ends the round of combat
+        Managers.TurnManager.Instance.EndRound();
+
+        yield return null;
+    }
+
+    IEnumerator DestroyTracker(GameObject t)
+    {
+        Image i = t.GetComponent<Image>();
+        while (i.color.a > 0)
+        {
+            i.color -= new Color(0, 0, 0, 0.1f);
+            yield return new WaitForSeconds(timeIncrements);
+        }
+
+        Destroy(t);
+
+        yield return null;
+    }
+
+    // Checks and shifts several values over
+    private void CheckTs(List<GameObject> t)
+    {
+        bool checkT = false;
+        while (!checkT)
+        {
+            checkT = true;
+
+            for (int i = 0; i < t.Count; ++i)
+            {
+                Debug.Log(t[i]);
+
+                if (t[i] == null && i != t.Count - 1 && t[i + 1] != null)
+                {
+                    t[i] = t[i + 1];
+                    t[i + 1] = null;
+                    checkT = false;
+                }
+
+                else if (t[i] == null && i == t.Count - 1)
+                {
+                    t.Remove(t[i]);
+                    checkT = false;
+                }
+            }
+        }
+
+        //for (int i = 0; i < t.Count; ++i)
+        //{
+        //    if (t[i] == null)
+        //    {
+        //        t.Remove(t[i]);
+        //    }
+        //}
     }
 
     // Moves the turn order to the LEFT whenever a character performs an action

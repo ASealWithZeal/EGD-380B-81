@@ -26,8 +26,11 @@ public class Attacker : MonoBehaviour
         Managers.CombatManager.Instance.DealDamage(attackMod);
     }
 
+    // Guards for a turn, raising defense
     public void Defend()
     {
-        //charStats.
+        // Animation
+        charStats.SetDefMod(1.5f, 1);
+        Managers.CombatManager.Instance.FollowUpAction();
     }
 }

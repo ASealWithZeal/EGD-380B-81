@@ -11,10 +11,16 @@ public class CharData : MonoBehaviour
     public GameObject charUI;
     public Stats charStats;
 
+    private void Start()
+    {
+        if (gameObject.tag == "Player")
+            charUI.GetComponent<PlayerStatusUI>().SetNewHP(charStats.currentHP, charStats.maxHP, charStats.currentTP, charStats.maxTP);
+    }
+
     public void ChangeHP()
     {
         if (gameObject.tag == "Player")
-            charUI.GetComponent<PlayerStatusUI>().ChangeHealth(charStats.HPPercent());
+            charUI.GetComponent<PlayerStatusUI>().ChangeHealth(charStats.HPPercent(), charStats.currentHP);
         else
             charUI.GetComponent<EnemyUI>().ChangeHealth(charStats.HPPercent());
     }

@@ -59,7 +59,7 @@ namespace Managers
             }
 
             Debug.Log(t2.Count);
-            tracker.ResetTrackers(t1, t2);
+            tracker.ResetTrackers();
         }
 
         public void StartGlobalTurn()

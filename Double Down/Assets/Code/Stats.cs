@@ -5,10 +5,10 @@ using UnityEngine;
 public class Stats : MonoBehaviour
 {
     [Header("Main Stats")]
-    [SerializeField] private int maxHP = 100;
+    public int maxHP = 100;
     public int currentHP = 100;
-    [SerializeField] private int maxTP = 25;
-    private int currentTP = 25;
+    public int maxTP = 25;
+    public int currentTP = 25;
 
     [SerializeField] private int atk = 10;
     [SerializeField] private int def = 10;
@@ -119,5 +119,11 @@ public class Stats : MonoBehaviour
             spdModTurns--;
         else
             spdMod = 1;
+    }
+
+    public void SetDefMod(float mod, int turns)
+    {
+        defMod = mod;
+        defModTurns = turns;
     }
 }

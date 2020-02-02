@@ -44,6 +44,10 @@ public class PlayerActions : MonoBehaviour
                 break;
 
             case (int)Actions.Defend:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().Defend();
+                //else if (character == Char.Char1)
+                //    GetComponent<Medic>().Attack();
                 break;
 
             case (int)Actions.Ability0:
