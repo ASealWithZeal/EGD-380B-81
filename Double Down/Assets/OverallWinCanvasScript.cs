@@ -43,8 +43,7 @@ public class OverallWinCanvasScript : MonoBehaviour
             }
 
         // TEMP
-        yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements * 100);
-
+        yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements * 300);
         Managers.SceneChangeManager.Instance.ChangeScene("WinScene");
 
         yield return null;
