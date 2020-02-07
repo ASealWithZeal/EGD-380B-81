@@ -23,12 +23,12 @@ public class DamageTextUI : MonoBehaviour
         uiOffset = new Vector2(parentCanvas.GetComponent<RectTransform>().sizeDelta.x / 2f, parentCanvas.GetComponent<RectTransform>().sizeDelta.y / 2f);
     }
 
-    public void DamageNumbers(int damage, Transform target)
+    public void DamageNumbers(int damage, Transform target, bool canEnd)
     {
-        StartCoroutine(SpawnDamageNumbers(damage, target));
+        StartCoroutine(SpawnDamageNumbers(damage, target, canEnd));
     }
 
-    public IEnumerator SpawnDamageNumbers(int damage, Transform target)
+    public IEnumerator SpawnDamageNumbers(int damage, Transform target, bool canEnd)
     {
         string dam = damage.ToString();
         float textOffset = (dam.Length - 1) * 0.5f;
@@ -75,7 +75,9 @@ public class DamageTextUI : MonoBehaviour
         }
 
         buttons.Clear();
-        Managers.CombatManager.Instance.FollowUpAction();
+
+        if (canEnd)
+            Managers.CombatManager.Instance.FollowUpAction();
 
         yield return null;
     }

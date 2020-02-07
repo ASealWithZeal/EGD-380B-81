@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Enemy
+{
+    Enem0 = 0,
+    Enem1 = 1
+}
+
 public class EnemyActions : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Enemy enemy;
 
-    // Update is called once per frame
-    void Update()
+    // Checks the character's action based on an input value
+    public void PerformAction()
     {
-        
+        if (enemy == Enemy.Enem0)
+            GetComponent<NormalEnemy>().Act();
     }
 }

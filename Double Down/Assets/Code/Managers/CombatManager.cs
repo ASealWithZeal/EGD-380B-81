@@ -4,11 +4,13 @@ using UnityEngine;
 
 public enum Targeting
 {
-    One_Enemy = 0,
-    All_Enemies = 1,
-    One_Ally = 2,
-    All_Allies = 3,
-    User = 4
+    OneEnemy = 0,
+    AllEnemies,
+    TwoRandomEnemies,
+    ThreeRandomEnemies,
+    OneAlly,
+    AllAllies,
+    User
 }
 
 namespace Managers
@@ -18,9 +20,16 @@ namespace Managers
         public GameObject combatMenu;
         public Transform moveTarget;
         public DamageTextUI dText = null;
+        public AbilityNameDisplay aDisplay = null;
         public OverallWinCanvasScript winCanvas = null;
 
         private List<GameObject> moveTargets = new List<GameObject>();
+
+        public int DAMAGE_MULT = 10;
+        private bool oneTarget = false;
+        private bool doneAttacking = false;
+        private int newTarget = 0;
+        private float storedMod = 0.0f;
 
         private Vector3 origPos;
         private bool endingTurn = false;
@@ -46,69 +55,81 @@ namespace Managers
         // Performs an action
         public void Act(int action)
         {
+            doneAttacking = false;
+            newTarget = 0;
             if (TurnManager.Instance.t1[0].tag == "Player")
             {
                 combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(false);
                 SetTarget(0);
+                if (action == 1)
+                    doneAttacking = true;
                 TurnManager.Instance.t1[0].GetComponent<PlayerActions>().CheckAction(action);
             }
 
             else
             {
-                for (int i = 0; i < moveTargets.Count; ++i)
-                    moveTargets.Remove(moveTargets[i]);
-                moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
-
-                DealDamage(1.0f);
+                //for (int i = 0; i < moveTargets.Count; ++i)
+                //    moveTargets.Remove(moveTargets[i]);
+                //moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+                TurnManager.Instance.t1[0].GetComponent<EnemyActions>().PerformAction();
             }
         }
 
         public void FollowUpAction()
         {
-            endingTurn = true;
-            bool canMoveOn = true;
-            for (int i = 0; i < moveTargets.Count; ++i)
-                if (moveTargets[i].GetComponent<Stats>().HP() <= 0)
-                {
-                    if (moveTargets[i].tag == "Player")
-                        TurnManager.Instance.playerCharsList.Remove(moveTargets[i]);
-                    else
-                        TurnManager.Instance.enemyCharsList.Remove(moveTargets[i]);
-
-                    TurnManager.Instance.combatChars.Remove(moveTargets[i]);
-                    Destroy(moveTargets[i]);
-
-                    //endingTurn = false;
-                }
-
-            if (TurnManager.Instance.enemyCharsList.Count == 0)
+            if (doneAttacking)
             {
-                canMoveOn = false;
-                for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
-                    TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().exp += 50;
-                winCanvas.ShowWinCanvas();
-            }
-            else if (TurnManager.Instance.playerCharsList.Count == 0)
-            {
-                canMoveOn = false;
-                SceneChangeManager.Instance.ChangeScene("LoseScene");
-            }
+                aDisplay.ChangeDisplayOpacity(false);
 
-            if (canMoveOn)
-            {
+                endingTurn = true;
+                bool canMoveOn = true;
                 for (int i = 0; i < moveTargets.Count; ++i)
-                    moveTargets.Remove(moveTargets[i]);
+                    if (moveTargets[i].GetComponent<Stats>().HP() <= 0)
+                    {
+                        if (moveTargets[i].tag == "Player")
+                            TurnManager.Instance.playerCharsList.Remove(moveTargets[i]);
+                        else
+                            TurnManager.Instance.enemyCharsList.Remove(moveTargets[i]);
 
-                if (TurnManager.Instance.t1[0].tag == "Player")
+                        TurnManager.Instance.combatChars.Remove(moveTargets[i]);
+                        Destroy(moveTargets[i]);
+
+                        //endingTurn = false;
+                    }
+
+                if (TurnManager.Instance.enemyCharsList.Count == 0)
                 {
-                    StartCoroutine(MovePlayerCharacter(origPos));
+                    canMoveOn = false;
+                    for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().exp += 50;
+                    winCanvas.ShowWinCanvas();
+                }
+                else if (TurnManager.Instance.playerCharsList.Count == 0)
+                {
+                    canMoveOn = false;
+                    SceneChangeManager.Instance.ChangeScene("LoseScene");
                 }
 
-                else
+                if (canMoveOn)
                 {
-                    TurnManager.Instance.EndRound();
+                    for (int i = 0; i < moveTargets.Count; ++i)
+                        moveTargets.Remove(moveTargets[i]);
+                    newTarget = 0;
+
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                    {
+                        StartCoroutine(MovePlayerCharacter(origPos));
+                    }
+
+                    else
+                    {
+                        TurnManager.Instance.EndRound();
+                    }
                 }
             }
+
+            else
+                DealDamage(storedMod);
         }
 
         public void SetTarget(int targetType)
@@ -118,51 +139,116 @@ namespace Managers
 
             switch (targetType)
             {
-                case (int)Targeting.One_Enemy:
-                    moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
+                // Target an enemy
+                case (int)Targeting.OneEnemy:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
+                    else
+                        moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+
+                    oneTarget = true;
                     break;
-                case (int)Targeting.All_Enemies:
-                    // target all enemies
+                
+                // Target all enemies
+                case (int)Targeting.AllEnemies:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        for (int i = 0; i < TurnManager.Instance.enemyCharsList.Count; ++i)
+                            moveTargets.Add(TurnManager.Instance.enemyCharsList[i]);
+                    else
+                        for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+                            moveTargets.Add(TurnManager.Instance.playerCharsList[i]);
+
+                    oneTarget = false;
                     break;
-                case (int)Targeting.One_Ally:
-                    // target an ally
+
+                // Target two random enemies
+                case (int)Targeting.TwoRandomEnemies:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        for (int i = 0; i < 2; ++i)
+                            moveTargets.Add(TurnManager.Instance.enemyCharsList[Random.Range(0, TurnManager.Instance.enemyCharsList.Count)]);
+                    else
+                        for (int i = 0; i < 2; ++i)
+                            moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+
+                    oneTarget = true;
                     break;
-                case (int)Targeting.All_Allies:
-                    // target all allies
+
+                // Target three random enemies
+                case (int)Targeting.ThreeRandomEnemies:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        for (int i = 0; i < 3; ++i)
+                            moveTargets.Add(TurnManager.Instance.enemyCharsList[Random.Range(0, TurnManager.Instance.enemyCharsList.Count)]);
+                    else
+                        for (int i = 0; i < 3; ++i)
+                            moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+
+                    oneTarget = true;
                     break;
+
+                // Target an ally
+                case (int)Targeting.OneAlly:
+                    break;
+
+                // Target all allies
+                case (int)Targeting.AllAllies:
+                    break;
+
+                // Target the user
                 case (int)Targeting.User:
-                    // target the user
                     break;
             }
         }
 
         private void AddEnemyTargets(Targeting t)
         {
-            if (t == Targeting.One_Enemy)
+            if (t == Targeting.OneEnemy)
                 moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
-            else if (t == Targeting.All_Enemies)
+            else if (t == Targeting.AllEnemies)
                 for (int i = 0; i < TurnManager.Instance.enemyCharsList.Count; ++i)
                     moveTargets.Add(TurnManager.Instance.enemyCharsList[i]);
+        }
+
+        public void DisplayAbilityName(string newString)
+        {
+            aDisplay.ChangeNameDisplay(newString);
+            aDisplay.ChangeDisplayOpacity(true);
         }
 
         // Deals damage to the current target(s) based on a shared modifier
         public void DealDamage(float modifier)
         {
-            for (int i = 0; i < moveTargets.Count; ++i)
+            int targ = newTarget + 1;
+            storedMod = modifier;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = newTarget; i < targ; ++i)
             {
                 int damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
-
+            
                 moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
                 moveTargets[i].GetComponent<CharData>().ChangeHP();
 
-                dText.DamageNumbers(damage, moveTargets[i].transform);
+                bool numEnd = true;
+                if (!oneTarget && i != targ - 1)
+                    numEnd = false;
+
+                dText.DamageNumbers(damage, moveTargets[i].transform, numEnd);
             }
+
+            if (!oneTarget || newTarget == moveTargets.Count - 1)
+                doneAttacking = true;
+            else
+                newTarget++;
         }
 
         private int DamageFormula(Stats a, Stats t, float mod)
         {
-            int i = (int)(((a.Attack() * a.Attack()) / t.Defense()) * mod * Random.Range(0.8f, 1.0f));
-            return i;
+            //int i = (int)(((a.Attack() * a.Attack()) / t.Defense()) * mod * Random.Range(0.8f, 1.0f));
+            float i = (int)((a.Attack() * (a.Attack() / 2)) * (1 + (1 - (0.3f * a.level))) * DAMAGE_MULT) / t.Defense();
+            i *= mod;
+            i *= Random.Range(0.8f, 1.0f);
+            return (int)i;
         }
 
         IEnumerator MovePlayerCharacter(Vector3 targetPos)

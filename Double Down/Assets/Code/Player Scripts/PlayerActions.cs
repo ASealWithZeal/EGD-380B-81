@@ -7,7 +7,10 @@ public enum Actions
     Attack = 0,
     Defend,
     Ability0,
-    Ability1
+    Ability1,
+    Ability2,
+    Ability3,
+    Ability4
 }
 
 public enum Char
