@@ -10,6 +10,7 @@ public class PlayerStatusUI : MonoBehaviour
     public Image tpBar = null;
     public List<Color> colors = null;
     private float lastHealth = 0;
+    private float lastTP = 0;
 
     public TextMeshProUGUI cHP;
     public TextMeshProUGUI mHP;
@@ -26,6 +27,7 @@ public class PlayerStatusUI : MonoBehaviour
     public void SetNewHP(int nCHP, int nMHP, int nCTP, int nMTP)
     {
         lastHealth = nCHP;
+        lastTP = nCTP;
         cHP.SetText(nCHP.ToString());
         mHP.SetText(nMHP.ToString());
 
@@ -36,6 +38,11 @@ public class PlayerStatusUI : MonoBehaviour
     public void ChangeHealth(float newHealthPercent, int currentHealth)
     {
         StartCoroutine(AlterHealthBar(newHealthPercent, currentHealth));
+    }
+
+    public void ChangeTP(float newTPPercent, int currentTP)
+    {
+        StartCoroutine(AlterTPBar(newTPPercent, currentTP));
     }
 
     IEnumerator AlterHealthBar(float newHealthPercent, int currentHealth)
@@ -75,6 +82,47 @@ public class PlayerStatusUI : MonoBehaviour
         healthBar.fillAmount = newHealthPercent;
         cHP.SetText(currentHealth.ToString());
         lastHealth = currentHealth;
+
+        yield return null;
+    }
+
+    IEnumerator AlterTPBar(float newTPPercent, int currentTP)
+    {
+        bool decrease = true;
+        float multiplier = 1;
+        if (tpBar.fillAmount < newTPPercent)
+        {
+            decrease = false;
+            multiplier = -1;
+        }
+
+        if (currentTP < 0)
+            currentTP = 0;
+
+        while ((decrease && tpBar.fillAmount > newTPPercent)
+            || (!decrease && tpBar.fillAmount < newTPPercent))
+        {
+            tpBar.fillAmount -= 0.005f * multiplier;
+
+            if ((decrease && lastTP > currentTP)
+                || (!decrease && lastTP < currentTP))
+            {
+                lastTP -= (0.15f * multiplier);
+                int newLastTP = (int)lastTP;
+                cTP.SetText(newLastTP.ToString());
+            }
+
+            //if (tpBar.fillAmount > 0.5f)
+            //    tpBar.color = colors[0];
+            //else if (tpBar.fillAmount <= 0.5f && tpBar.fillAmount > 0.25f)
+            //    tpBar.color = colors[1];
+
+            yield return new WaitForSeconds(0.005f);
+        }
+
+        tpBar.fillAmount = newTPPercent;
+        cTP.SetText(currentTP.ToString());
+        lastTP = currentTP;
 
         yield return null;
     }

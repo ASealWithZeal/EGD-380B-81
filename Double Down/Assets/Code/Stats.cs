@@ -67,6 +67,11 @@ public class Stats : MonoBehaviour
         return ((float)currentHP / maxHP);
     }
 
+    public float TPPercent()
+    {
+        return ((float)currentTP / maxTP);
+    }
+
     // Returns the character's current TP
     public int TP()
     {
@@ -104,27 +109,39 @@ public class Stats : MonoBehaviour
     public void TickModifierChanges()
     {
         // Ticks down attack changes
-        if (atkModTurns > 0)
+        if (atkModTurns > 1)
             atkModTurns--;
         else
             atkMod = 1;
 
         // Ticks down defense changes
-        if (defModTurns > 0)
+        if (defModTurns > 1)
             defModTurns--;
         else
             defMod = 1;
 
         // Ticks down speed changes
-        if (spdModTurns > 0)
+        if (spdModTurns > 1)
             spdModTurns--;
         else
             spdMod = 1;
+    }
+
+    public void SetAtkMod(float mod, int turns)
+    {
+        atkMod = mod;
+        atkModTurns = turns;
     }
 
     public void SetDefMod(float mod, int turns)
     {
         defMod = mod;
         defModTurns = turns;
+    }
+
+    public void SetSpdMod(float mod, int turns)
+    {
+        spdMod = mod;
+        spdModTurns = turns;
     }
 }

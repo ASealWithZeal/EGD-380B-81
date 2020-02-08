@@ -14,10 +14,10 @@ public class AbilityNameDisplay : MonoBehaviour
     public void ChangeNameDisplay(string newName)
     {
         float fontSize = text.fontSize;
-        float widener = newName.Length;
+        float widener = newName.Length * 2;
 
         if (newName.Length < 16)
-            widener = 16;
+            widener = 32;
 
         text.SetText(newName);
         displayObj.sizeDelta = new Vector2((newName.Length * (fontSize / 2)) + (widener), displayObj.sizeDelta.y);

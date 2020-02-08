@@ -42,6 +42,7 @@ namespace Managers
             {
                 // Ticks down the characters modifier changes
                 TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                TurnManager.Instance.t1[0].GetComponent<CharData>().delayTimer--;
                 origPos = TurnManager.Instance.t1[0].transform.position;
                 StartCoroutine(MovePlayerCharacter(moveTarget.position));
             }
@@ -148,7 +149,7 @@ namespace Managers
 
                     oneTarget = true;
                     break;
-                
+
                 // Target all enemies
                 case (int)Targeting.AllEnemies:
                     if (TurnManager.Instance.t1[0].tag == "Player")
@@ -195,6 +196,10 @@ namespace Managers
 
                 // Target the user
                 case (int)Targeting.User:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        moveTargets.Add(TurnManager.Instance.playerCharsList[0]);
+                    else
+                        moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
                     break;
             }
         }
@@ -225,7 +230,7 @@ namespace Managers
             for (int i = newTarget; i < targ; ++i)
             {
                 int damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
-            
+
                 moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
                 moveTargets[i].GetComponent<CharData>().ChangeHP();
 
@@ -242,17 +247,84 @@ namespace Managers
                 newTarget++;
         }
 
+        // Performs an ability with a non-damaging effect
+        public void UseStatusAbility(int type, float mod, int length, bool endTurn)
+        {
+            int targ = 1;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = 0; i < targ; ++i)
+            {
+                if (type == 0)
+                    moveTargets[i].GetComponent<Stats>().SetAtkMod(mod, length);
+                if (type == 1)
+                    moveTargets[i].GetComponent<Stats>().SetDefMod(mod, length);
+                if (type == 2)
+                    moveTargets[i].GetComponent<Stats>().SetSpdMod(mod, length);
+            }
+
+            if (endTurn)
+                StartCoroutine(EndNonDamageTextDisplay(0.5f));
+        }
+
+        // Prepares to let the user perform a delayed attack
+        public void UseDelayedAbility(string name, float mod, int delay, bool endTurn)
+        {
+            TurnManager.Instance.t1[0].GetComponent<CharData>().SetDelayedAttack(name, delay, mod, moveTargets);
+
+            if (endTurn)
+                StartCoroutine(EndNonDamageTextDisplay(0.5f));
+        }
+
+        private void PerformDelayedAbility(CharData c)
+        {
+            c.delayedAttack = false;
+            DisplayAbilityName(c.delayedAbilityName);
+
+            for (int i = 0; i < c.target.Count; ++i)
+            {
+                if (c.target[i] == null && c.target.Count == 1)
+                    c.target[i] = TurnManager.Instance.enemyCharsList[0];
+
+                moveTargets.Add(c.target[i]);
+            }
+
+            if (c.target.Count > 1)
+            {
+                oneTarget = false;
+            }
+
+            DealDamage(c.storedModifier);
+        }
+
+        IEnumerator EndNonDamageTextDisplay(float time)
+        {
+            yield return new WaitForSeconds(time);
+            doneAttacking = true;
+            aDisplay.ChangeDisplayOpacity(false);
+            FollowUpAction();
+            yield return null;
+        }
+
         private int DamageFormula(Stats a, Stats t, float mod)
         {
             //int i = (int)(((a.Attack() * a.Attack()) / t.Defense()) * mod * Random.Range(0.8f, 1.0f));
-            float i = (int)((a.Attack() * (a.Attack() / 2)) * (1 + (1 - (0.3f * a.level))) * DAMAGE_MULT) / t.Defense();
+            float i = ((a.Attack() * (a.Attack() / 2)) * (1 + (1 - (0.3f * a.level))) * DAMAGE_MULT) / t.Defense();
             i *= mod;
             i *= Random.Range(0.8f, 1.0f);
             return (int)i;
         }
 
+        public void ChangeVisibleMenuButtons(bool change)
+        {
+            combatMenu.GetComponent<PlayerCombatMenuManager>().ShowAbilities(change, TurnManager.Instance.t1[0]);
+        }
+
         IEnumerator MovePlayerCharacter(Vector3 targetPos)
         {
+            CharData c = TurnManager.Instance.t1[0].GetComponent<CharData>();
+
             while (TurnManager.Instance.t1[0].transform.position != targetPos)
             {
                 TurnManager.Instance.t1[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.t1[0].transform.position, targetPos, 0.125f);
@@ -260,16 +332,22 @@ namespace Managers
             }
 
             // IN FUTURE CHANGE
-            if (endingTurn)
+            if (!c.delayedAttack || c.delayTimer > 0)
             {
-                endingTurn = false;
-                TurnManager.Instance.EndRound();
+                if (endingTurn)
+                {
+                    endingTurn = false;
+                    TurnManager.Instance.EndRound();
+                }
+
+                else
+                {
+                    combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(true);
+                }
             }
 
             else
-            {
-                combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(true);
-            }
+                PerformDelayedAbility(c);
 
             yield return null;
         }
