@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerCombatMenuManager : MonoBehaviour
 {
@@ -71,6 +72,15 @@ public class PlayerCombatMenuManager : MonoBehaviour
         if (inter)
         {
             incs *= -1;
+            for (int i = 0; i < playerAbilitiesMenu.Count; ++i)
+            {
+                if (i == 0)
+                {
+                    playerAbilitiesMenu[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityName(i));
+                    playerAbilitiesMenu[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i) + " TP");
+                }
+            }
+
             for (int i = 0; i < playerMenu.Count; ++i)
             {
                 playerMenu[i].GetComponent<Button>().interactable = !inter;
@@ -109,7 +119,7 @@ public class PlayerCombatMenuManager : MonoBehaviour
         {
             for (int i = 0; i < playerMenu.Count; ++i)
             {
-                if (Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= 6)
+                if (Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i))
                     playerAbilitiesMenu[i].GetComponent<Button>().interactable = inter;
             }
             playerAbilitiesMenu[0].GetComponent<Button>().Select();

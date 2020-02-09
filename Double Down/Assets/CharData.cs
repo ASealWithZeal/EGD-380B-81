@@ -19,6 +19,7 @@ public class CharData : MonoBehaviour
 
     public GameObject charUI;
     public Stats charStats;
+    public bool hasActed = false;
 
     private void Start()
     {

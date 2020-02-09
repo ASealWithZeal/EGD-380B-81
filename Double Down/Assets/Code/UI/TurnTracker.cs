@@ -57,11 +57,45 @@ public class TurnTracker : MonoBehaviour
         //        Destroy(t2[0]);
         //    t2.Remove(t2[0]);
         //}
-
-        Debug.Log("DED");
+        
         StartCoroutine(ShiftNonDestroyedTrackers());
 
         //SetUpTrackers(l2, 2, false);
+    }
+
+    public void ReorderTrackers(List<GameObject> l1, List<GameObject> l2)
+    {
+        bool sorted = false;
+        GameObject temp;
+        while (!sorted)
+        {
+            sorted = true;
+
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                //Debug.Log(t1[0].GetComponent<TurnTrackerObj>().obj + ", " + l1[0]);
+                if (t1[0] != null && t1.Count > 0 && i > 1 && t1[i].GetComponent<TurnTrackerObj>().obj != l1[i])
+                {
+                    sorted = false;
+
+                    temp = t1[i];
+                    t1[i] = t1[i - 1];
+                    t1[i - 1] = temp;
+                }
+            }
+
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                if (t2.Count > 0 && i != 0 && t2[i].GetComponent<TurnTrackerObj>().obj != l2[i])
+                {
+                    sorted = false;
+
+                    temp = t2[i];
+                    t2[i] = t2[i - 1];
+                    t2[i - 1] = temp;
+                }
+            }
+        }
     }
 
     // Creates a tracker at a specific index

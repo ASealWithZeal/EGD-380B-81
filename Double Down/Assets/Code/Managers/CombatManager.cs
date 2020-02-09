@@ -192,6 +192,14 @@ namespace Managers
 
                 // Target all allies
                 case (int)Targeting.AllAllies:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+                            moveTargets.Add(TurnManager.Instance.playerCharsList[i]);
+                    else
+                        for (int i = 0; i < TurnManager.Instance.enemyCharsList.Count; ++i)
+                            moveTargets.Add(TurnManager.Instance.enemyCharsList[i]);
+
+                    oneTarget = false;
                     break;
 
                 // Target the user
@@ -245,6 +253,49 @@ namespace Managers
                 doneAttacking = true;
             else
                 newTarget++;
+        }
+
+        // Deals damage to the current target(s) based on a shared modifier
+        public int DealDamageWithAbsorb(float modifier)
+        {
+            int damage = 0;
+            int targ = 1;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = 0; i < targ; ++i)
+            {
+                damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
+
+                moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                moveTargets[i].GetComponent<CharData>().ChangeHP();
+
+                dText.DamageNumbers(damage, moveTargets[i].transform, false);
+            }
+
+            return damage;
+        }
+
+        // Restores health to all specified targets
+        public void RestoreHealth(int amount)
+        {
+            int targ = 1;
+            bool canEnd = false;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = 0; i < targ; ++i)
+            {
+                moveTargets[i].GetComponent<Stats>().ReduceHP(-amount);
+                moveTargets[i].GetComponent<CharData>().ChangeHP();
+
+                if (i == targ - 1)
+                    canEnd = true;
+
+                dText.DamageNumbers(-amount, moveTargets[i].transform, canEnd);
+            }
+
+            doneAttacking = true;
         }
 
         // Performs an ability with a non-damaging effect

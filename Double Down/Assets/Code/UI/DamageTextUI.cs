@@ -12,6 +12,8 @@ public class DamageTextUI : MonoBehaviour
     public Canvas parentCanvas;
     private Vector2 uiOffset;
 
+    public List<Color> textColors;
+
     public float timeBetweenButtons = 0.05f;
 
     /// <summary>
@@ -30,6 +32,17 @@ public class DamageTextUI : MonoBehaviour
 
     public IEnumerator SpawnDamageNumbers(int damage, Transform target, bool canEnd)
     {
+        Color currentColor;
+
+        if (damage < 0)
+        {
+            damage = Mathf.Abs(damage);
+            currentColor = textColors[1];
+        }
+
+        else
+            currentColor = textColors[0];
+
         string dam = damage.ToString();
         float textOffset = (dam.Length - 1) * 0.5f;
         float offsetMod = 6.3f - (dam.Length * 0.25f);
@@ -42,8 +55,7 @@ public class DamageTextUI : MonoBehaviour
             GameObject newText = Instantiate(textObject, GetComponent<RectTransform>());
 
             newText.GetComponent<TextMeshProUGUI>().fontSize = 35.0f;
-            //newText.GetComponent<TextMeshProUGUI>().SetText(damage.ToString());
-
+            newText.GetComponent<TextMeshProUGUI>().color = currentColor;
             newText.GetComponent<TextMeshProUGUI>().SetText(dam[i].ToString());
 
             // Get the position on the canvas

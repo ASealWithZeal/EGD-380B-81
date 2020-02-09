@@ -62,6 +62,9 @@ namespace Managers
 
         public void StartGlobalTurn()
         {
+            for (int i = 0; i < combatChars.Count; ++i)
+                combatChars[i].GetComponent<CharData>().hasActed = false;
+
             SetTurnOrder();
             tracker.SetUpTrackers(t2, 2, false);
         }
@@ -69,6 +72,7 @@ namespace Managers
         // Starts a turn of gameplay
         public void StartRound()
         {
+            t1[0].GetComponent<CharData>().hasActed = true;
             tracker.MoveTracker(0);
         }
 
@@ -130,7 +134,7 @@ namespace Managers
             {
                 for (int i = 0; i < combatChars.Count; ++i)
                 {
-                    if (t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed())
+                    if (t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed() && !t1[i - 1].GetComponent<CharData>().hasActed)
                     {
                         sorted = false;
 

@@ -482,6 +482,9 @@ MonoBehaviour:
     type: 3}
   targetPos: {fileID: 1940500299}
   parentCanvas: {fileID: 386132070}
+  textColors:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0.41960785, a: 1}
   timeBetweenButtons: 0.05
 --- !u!1 &61372003
 GameObject:
@@ -2920,8 +2923,8 @@ GameObject:
   - component: {fileID: 327827564}
   - component: {fileID: 327827565}
   - component: {fileID: 327827567}
-  - component: {fileID: 327827566}
   - component: {fileID: 327827568}
+  - component: {fileID: 327827566}
   m_Layer: 0
   m_Name: Char2
   m_TagString: Player
@@ -3028,7 +3031,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 327827562}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 378946a8aac5cf6468ee1f090d6bed33, type: 3}
+  m_Script: {fileID: 11500000, guid: 70914eb20f3e1d647b874d0df34be4c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   charStats: {fileID: 327827565}
@@ -3038,11 +3041,11 @@ MonoBehaviour:
   defendName: Defend
   defendMod: 0
   defendTarget: 6
-  ability0Name: Heavy Slash
-  ability0Mod: 0
-  ability0Delay: 1
-  ability0Cost: 6
+  ability0Name: Blood Draw
+  ability0Mod: 1
+  ability0Cost: 4
   ability0Target: 0
+  ability0HealTarget: 5
 --- !u!114 &327827567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3055,7 +3058,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 767be362d52b324478091fcecdd203cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  character: 0
+  character: 1
 --- !u!114 &327827568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3078,6 +3081,7 @@ MonoBehaviour:
   targetSprite: []
   charUI: {fileID: 2116764837}
   charStats: {fileID: 327827565}
+  hasActed: 0
 --- !u!1 &336820938
 GameObject:
   m_ObjectHideFlags: 0
@@ -3923,6 +3927,7 @@ MonoBehaviour:
   targetSprite: []
   charUI: {fileID: 2017770852}
   charStats: {fileID: 480594855}
+  hasActed: 0
 --- !u!1 &485373114
 GameObject:
   m_ObjectHideFlags: 0
@@ -5118,7 +5123,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 0.5882353}
     m_PressedColor: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 0.5882353}
     m_SelectedColor: {r: 0.19607843, g: 0.19607843, b: 0.39215687, a: 0.5882353}
-    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.5882353}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.39215687}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -12061,7 +12066,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 0.5882353}
     m_PressedColor: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 0.5882353}
     m_SelectedColor: {r: 0.19607843, g: 0.19607843, b: 0.39215687, a: 0.5882353}
-    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.5882353}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.39215687}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -15308,6 +15313,7 @@ MonoBehaviour:
   targetSprite: []
   charUI: {fileID: 1231297121}
   charStats: {fileID: 1940500301}
+  hasActed: 0
 --- !u!114 &1940500304
 MonoBehaviour:
   m_ObjectHideFlags: 0
