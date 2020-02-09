@@ -333,6 +333,9 @@ namespace Managers
             c.delayedAttack = false;
             DisplayAbilityName(c.delayedAbilityName);
 
+            for (int i = 0; i < moveTargets.Count; ++i)
+                moveTargets.Remove(moveTargets[i]);
+
             for (int i = 0; i < c.target.Count; ++i)
             {
                 if (c.target[i] == null && c.target.Count == 1)
