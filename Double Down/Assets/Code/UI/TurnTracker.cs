@@ -36,6 +36,16 @@ public class TurnTracker : MonoBehaviour
             StartCoroutine(CreateT2TrackerUI(l));
     }
 
+    public void HighlightSelectedTrackers(GameObject obj)
+    {
+        for (int i = 0; i < t1.Count; ++i)
+            if (t1[i].GetComponent<TurnTrackerObj>().obj == obj)
+                t1[i].GetComponent<TurnTrackerObj>().Select();
+        for (int i = 0; i < t2.Count; ++i)
+            if (t2[i].GetComponent<TurnTrackerObj>().obj == obj)
+                t2[i].GetComponent<TurnTrackerObj>().Select();
+    }
+
     public void ResetTrackers()
     {
         //int c = t1.Count;
@@ -74,7 +84,7 @@ public class TurnTracker : MonoBehaviour
             for (int i = 0; i < t1.Count; ++i)
             {
                 //Debug.Log(t1[0].GetComponent<TurnTrackerObj>().obj + ", " + l1[0]);
-                if (t1[0] != null && t1.Count > 0 && i > 1 && t1[i].GetComponent<TurnTrackerObj>().obj != l1[i])
+                if (t1[0] != null && t1.Count > 0 && i > 0 && t1[i].GetComponent<TurnTrackerObj>().obj != l1[i])
                 {
                     sorted = false;
 

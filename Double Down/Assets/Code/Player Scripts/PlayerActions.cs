@@ -26,13 +26,13 @@ public class PlayerActions : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void CheckAction(int action)
@@ -41,29 +41,56 @@ public class PlayerActions : MonoBehaviour
         {
             case (int)Actions.Attack:
                 if (character == Char.Char0)
-                    GetComponent<Attacker>().Attack();
+                    GetComponent<Attacker>().SetAttack();
                 else if (character == Char.Char1)
-                    GetComponent<Healer>().Attack();
+                    GetComponent<Healer>().SetAttack();
                 break;
 
             case (int)Actions.Defend:
                 if (character == Char.Char0)
-                    GetComponent<Attacker>().Defend();
+                    GetComponent<Attacker>().SetDefend();
                 else if (character == Char.Char1)
-                    GetComponent<Healer>().Defend();
+                    GetComponent<Healer>().SetDefend();
                 break;
 
             case (int)Actions.Ability0:
                 if (character == Char.Char0)
-                    GetComponent<Attacker>().Ability0();
+                    GetComponent<Attacker>().SetAbility0();
                 else if (character == Char.Char1)
-                    GetComponent<Healer>().Ability0();
+                    GetComponent<Healer>().SetAbility0();
+                break;
+        }
+
+    }
+
+    public void PerformAction(int action)
+    {
+        switch (action)
+        {
+            case (int)Actions.Attack:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().PerformAttack();
+                else if (character == Char.Char1)
+                    GetComponent<Healer>().PerformAttack();
+                break;
+
+            case (int)Actions.Defend:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().PerformDefend();
+                else if (character == Char.Char1)
+                    GetComponent<Healer>().PerformDefend();
+                break;
+
+            case (int)Actions.Ability0:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().PerformAbility0();
+                else if (character == Char.Char1)
+                    GetComponent<Healer>().PerformAbility0();
                 break;
 
             case (int)Actions.Ability1:
                 break;
         }
-            
     }
 
     public string GetAbilityName(int i)

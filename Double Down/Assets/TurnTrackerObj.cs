@@ -5,6 +5,7 @@ using UnityEngine;
 public class TurnTrackerObj : MonoBehaviour
 {
     public GameObject obj;
+    public GameObject selector;
 
     // Start is called before the first frame update
     void Start()
@@ -16,5 +17,10 @@ public class TurnTrackerObj : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void Select()
+    {
+        selector.SetActive(!selector.activeSelf);
     }
 }

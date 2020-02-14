@@ -37,7 +37,7 @@ namespace Managers
                 t2.Add(combatChars[i]);
             }
 
-            SetTurnOrder();
+            SetTurnOrder(true);
             tracker.SetUpTrackers(t1, 1, true);
             tracker.SetUpTrackers(t2, 2, false);
         }
@@ -64,14 +64,13 @@ namespace Managers
         {
             for (int i = 0; i < combatChars.Count; ++i)
                 combatChars[i].GetComponent<CharData>().hasActed = false;
-
-            SetTurnOrder();
             tracker.SetUpTrackers(t2, 2, false);
         }
 
         // Starts a turn of gameplay
         public void StartRound()
         {
+            SetTurnOrder(false);
             t1[0].GetComponent<CharData>().hasActed = true;
             tracker.MoveTracker(0);
         }
@@ -116,15 +115,15 @@ namespace Managers
             for (int i = 0; i < combatChars.Count; ++i)
                 t2.Add(combatChars[i]);
 
-            tracker.MoveTracker(1);
+            SetTurnOrder(false);
+            tracker.ReorderTrackers(t1, t2);
 
-            //SetTurnOrder();
-            //StartRound();
+            tracker.MoveTracker(1);
         }
 
         // Sorts the character order for each turn
         // Can be used to re-sort the order mid-turn
-        private void SetTurnOrder()
+        private void SetTurnOrder(bool init)
         {
             bool sorted = false;
             bool sorting = true;
@@ -134,7 +133,7 @@ namespace Managers
             {
                 for (int i = 0; i < combatChars.Count; ++i)
                 {
-                    if (t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed() && !t1[i - 1].GetComponent<CharData>().hasActed)
+                    if (t1.Count > i && t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed() && !t1[i - 1].GetComponent<CharData>().hasActed)
                     {
                         sorted = false;
 
@@ -159,6 +158,9 @@ namespace Managers
                 else
                     sorting = false;
             }
+
+            //if (!init)
+                //tracker.ReorderTrackers(t1, t2);
         }
     }
 }

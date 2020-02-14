@@ -7,6 +7,7 @@ public class EnemyUI : MonoBehaviour
 {
     public Image healthBar = null;
     public List<Color> colors = null;
+    public Canvas parentCanvas = null;
 
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,25 @@ public class EnemyUI : MonoBehaviour
     public void ChangeHealth(float newHealthPercent)
     {
         StartCoroutine(AlterHealthBar(newHealthPercent));
+    }
+
+    public void CreateUI(Transform objTransform)
+    {
+        // Get the position on the canvas
+        Vector2 uiOffset = new Vector2(parentCanvas.GetComponent<RectTransform>().sizeDelta.x / 2f, parentCanvas.GetComponent<RectTransform>().sizeDelta.y / 2f);
+
+        Vector2 sprite_size = objTransform.gameObject.GetComponent<SpriteRenderer>().sprite.rect.size;
+
+        //convert to screen space size
+        Vector3 size = new Vector3(0, (sprite_size.y / 2.0f), 0);
+
+        Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(objTransform.position - size);
+        Vector2 proportionalPosition = new Vector2(ViewportPosition.x * parentCanvas.GetComponent<RectTransform>().sizeDelta.x, ViewportPosition.y * parentCanvas.GetComponent<RectTransform>().sizeDelta.y);
+        Vector2 actualPosition = proportionalPosition - uiOffset;
+        actualPosition.y = (actualPosition.y / objTransform.localScale.y) - 15.0f;
+
+        // Set the position and remove the screen offset
+        gameObject.transform.localPosition = actualPosition;
     }
 
     IEnumerator AlterHealthBar(float newHealthPercent)

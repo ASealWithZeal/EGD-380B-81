@@ -30,9 +30,16 @@ namespace Managers
         private bool doneAttacking = false;
         private int newTarget = 0;
         private float storedMod = 0.0f;
+        private int storedAbility = -1;
 
         private Vector3 origPos;
         private bool endingTurn = false;
+        private bool settingTarget = false;
+
+        private void Update()
+        {
+            SelectTargets();
+        }
 
         // Starts each character's round of combat
         public void StartRound()
@@ -76,6 +83,7 @@ namespace Managers
             }
         }
 
+        // Performs a follow-up action or instantly ends the turn
         public void FollowUpAction()
         {
             if (doneAttacking)
@@ -84,18 +92,16 @@ namespace Managers
 
                 endingTurn = true;
                 bool canMoveOn = true;
-                for (int i = 0; i < moveTargets.Count; ++i)
-                    if (moveTargets[i].GetComponent<Stats>().HP() <= 0)
+                for (int i = 0; i < TurnManager.Instance.combatChars.Count; ++i)
+                    if (TurnManager.Instance.combatChars[i].GetComponent<Stats>().HP() <= 0)
                     {
-                        if (moveTargets[i].tag == "Player")
-                            TurnManager.Instance.playerCharsList.Remove(moveTargets[i]);
+                        if (TurnManager.Instance.combatChars[i].tag == "Player")
+                            TurnManager.Instance.playerCharsList.Remove(TurnManager.Instance.combatChars[i]);
                         else
-                            TurnManager.Instance.enemyCharsList.Remove(moveTargets[i]);
+                            TurnManager.Instance.enemyCharsList.Remove(TurnManager.Instance.combatChars[i]);
 
-                        TurnManager.Instance.combatChars.Remove(moveTargets[i]);
-                        Destroy(moveTargets[i]);
-
-                        //endingTurn = false;
+                        TurnManager.Instance.combatChars[i].GetComponent<CharData>().KillChar();
+                        TurnManager.Instance.combatChars.Remove(TurnManager.Instance.combatChars[i]);
                     }
 
                 if (TurnManager.Instance.enemyCharsList.Count == 0)
@@ -131,6 +137,109 @@ namespace Managers
 
             else
                 DealDamage(storedMod);
+        }
+
+        // Sets up an action before targeting the relevant character(s)
+        public void SetUpAction(int type)
+        {
+            storedAbility = type;
+            Invoke("SetTarget", 0.0125f);
+            for (int i = 0; i < moveTargets.Count; ++i)
+            {
+                moveTargets[i].GetComponent<CharData>().Targeted();
+                TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[i]);
+            }
+        }
+
+        private void SetTarget()
+        {
+            settingTarget = true;
+        }
+
+        private void SelectTargets()
+        {
+            if (settingTarget)
+            {
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                    PerformAction();
+
+                else if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    for (int i = 0; i < moveTargets.Count; ++i)
+                    {
+                        moveTargets[i].GetComponent<CharData>().Targeted();
+                        TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[i]);
+                    }
+
+                    settingTarget = false;
+                    combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(true);
+                }
+
+                else if (oneTarget && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow)))
+                {
+                    if (moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
+                        TargetDown(TurnManager.Instance.playerCharsList);
+
+                    else if (moveTargets[0].tag != "Player" && TurnManager.Instance.enemyCharsList.Count > 1)
+                        TargetDown(TurnManager.Instance.enemyCharsList);
+                }
+
+                else if (oneTarget && (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow)))
+                {
+                    if (moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
+                        TargetUp(TurnManager.Instance.playerCharsList);
+
+                    else if (moveTargets[0].tag != "Player" && TurnManager.Instance.enemyCharsList.Count > 1)
+                        TargetUp(TurnManager.Instance.enemyCharsList);
+                }
+            }
+        }
+
+        // Targets one below the current target
+        private void TargetDown(List<GameObject> l)
+        {
+            int num = 0;
+            for (int i = 0; i < l.Count; ++i)
+            {
+                if (l[i] == moveTargets[0] && i > 0)
+                    num = i - 1;
+                else if (l[i] == moveTargets[0] && i == 0)
+                    num = l.Count - 1;
+            }
+            moveTargets[0].GetComponent<CharData>().Targeted();
+            TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[0]);
+            SetTarget(l[num]);
+        }
+
+        // Targets one above the current target
+        private void TargetUp(List<GameObject> l)
+        {
+            int num = 0;
+            for (int i = 0; i < l.Count; ++i)
+            {
+                if (l[i] == moveTargets[0] && i < l.Count - 1)
+                    num = i + 1;
+                else if (l[i] == moveTargets[0] && i == l.Count - 1)
+                    num = 0;
+            }
+            moveTargets[0].GetComponent<CharData>().Targeted();
+            TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[0]);
+            SetTarget(l[num]);
+        }
+
+        private void PerformAction()
+        {
+            settingTarget = false;
+
+            // Stops targeting ALL targets
+            for (int i = 0; i < moveTargets.Count; ++i)
+            {
+                moveTargets[i].GetComponent<CharData>().Targeted();
+                TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[i]);
+            }
+
+            if (TurnManager.Instance.t1[0].tag == "Player")
+                TurnManager.Instance.t1[0].GetComponent<PlayerActions>().PerformAction(storedAbility);
         }
 
         public void SetTarget(int targetType)
@@ -204,12 +313,21 @@ namespace Managers
 
                 // Target the user
                 case (int)Targeting.User:
-                    if (TurnManager.Instance.t1[0].tag == "Player")
-                        moveTargets.Add(TurnManager.Instance.playerCharsList[0]);
-                    else
-                        moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
+                    moveTargets.Add(TurnManager.Instance.t1[0]);
+
+                    oneTarget = false;
                     break;
             }
+        }
+
+        private void SetTarget(GameObject newTarget)
+        {
+            for (int i = 0; i < moveTargets.Count; ++i)
+                moveTargets.Remove(moveTargets[i]);
+
+            moveTargets.Add(newTarget);
+            newTarget.GetComponent<CharData>().Targeted();
+            TurnManager.Instance.tracker.HighlightSelectedTrackers(newTarget);
         }
 
         private void AddEnemyTargets(Targeting t)

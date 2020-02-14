@@ -53,6 +53,10 @@ public class Stats : MonoBehaviour
     public void ReduceHP(int i)
     {
         currentHP -= i;
+        if (currentHP <= 0)
+            currentHP = 0;
+        else if (currentHP > maxHP)
+            currentHP = maxHP;
     }
 
     // Returns the character's current HP

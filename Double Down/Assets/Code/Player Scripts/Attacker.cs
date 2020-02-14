@@ -24,28 +24,40 @@ public class Attacker : MonoBehaviour
     public Targeting ability0Target;
 
     // Perform a simple attack
-    public void Attack()
+    public void SetAttack()
+    {
+        Managers.CombatManager.Instance.SetTarget((int)attackTarget);
+        Managers.CombatManager.Instance.SetUpAction(0);
+    }
+    public void PerformAttack()
     {
         // Animation
         Managers.CombatManager.Instance.DisplayAbilityName(attackName);
-        Managers.CombatManager.Instance.SetTarget((int)attackTarget);
         Managers.CombatManager.Instance.DealDamage(attackMod);
     }
 
     // Guards for a turn, raising defense
-    public void Defend()
+    public void SetDefend()
+    {
+        Managers.CombatManager.Instance.SetTarget((int)defendTarget);
+        Managers.CombatManager.Instance.SetUpAction(1);
+    }
+    public void PerformDefend()
     {
         // Animation
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
-        Managers.CombatManager.Instance.SetTarget((int)defendTarget);
         Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true);
     }
 
     // Uses Heavy Slash
-    public void Ability0()
+    public void SetAbility0()
+    {
+        Managers.CombatManager.Instance.SetTarget((int)ability0Target);
+        Managers.CombatManager.Instance.SetUpAction(2);
+    }
+    public void PerformAbility0()
     {
         // Animation
-        charStats.SetSpdMod(0.01f, 1);
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
