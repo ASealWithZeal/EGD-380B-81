@@ -5,6 +5,9 @@ using UnityEngine;
 public class CharData : MonoBehaviour
 {
     public bool targeting;
+    [HideInInspector] public bool isInCombat = true;
+    public int t1Pos = 0;
+    public int t2Pos = 0;
 
     [Header("Delayed Attack Info")]
     public string delayedAbilityName;
@@ -70,11 +73,12 @@ public class CharData : MonoBehaviour
     IEnumerator DeathAnim()
     {
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+        isInCombat = false;
 
         while (sr.color.a > 0)
         {
             sr.color -= new Color(0.07f, 0.07f, 0.07f, 0.1f);
-            yield return new WaitForSeconds(0.0125f);
+            yield return new WaitForSeconds(0.025f);
         }
         
         if (gameObject.tag != "Player")

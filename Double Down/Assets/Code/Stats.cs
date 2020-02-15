@@ -34,14 +34,19 @@ public class Stats : MonoBehaviour
 
     [Header("Level and Experience")]
     public int level = 1;
+    [HideInInspector] public int startingLevel = 1;
     public int exp = 0;
-    public int nextLevelExp = 50;
+    [HideInInspector] public int startingExp = 0;
+    public List<int> nextLevelExp = new List<int>();
+    [HideInInspector] public int lastLevelUpEXP = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         currentHP = maxHP;
         currentTP = maxTP;
+        lastLevelUpEXP = 0;
+        startingExp = 0;
     }
 
     // Update is called once per frame
@@ -109,26 +114,43 @@ public class Stats : MonoBehaviour
         return i;
     }
 
+    // Returns the expected speed for NEXT TURN
+    public int NextSpeed(bool hasActed)
+    {
+        if (hasActed && spdModTurns - 1 < 0)
+            return spd;
+        else if (!hasActed && spdModTurns - 2 < 0)
+            return spd;
+        else
+            return Speed();
+    }
+
     // Ticks down the modifier turn count at the end of each turn
     public void TickModifierChanges()
     {
         // Ticks down attack changes
-        if (atkModTurns > 1)
-            atkModTurns--;
-        else
+        atkModTurns--;
+        if (atkModTurns <= 0)
+        {
             atkMod = 1;
+            atkModTurns = 0;
+        }
 
         // Ticks down defense changes
-        if (defModTurns > 1)
-            defModTurns--;
-        else
+        defModTurns--;
+        if (defModTurns <= 0)
+        {
             defMod = 1;
+            defModTurns = 0;
+        }
 
         // Ticks down speed changes
-        if (spdModTurns > 1)
-            spdModTurns--;
-        else
+        spdModTurns--;
+        if (spdModTurns <= 0)
+        {
             spdMod = 1;
+            spdModTurns = 0;
+        }
     }
 
     public void SetAtkMod(float mod, int turns)
@@ -147,5 +169,35 @@ public class Stats : MonoBehaviour
     {
         spdMod = mod;
         spdModTurns = turns;
+    }
+
+    // Give a character experience and let them level up, if possible
+    public void GainEXP(int winEXP)
+    {
+        startingLevel = level;
+        startingExp = exp;
+        exp += winEXP;
+        if (level < nextLevelExp.Count + 1 && exp > nextLevelExp[level - 1])
+        {
+            LevelUp(winEXP);
+        }
+    }
+
+    public void LevelUp(int winEXP)
+    {
+        level++;
+        exp = winEXP - nextLevelExp[level - 2];
+        lastLevelUpEXP = nextLevelExp[level - 2];
+
+        maxHP += HPGain;
+        maxTP += TPGain;
+        atk += atkGain;
+        def += defGain;
+        spd += spdGain;
+
+        if (level < nextLevelExp.Count + 1 && exp > nextLevelExp[level - 1])
+        {
+            LevelUp(winEXP);
+        }
     }
 }

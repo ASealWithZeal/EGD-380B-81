@@ -73,10 +73,11 @@ public class TurnTracker : MonoBehaviour
         //SetUpTrackers(l2, 2, false);
     }
 
-    public void ReorderTrackers(List<GameObject> l1, List<GameObject> l2)
+    public void ReorderTrackers()
     {
         bool sorted = false;
         GameObject temp;
+        Vector3 origPos = new Vector3();
         while (!sorted)
         {
             sorted = true;
@@ -84,24 +85,31 @@ public class TurnTracker : MonoBehaviour
             for (int i = 0; i < t1.Count; ++i)
             {
                 //Debug.Log(t1[0].GetComponent<TurnTrackerObj>().obj + ", " + l1[0]);
-                if (t1[0] != null && t1.Count > 0 && i > 0 && t1[i].GetComponent<TurnTrackerObj>().obj != l1[i])
+                if (t1[0] != null && t1.Count > 0 && i > 0 && t1[i].GetComponent<TurnTrackerObj>().objData.t1Pos < t1[i - 1].GetComponent<TurnTrackerObj>().objData.t1Pos)
                 {
                     sorted = false;
 
+                    origPos = t1[i].transform.position;
                     temp = t1[i];
+                    temp.transform.position = t1[i].transform.position;
+                    t1[i].transform.position = t1[i - 1].transform.position;
                     t1[i] = t1[i - 1];
+                    t1[i - 1].transform.position = origPos;
                     t1[i - 1] = temp;
                 }
             }
 
             for (int i = 0; i < t2.Count; ++i)
             {
-                if (t2.Count > 0 && i != 0 && t2[i].GetComponent<TurnTrackerObj>().obj != l2[i])
+                if (t2.Count > 0 && i != 0 && t2[i].GetComponent<TurnTrackerObj>().objData.t2Pos < t2[i - 1].GetComponent<TurnTrackerObj>().objData.t2Pos)
                 {
                     sorted = false;
 
+                    origPos = t2[i].transform.position;
                     temp = t2[i];
+                    t2[i].transform.position = t2[i - 1].transform.position;
                     t2[i] = t2[i - 1];
+                    t2[i - 1].transform.position = origPos;
                     t2[i - 1] = temp;
                 }
             }
@@ -157,6 +165,7 @@ public class TurnTracker : MonoBehaviour
             g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
             g.GetComponent<TurnTrackerObj>().obj = l[i];
+            g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
 
             g.transform.position = t1Tracker[i + 1].rectTransform.position;
             g.transform.localScale = t1Tracker[i + 1].rectTransform.localScale * 2;
@@ -196,6 +205,7 @@ public class TurnTracker : MonoBehaviour
             g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
             g.GetComponent<TurnTrackerObj>().obj = l[i];
+            g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
 
             g.transform.position = t2Tracker[i].rectTransform.position;
             g.transform.localScale = t2Tracker[i].rectTransform.localScale * 2;
@@ -234,18 +244,18 @@ public class TurnTracker : MonoBehaviour
         // Destroy all T1 trackers
         for (int i = 0; i < t1.Count; ++i)
         {
-            if (t1[i].GetComponent<TurnTrackerObj>().obj == null)
+            if (!t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
                 StartCoroutine(DestroyTracker(t1[i]));
         }
 
         // Destroy all T2 trackers
         for (int i = 0; i < t2.Count; ++i)
         {
-            if (t2[i].GetComponent<TurnTrackerObj>().obj == null)
+            if (!t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
                 StartCoroutine(DestroyTracker(t2[i]));
         }
 
-        yield return new WaitForSeconds(0.125f + (1 / 0.1f) * timeIncrements);
+        yield return new WaitForSeconds(0.1f + (1 / 0.1f) * timeIncrements);
 
         float mainInc = (240 / seconds) * timeIncrements;
         float incs = (200 / seconds) * timeIncrements;
@@ -264,7 +274,7 @@ public class TurnTracker : MonoBehaviour
                     t1[i].transform.position -= new Vector3(incs, 0);
                 }
 
-                else if (i == 0 && t1[0].transform.position.x > t1Tracker[0].transform.position.x)
+                else if (i == 0 && t1[0].transform.position.x > t1Tracker[0].transform.position.x + 0.01f)
                 {
                     t1[0].transform.position -= new Vector3(mainInc, 0);
                     if (t1[0].transform.localScale.x < 1.5f)
@@ -284,8 +294,8 @@ public class TurnTracker : MonoBehaviour
             yield return new WaitForSeconds(timeIncrements);
 
             // Sets T1 and T2 to make sure the new positions are accurate
-            if (t1[t1.Count - 1].transform.position.x <= t1Tracker[t1.Count - 1].transform.position.x &&
-                t2[t2.Count - 1].transform.position.x <= t2Tracker[t2.Count - 1].transform.position.x)
+            if (t1[t1.Count - 1].transform.position.x <= t1Tracker[t1.Count - 1].transform.position.x + 0.01f &&
+                t2[t2.Count - 1].transform.position.x <= t2Tracker[t2.Count - 1].transform.position.x + 0.01f)
             {
                 for (int i = 0; i < t1.Count; ++i)
                 {
@@ -358,7 +368,7 @@ public class TurnTracker : MonoBehaviour
     IEnumerator MoveTurnTrackerUI(int j)
     {
         bool moving = true;
-
+        
         yield return new WaitForSeconds(0.1f);
 
         float mainInc = (240 / seconds) * timeIncrements;

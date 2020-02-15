@@ -30,6 +30,7 @@ namespace Managers
         private bool doneAttacking = false;
         private int newTarget = 0;
         private float storedMod = 0.0f;
+        private int winEXP = 0;
         private int storedAbility = -1;
 
         private Vector3 origPos;
@@ -98,7 +99,11 @@ namespace Managers
                         if (TurnManager.Instance.combatChars[i].tag == "Player")
                             TurnManager.Instance.playerCharsList.Remove(TurnManager.Instance.combatChars[i]);
                         else
+                        {
+                            // Increases the battle's EXP point gain
+                            winEXP += TurnManager.Instance.combatChars[i].GetComponent<Stats>().exp;
                             TurnManager.Instance.enemyCharsList.Remove(TurnManager.Instance.combatChars[i]);
+                        }
 
                         TurnManager.Instance.combatChars[i].GetComponent<CharData>().KillChar();
                         TurnManager.Instance.combatChars.Remove(TurnManager.Instance.combatChars[i]);
@@ -108,8 +113,8 @@ namespace Managers
                 {
                     canMoveOn = false;
                     for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
-                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().exp += 50;
-                    winCanvas.ShowWinCanvas();
+                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(winEXP / TurnManager.Instance.playerCharsList.Count);
+                    winCanvas.ShowWinCanvas(winEXP / TurnManager.Instance.playerCharsList.Count);
                 }
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {
@@ -463,9 +468,7 @@ namespace Managers
             }
 
             if (c.target.Count > 1)
-            {
                 oneTarget = false;
-            }
 
             DealDamage(c.storedModifier);
         }

@@ -6,6 +6,7 @@ public class TurnTrackerObj : MonoBehaviour
 {
     public GameObject obj;
     public GameObject selector;
+    public CharData objData;
 
     // Start is called before the first frame update
     void Start()

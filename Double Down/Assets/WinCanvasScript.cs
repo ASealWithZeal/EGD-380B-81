@@ -7,6 +7,7 @@ public class WinCanvasScript : MonoBehaviour
 {
     public Stats charStats;
     public bool done = false;
+    public List<Color> fullTextColor;
 
     [Header("EXP Meter")]
     public TextMeshProUGUI expText;
@@ -45,32 +46,58 @@ public class WinCanvasScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void UpdateUI()
+    public void UpdateUI(int earnedEXP)
     {
-        StartCoroutine(UpdatePlayerUI());
+        StartCoroutine(UpdatePlayerUI(earnedEXP));
     }
 
-    IEnumerator UpdatePlayerUI()
+    IEnumerator UpdatePlayerUI(int earnedEXP)
     {
-        expText.SetText("+" + charStats.exp.ToString());
-        neededEXPText.SetText("Next: " + charStats.nextLevelExp.ToString());
+        int levelUp = 0;
+        int cEXP = charStats.startingExp + earnedEXP;
+        bool levelingUp = true;
 
-        bool levelUp = false;
-        float fill = charStats.exp / charStats.nextLevelExp;
-        if (fill >= 1.0f)
-        {
-            levelUp = true;
-            fill = 1.0f;
-        }
-        
-        while (expMeter.fillAmount < fill)
-        {
-            expMeter.fillAmount += 0.01f;
-            yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
-        }
-        expMeter.fillAmount = fill;
+        expText.SetText("+" + earnedEXP.ToString());
+        expMeter.fillAmount = charStats.startingExp / (float)charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
 
-        if (levelUp)
+        while (levelingUp && charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1)
+        {
+            levelingUp = false;
+            expMeter.fillAmount = 0;
+            neededEXPText.SetText("Next: " + (charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp]).ToString());
+
+            float fill = cEXP / (float)charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+            if (fill >= 1.0f)
+            {
+                levelUp++;
+                levelingUp = true;
+                fill = 1.0f;
+            }
+
+            while (expMeter.fillAmount < fill)
+            {
+                expMeter.fillAmount += 0.01f;
+                yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
+            }
+            expMeter.fillAmount = fill;
+
+            if (charStats.exp == 0)
+                levelingUp = false;
+            else if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1 && charStats.exp != 0 && levelingUp)
+            {
+                expMeter.fillAmount = 0;
+                cEXP -= charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+            }
+        }
+
+        StartCoroutine(LevelUpVisual(levelUp));
+
+        yield return null;
+    }
+
+    IEnumerator LevelUpVisual(int num)
+    {
+        if (num > 0)
         {
             while (levelUpGroup.alpha < 1.0f)
             {
@@ -78,11 +105,22 @@ public class WinCanvasScript : MonoBehaviour
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
 
-            levelGainText.SetText("+1 )");
+
+            // LEVEL GAIN
+            int t = num;
+            int d = 0;
+            while (d < t)
+            {
+                d++;
+                levelGainText.SetText("+" + num.ToString());
+                yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
+            }
+            levelGainText.color = fullTextColor[0];
+
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            int t = charStats.level + 1;
-            int d = charStats.level;
+            t = charStats.level + num;
+            d = charStats.level;
             while (d < t)
             {
                 d++;
@@ -94,18 +132,19 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // HP GAIN
-            t = charStats.HPGain;
+            t = charStats.HPGain * num;
             d = 0;
             while (d < t)
             {
                 d++;
-                hpGainText.SetText("+" + d.ToString() + " )");
+                hpGainText.SetText("+" + d.ToString());
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
+            hpGainText.color = fullTextColor[0];
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.maxHP + charStats.HPGain;
+            t = charStats.maxHP + (charStats.HPGain * num);
             d = charStats.maxHP;
             while (d < t)
             {
@@ -118,18 +157,19 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // TP GAIN
-            t = charStats.TPGain;
+            t = charStats.TPGain * num;
             d = 0;
             while (d < t)
             {
                 d++;
-                tpGainText.SetText("+" + d.ToString() + " )");
+                tpGainText.SetText("+" + d.ToString());
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
+            tpGainText.color = fullTextColor[0];
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.maxTP + charStats.TPGain;
+            t = charStats.maxTP + (charStats.TPGain * num);
             d = charStats.maxTP;
             while (d < t)
             {
@@ -142,18 +182,19 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // ATK GAIN
-            t = charStats.atkGain;
+            t = charStats.atkGain * num;
             d = 0;
             while (d < t)
             {
                 d++;
-                atkGainText.SetText("+" + d.ToString() + " )");
+                atkGainText.SetText("+" + d.ToString());
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
+            atkGainText.color = fullTextColor[0];
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.atk + charStats.atkGain;
+            t = charStats.atk + (charStats.atkGain * num);
             d = charStats.atk;
             while (d < t)
             {
@@ -166,18 +207,19 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // DEF GAIN
-            t = charStats.defGain;
+            t = charStats.defGain * num;
             d = 0;
             while (d < t)
             {
                 d++;
-                defGainText.SetText("+" + d.ToString() + " )");
+                defGainText.SetText("+" + d.ToString());
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
+            defGainText.color = fullTextColor[0];
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.def + charStats.defGain;
+            t = charStats.def + (charStats.defGain * num);
             d = charStats.def;
             while (d < t)
             {
@@ -190,18 +232,19 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // SPD GAIN
-            t = charStats.spdGain;
+            t = charStats.spdGain * num;
             d = 0;
             while (d < t)
             {
                 d++;
-                spdGainText.SetText("+" + d.ToString() + " )");
+                spdGainText.SetText("+" + d.ToString());
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
+            spdGainText.color = fullTextColor[0];
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.spd + charStats.spdGain;
+            t = charStats.spd + (charStats.spdGain * num);
             d = charStats.spd;
             while (d < t)
             {
@@ -214,7 +257,5 @@ public class WinCanvasScript : MonoBehaviour
         }
 
         done = true;
-        yield return null;
-
     }
 }

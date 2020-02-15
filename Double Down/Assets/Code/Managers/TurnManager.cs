@@ -38,8 +38,6 @@ namespace Managers
             }
 
             SetTurnOrder(true);
-            tracker.SetUpTrackers(t1, 1, true);
-            tracker.SetUpTrackers(t2, 2, false);
         }
 
         // Resets the turn order to account for dead enemies
@@ -89,6 +87,7 @@ namespace Managers
         // Ends the current round of combat
         public void EndRound()
         {
+            t1[0].GetComponent<CharData>().t1Pos--;
             if (combatChars.Count != t2.Count)
                 ResetTurns();
 
@@ -115,9 +114,6 @@ namespace Managers
             for (int i = 0; i < combatChars.Count; ++i)
                 t2.Add(combatChars[i]);
 
-            SetTurnOrder(false);
-            tracker.ReorderTrackers(t1, t2);
-
             tracker.MoveTracker(1);
         }
 
@@ -142,7 +138,7 @@ namespace Managers
                         t1[i - 1] = temp;
                     }
 
-                    if (t2.Count > 0 && i != 0 && t2[i].GetComponent<Stats>().Speed() > t2[i - 1].GetComponent<Stats>().Speed())
+                    if (t2.Count > 0 && i != 0 && t2[i].GetComponent<Stats>().NextSpeed(t2[i].GetComponent<CharData>().hasActed) > t2[i - 1].GetComponent<Stats>().NextSpeed(t2[i - 1].GetComponent<CharData>().hasActed))
                     {
                         sorted = false;
 
@@ -159,8 +155,23 @@ namespace Managers
                     sorting = false;
             }
 
-            //if (!init)
-                //tracker.ReorderTrackers(t1, t2);
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                t1[i].GetComponent<CharData>().t1Pos = i;
+            }
+
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                t2[i].GetComponent<CharData>().t2Pos = i;
+            }
+
+            if (init)
+            {
+                tracker.SetUpTrackers(t1, 1, true);
+                tracker.SetUpTrackers(t2, 2, false);
+            }
+            else
+                tracker.ReorderTrackers();
         }
     }
 }

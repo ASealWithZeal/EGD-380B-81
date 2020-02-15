@@ -20,12 +20,12 @@ public class OverallWinCanvasScript : MonoBehaviour
         
     }
 
-    public void ShowWinCanvas()
+    public void ShowWinCanvas(int earnedEXP)
     {
-        StartCoroutine(ShowCanvas());
+        StartCoroutine(ShowCanvas(earnedEXP));
     }
 
-    IEnumerator ShowCanvas()
+    IEnumerator ShowCanvas(int earnedEXP)
     {
         while (theGroup.alpha < 1.0f)
         {
@@ -34,7 +34,7 @@ public class OverallWinCanvasScript : MonoBehaviour
         }
 
         for (int i = 0; i < charScripts.Count; ++i)
-            charScripts[i].UpdateUI();
+            charScripts[i].UpdateUI(earnedEXP);
 
         for (int i = 0; i < charScripts.Count; ++i)
             while (!charScripts[i].done)

@@ -61,13 +61,10 @@ public class Attacker : MonoBehaviour
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
+        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, true);
 
         // Adds the self-debuff
         Managers.CombatManager.Instance.SetTarget(6);
         Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, false);
-
-        // Sets up the next turn's action
-        Managers.CombatManager.Instance.SetTarget((int)ability0Target);
-        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, true);
     }
 }
