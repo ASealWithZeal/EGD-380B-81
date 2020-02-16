@@ -177,7 +177,7 @@ public class Stats : MonoBehaviour
         startingLevel = level;
         startingExp = exp;
         exp += winEXP;
-        if (level < nextLevelExp.Count + 1 && exp > nextLevelExp[level - 1])
+        if (level < nextLevelExp.Count + 1 && exp >= nextLevelExp[level - 1])
         {
             LevelUp(winEXP);
         }
@@ -199,5 +199,46 @@ public class Stats : MonoBehaviour
         {
             LevelUp(winEXP);
         }
+    }
+
+    public void CopyStats(Stats s)
+    {
+        // Consumable stats
+        maxHP = s.maxHP;
+        currentHP = s.currentHP;
+        maxTP = s.maxTP;
+        currentTP = s.currentTP;
+
+        // Non-consumable stats
+        atk = s.atk;
+        def = s.def;
+        spd = s.spd;
+
+        // Stat Modifiers
+        atkMod = s.atkMod;
+        defMod = s.defMod;
+        spdMod = s.spdMod;
+
+        // Modifier Turns
+        atkModTurns = s.atkModTurns;
+        defModTurns = s.defModTurns;
+        spdModTurns = s.spdModTurns;
+
+        // Level Up Gains
+        HPGain = s.HPGain;
+        TPGain = s.TPGain;
+        atkGain = s.atkGain;
+        defGain = s.defGain;
+        spdGain = s.spdGain;
+
+        // Levels and EXP Data
+        level = s.level;
+        startingLevel = s.startingLevel;
+        exp = s.exp;
+        startingExp = s.startingExp;
+        nextLevelExp.Clear();
+        for (int i = 0; i < s.nextLevelExp.Count; ++i)
+            nextLevelExp.Add(s.nextLevelExp[i]);
+        lastLevelUpEXP = s.lastLevelUpEXP;
     }
 }

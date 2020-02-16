@@ -8,6 +8,7 @@ public class CharData : MonoBehaviour
     [HideInInspector] public bool isInCombat = true;
     public int t1Pos = 0;
     public int t2Pos = 0;
+    public int charNum = -1;
 
     [Header("Delayed Attack Info")]
     public string delayedAbilityName;
@@ -21,14 +22,24 @@ public class CharData : MonoBehaviour
     public Sprite[] targetSprite;
 
     public GameObject charUI;
+    public WinCanvasScript charWinUI;
     public Stats charStats;
     public bool hasActed = false;
 
     private void Start()
     {
+        if (gameObject.tag == "Enemy")
+            charUI.GetComponent<EnemyUI>().CreateUI(transform);
+    }
+
+    public void SetCharUI()
+    {
         if (gameObject.tag == "Player")
+        {
             charUI.GetComponent<PlayerStatusUI>().SetNewHP(charStats.currentHP, charStats.maxHP, charStats.currentTP, charStats.maxTP);
-        else
+            charWinUI.Init();
+        }
+        else if (gameObject.tag == "Enemy")
             charUI.GetComponent<EnemyUI>().CreateUI(transform);
     }
 
@@ -80,10 +91,18 @@ public class CharData : MonoBehaviour
             sr.color -= new Color(0.07f, 0.07f, 0.07f, 0.1f);
             yield return new WaitForSeconds(0.025f);
         }
-        
+
         if (gameObject.tag != "Player")
             charUI.SetActive(false);
         Destroy(gameObject);
         yield return null;
+    }
+
+    public void CopyData(CharData c)
+    {
+        c.isInCombat = isInCombat;
+        c.t1Pos = t1Pos;
+        c.t2Pos = t2Pos;
+        c.charNum = charNum;
     }
 }

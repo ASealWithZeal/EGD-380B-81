@@ -119,6 +119,7 @@ namespace Managers
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {
                     canMoveOn = false;
+                    BattleDataScript.Instance.SetMaxCharValues();
                     SceneChangeManager.Instance.ChangeScene("LoseScene");
                 }
 

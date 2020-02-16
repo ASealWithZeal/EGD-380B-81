@@ -33,9 +33,8 @@ public class WinCanvasScript : MonoBehaviour
 
     public TextMeshProUGUI spdText;
     public TextMeshProUGUI spdGainText;
-
-    // Start is called before the first frame update
-    void Start()
+    
+    public void Init()
     {
         levelText.SetText(charStats.level.ToString() + " (");
         hpText.SetText(charStats.maxHP.ToString() + " (");
@@ -54,35 +53,65 @@ public class WinCanvasScript : MonoBehaviour
     IEnumerator UpdatePlayerUI(int earnedEXP)
     {
         int levelUp = 0;
+        int cStartingEXP = charStats.startingExp;
         int cEXP = charStats.startingExp + earnedEXP;
         bool levelingUp = true;
+        float e = earnedEXP;
+        float n = 0;
 
-        expText.SetText("+" + earnedEXP.ToString());
-        expMeter.fillAmount = charStats.startingExp / (float)charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+        if (charStats.startingLevel < charStats.nextLevelExp.Count + 1)
+        {
+            expText.SetText("+" + earnedEXP.ToString());
+            expMeter.fillAmount = cStartingEXP / (float)charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+        }
+        else if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
+        {
+            expText.SetText("+0");
+            neededEXPText.SetText("0");
+            expMeter.fillAmount = 1.0f;
+        }
 
         while (levelingUp && charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1)
         {
             levelingUp = false;
-            expMeter.fillAmount = 0;
-            neededEXPText.SetText("Next: " + (charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp]).ToString());
+            neededEXPText.SetText((charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp] - cStartingEXP).ToString());
+            n = charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp] - cStartingEXP;
 
             float fill = cEXP / (float)charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
             if (fill >= 1.0f)
             {
                 levelUp++;
+                cStartingEXP = 0;
                 levelingUp = true;
                 fill = 1.0f;
             }
 
+            float elapser = (e * ((1 / fill - expMeter.fillAmount) * Managers.TurnManager.Instance.tracker.timeIncrements));
             while (expMeter.fillAmount < fill)
             {
                 expMeter.fillAmount += 0.01f;
+                if (e > 0)
+                    e -= elapser;
+                if (n > 0)
+                    n -= elapser;
+                expText.SetText("+" + Mathf.FloorToInt(e).ToString());
+                neededEXPText.SetText(Mathf.FloorToInt(n).ToString());
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
+
+            // Normalizes the displayed text
+            expText.SetText("+0");
+            if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1)
+                neededEXPText.SetText(((charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp]) - charStats.exp).ToString());
+            else
+                neededEXPText.SetText("0");
             expMeter.fillAmount = fill;
 
             if (charStats.exp == 0)
+            {
+                expMeter.fillAmount = 0;
                 levelingUp = false;
+            }
             else if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1 && charStats.exp != 0 && levelingUp)
             {
                 expMeter.fillAmount = 0;
@@ -104,8 +133,7 @@ public class WinCanvasScript : MonoBehaviour
                 levelUpGroup.alpha += 0.1f;
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
             }
-
-
+            
             // LEVEL GAIN
             int t = num;
             int d = 0;
@@ -119,8 +147,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.level + num;
-            d = charStats.level;
+            t = charStats.level;
+            d = charStats.level - num;
             while (d < t)
             {
                 d++;
@@ -144,8 +172,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.maxHP + (charStats.HPGain * num);
-            d = charStats.maxHP;
+            t = charStats.maxHP;
+            d = charStats.maxHP - (charStats.HPGain * num);
             while (d < t)
             {
                 d++;
@@ -169,8 +197,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.maxTP + (charStats.TPGain * num);
-            d = charStats.maxTP;
+            t = charStats.maxTP;
+            d = charStats.maxTP - (charStats.TPGain * num);
             while (d < t)
             {
                 d++;
@@ -194,8 +222,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.atk + (charStats.atkGain * num);
-            d = charStats.atk;
+            t = charStats.atk;
+            d = charStats.atk - (charStats.atkGain * num);
             while (d < t)
             {
                 d++;
@@ -219,8 +247,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.def + (charStats.defGain * num);
-            d = charStats.def;
+            t = charStats.def;
+            d = charStats.def - (charStats.defGain * num);
             while (d < t)
             {
                 d++;
@@ -244,8 +272,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.spd + (charStats.spdGain * num);
-            d = charStats.spd;
+            t = charStats.spd;
+            d = charStats.spd - (charStats.spdGain * num);
             while (d < t)
             {
                 d++;
