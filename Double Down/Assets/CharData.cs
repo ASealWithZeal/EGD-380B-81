@@ -103,6 +103,6 @@ public class CharData : MonoBehaviour
         c.isInCombat = isInCombat;
         c.t1Pos = t1Pos;
         c.t2Pos = t2Pos;
-        c.charNum = charNum;
+        //c.charNum = charNum;
     }
 }

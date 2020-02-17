@@ -34,7 +34,12 @@ public class OverallWinCanvasScript : MonoBehaviour
         }
 
         for (int i = 0; i < charScripts.Count; ++i)
-            charScripts[i].UpdateUI(earnedEXP);
+        {
+            if (charScripts[i].charStats != null)
+                charScripts[i].UpdateUI(earnedEXP);
+            else
+                charScripts[i].done = true;
+        }
 
         for (int i = 0; i < charScripts.Count; ++i)
             while (!charScripts[i].done)

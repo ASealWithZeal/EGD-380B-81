@@ -82,11 +82,14 @@ namespace Managers
         // Copy the data of each player character for future use, with maxed-out HP and TP
         public void SetMaxCharValues()
         {
-            string name = "Char";
+            for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+            {
+                GameObject temp = TurnManager.Instance.playerCharsList[i];
+                CopyCharData(temp.GetComponent<Stats>(), temp.GetComponent<CharData>(), temp.GetComponent<CharData>().charNum);
+            }
+
             for (int i = 0; i < 2; ++i)
             {
-                GameObject temp = GameObject.Find(name + (i + 1));
-                CopyCharData(temp.GetComponent<Stats>(), temp.GetComponent<CharData>(), i);
                 cStats[i].currentHP = cStats[i].maxHP;
                 cStats[i].currentTP = cStats[i].maxTP;
             }
