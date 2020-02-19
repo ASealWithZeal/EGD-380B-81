@@ -2989,6 +2989,11 @@ MonoBehaviour:
   atkGain: 0
   defGain: 0
   spdGain: 0
+  HPPassives: 0
+  TPPassives: 0
+  atkPassives: 0
+  defPassives: 0
+  spdPassives: 0
   level: 1
   startingLevel: 1
   exp: 50
@@ -3381,6 +3386,11 @@ MonoBehaviour:
   atkGain: 3
   defGain: 3
   spdGain: 2
+  HPPassives: 0
+  TPPassives: 0
+  atkPassives: 0
+  defPassives: 0
+  spdPassives: 0
   level: 1
   startingLevel: 1
   exp: 0
@@ -3411,6 +3421,16 @@ MonoBehaviour:
   ability0Cost: 4
   ability0Target: 0
   ability0HealTarget: 5
+  ability0UpgradeName: Overdraw
+  ability0UpgradeMod: 1.35
+  ability0UpgradeCost: 7
+  ability0UpgradeTarget: 0
+  ability0UpgradeHealTarget: 5
+  ability1Name: Adrenalinjection
+  ability1Cost: 4
+  ability1Effect: 1.25
+  ability1Duration: 3
+  ability1Target: 4
 --- !u!114 &327827567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4374,6 +4394,11 @@ MonoBehaviour:
   atkGain: 4
   defGain: 2
   spdGain: 3
+  HPPassives: 0
+  TPPassives: 0
+  atkPassives: 0
+  defPassives: 0
+  spdPassives: 0
   level: 1
   startingLevel: 1
   exp: 0
@@ -7402,6 +7427,11 @@ MonoBehaviour:
   atkGain: 0
   defGain: 0
   spdGain: 0
+  HPPassives: 0
+  TPPassives: 0
+  atkPassives: 0
+  defPassives: 0
+  spdPassives: 0
   level: 1
   startingLevel: 1
   exp: 300
@@ -17954,6 +17984,11 @@ MonoBehaviour:
   atkGain: 0
   defGain: 0
   spdGain: 0
+  HPPassives: 0
+  TPPassives: 0
+  atkPassives: 0
+  defPassives: 0
+  spdPassives: 0
   level: 1
   startingLevel: 1
   exp: 50

@@ -307,6 +307,12 @@ namespace Managers
 
                 // Target an ally
                 case (int)Targeting.OneAlly:
+                    if (TurnManager.Instance.t1[0].tag == "Player")
+                        moveTargets.Add(TurnManager.Instance.playerCharsList[0]);
+                    else
+                        moveTargets.Add(TurnManager.Instance.enemyCharsList[Random.Range(0, TurnManager.Instance.enemyCharsList.Count)]);
+
+                    oneTarget = true;
                     break;
 
                 // Target all allies

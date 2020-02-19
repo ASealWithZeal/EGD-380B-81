@@ -32,6 +32,14 @@ public class Stats : MonoBehaviour
     public int defGain = 3;
     public int spdGain = 3;
 
+    [Header("Stat Passives")]
+    public float HPPassives = 0.0f;
+    public float TPPassives = 0.0f;
+
+    public float atkPassives = 0.0f;
+    public float defPassives = 0.0f;
+    public float spdPassives = 0.0f;
+
     [Header("Level and Experience")]
     public int level = 1;
     [HideInInspector] public int startingLevel = 1;
@@ -90,7 +98,7 @@ public class Stats : MonoBehaviour
     // Returns the character's attack stat
     public int Attack()
     {
-        int i = (int)(atk * atkMod);
+        int i = (int)(atk * atkMod) + (int)(atk * atkPassives);
         if (i <= 0)
             i = 1;
         return i;
@@ -99,7 +107,7 @@ public class Stats : MonoBehaviour
     // Returns the character's defense stat
     public int Defense()
     {
-        int i = (int)(def * defMod);
+        int i = (int)(def * defMod) + (int)(def * defPassives);
         if (i <= 0)
             i = 1;
         return i;
@@ -108,7 +116,7 @@ public class Stats : MonoBehaviour
     // Returns the character's speed stat
     public int Speed()
     {
-        int i = (int)(spd * spdMod);
+        int i = (int)(spd * spdMod) + (int)(spd * spdPassives);
         if (i <= 0)
             i = 1;
         return i;
