@@ -46,7 +46,7 @@ public class Healer : MonoBehaviour
     {
         // Animation
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
-        Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true);
+        Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true, 0.5f);
     }
 
     // Uses Blood Draw

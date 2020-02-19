@@ -46,7 +46,7 @@ public class Attacker : MonoBehaviour
     {
         // Animation
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
-        Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true);
+        Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true, 0.5f);
     }
 
     // Uses Heavy Slash
@@ -61,10 +61,10 @@ public class Attacker : MonoBehaviour
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
-        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, true);
+        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, true, 0.5f);
 
         // Adds the self-debuff
         Managers.CombatManager.Instance.SetTarget(6);
-        Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, false);
+        Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, false, 0.5f);
     }
 }

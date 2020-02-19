@@ -54,9 +54,12 @@ namespace Managers
                 origPos = TurnManager.Instance.t1[0].transform.position;
                 StartCoroutine(MovePlayerCharacter(moveTarget.position));
             }
-
+        
             else
             {
+                // Ticks down the characters modifier changes
+                TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                TurnManager.Instance.t1[0].GetComponent<CharData>().delayTimer--;
                 Act(0);
             }
         }
@@ -77,10 +80,11 @@ namespace Managers
 
             else
             {
-                //for (int i = 0; i < moveTargets.Count; ++i)
-                //    moveTargets.Remove(moveTargets[i]);
-                //moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
-                TurnManager.Instance.t1[0].GetComponent<EnemyActions>().PerformAction();
+                CharData c = TurnManager.Instance.t1[0].GetComponent<CharData>();
+                if (!c.delayedAttack || c.delayTimer > 0)
+                    TurnManager.Instance.t1[0].GetComponent<EnemyActions>().PerformAction();
+                else
+                    PerformDelayedAbility(c);
             }
         }
 
@@ -351,6 +355,11 @@ namespace Managers
             aDisplay.ChangeDisplayOpacity(true);
         }
 
+        public void EndTurnImmediately()
+        {
+
+        }
+
         // Deals damage to the current target(s) based on a shared modifier
         public void DealDamage(float modifier)
         {
@@ -377,6 +386,25 @@ namespace Managers
                 doneAttacking = true;
             else
                 newTarget++;
+        }
+
+        // Deal damage AS A START / END OF TURN EFFECT
+        //  Can be used for poison, mists, other effects
+        public void DealDamageTurnStart(int damage, float textDuration)
+        {
+            int targ = 0;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = newTarget; i < targ; ++i)
+            {
+                moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                moveTargets[i].GetComponent<CharData>().ChangeHP();
+
+                dText.DamageNumbers(damage, moveTargets[i].transform, false);
+            }
+            
+            StartCoroutine(EndNonDamageTextDisplay(textDuration, false));
         }
 
         // Deals damage to the current target(s) based on a shared modifier
@@ -423,7 +451,7 @@ namespace Managers
         }
 
         // Performs an ability with a non-damaging effect
-        public void UseStatusAbility(int type, float mod, int length, bool endTurn)
+        public void UseStatusAbility(int type, float mod, int length, bool endTurn, float textDuration)
         {
             int targ = 1;
             if (!oneTarget)
@@ -440,16 +468,16 @@ namespace Managers
             }
 
             if (endTurn)
-                StartCoroutine(EndNonDamageTextDisplay(0.5f));
+                StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
         }
 
         // Prepares to let the user perform a delayed attack
-        public void UseDelayedAbility(string name, float mod, int delay, bool endTurn)
+        public void UseDelayedAbility(string name, float mod, int delay, bool endTurn, float textDuration)
         {
             TurnManager.Instance.t1[0].GetComponent<CharData>().SetDelayedAttack(name, delay, mod, moveTargets);
 
             if (endTurn)
-                StartCoroutine(EndNonDamageTextDisplay(0.5f));
+                StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
         }
 
         private void PerformDelayedAbility(CharData c)
@@ -474,12 +502,13 @@ namespace Managers
             DealDamage(c.storedModifier);
         }
 
-        IEnumerator EndNonDamageTextDisplay(float time)
+        IEnumerator EndNonDamageTextDisplay(float time, bool followUp)
         {
             yield return new WaitForSeconds(time);
             doneAttacking = true;
             aDisplay.ChangeDisplayOpacity(false);
-            FollowUpAction();
+            if (followUp)
+                FollowUpAction();
             yield return null;
         }
 

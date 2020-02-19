@@ -17,5 +17,7 @@ public class EnemyActions : MonoBehaviour
     {
         if (enemy == Enemy.Enem0)
             GetComponent<NormalEnemy>().Act();
+        else if (enemy == Enemy.Enem1)
+            GetComponent<BossEnemy>().Act();
     }
 }
