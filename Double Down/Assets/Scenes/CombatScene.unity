@@ -2954,6 +2954,7 @@ MonoBehaviour:
   t1Pos: 0
   t2Pos: 0
   charNum: -1
+  learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0
   delayTimer: 0
@@ -3461,6 +3462,7 @@ MonoBehaviour:
   t1Pos: 0
   t2Pos: 0
   charNum: 1
+  learnedAbilities: 01000000
   delayedAbilityName: 
   delayedAttack: 0
   delayTimer: 0
@@ -4478,6 +4480,11 @@ MonoBehaviour:
   ability0Delay: 1
   ability0Cost: 6
   ability0Target: 0
+  ability0UpgradeName: Guard Crash
+  ability0UpgradeMod: 3
+  ability0UpgradeDefMod: 1.5
+  ability0UpgradeCost: 8
+  ability0UpgradeTarget: 0
 --- !u!114 &480594858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4508,6 +4515,7 @@ MonoBehaviour:
   t1Pos: 0
   t2Pos: 0
   charNum: 0
+  learnedAbilities: 01000000
   delayedAbilityName: 
   delayedAttack: 0
   delayTimer: 0
@@ -7392,6 +7400,7 @@ MonoBehaviour:
   t1Pos: 0
   t2Pos: 0
   charNum: -1
+  learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0
   delayTimer: 0
@@ -18061,6 +18070,7 @@ MonoBehaviour:
   t1Pos: 0
   t2Pos: 0
   charNum: -1
+  learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0
   delayTimer: 0

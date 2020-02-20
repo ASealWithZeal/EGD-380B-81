@@ -10,6 +10,9 @@ public class CharData : MonoBehaviour
     public int t2Pos = 0;
     public int charNum = -1;
 
+    [Header("Abilities")]
+    public List<bool> learnedAbilities = new List<bool>();
+
     [Header("Delayed Attack Info")]
     public string delayedAbilityName;
     public bool delayedAttack;

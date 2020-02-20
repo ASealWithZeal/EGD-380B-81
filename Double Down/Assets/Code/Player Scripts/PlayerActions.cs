@@ -53,6 +53,7 @@ public class PlayerActions : MonoBehaviour
                     GetComponent<Healer>().SetDefend();
                 break;
 
+            // Sets the character's basic (or upgraded basic) ability
             case (int)Actions.Ability0:
                 if (character == Char.Char0)
                     GetComponent<Attacker>().SetAbility0();
@@ -81,11 +82,23 @@ public class PlayerActions : MonoBehaviour
                     GetComponent<Healer>().PerformDefend();
                 break;
 
+            // Performs the character's basic (or upgraded basic) ability
             case (int)Actions.Ability0:
-                if (character == Char.Char0)
-                    GetComponent<Attacker>().PerformAbility0();
-                else if (character == Char.Char1)
-                    GetComponent<Healer>().PerformAbility0();
+                if (!GetComponent<CharData>().learnedAbilities[0])
+                {
+                    if (character == Char.Char0)
+                        GetComponent<Attacker>().PerformAbility0();
+                    else if (character == Char.Char1)
+                        GetComponent<Healer>().PerformAbility0();
+                }
+
+                else
+                {
+                    if (character == Char.Char0)
+                        GetComponent<Attacker>().PerformAbility0Upgrade();
+                    else if (character == Char.Char1)
+                        GetComponent<Healer>().PerformAbility0Upgrade();
+                }
                 break;
 
             case (int)Actions.Ability1:
@@ -100,18 +113,29 @@ public class PlayerActions : MonoBehaviour
         switch (i)
         {
             case 0:
-                if (character == Char.Char0)
-                    returnVal = GetComponent<Attacker>().ability0Name;
-                else if (character == Char.Char1)
-                    returnVal = GetComponent<Healer>().ability0Name;
+                if (!GetComponent<CharData>().learnedAbilities[0])
+                {
+                    if (character == Char.Char0)
+                        returnVal = GetComponent<Attacker>().ability0Name;
+                    else if (character == Char.Char1)
+                        returnVal = GetComponent<Healer>().ability0Name;
+                }
+
+                else
+                {
+                    if (character == Char.Char0)
+                        returnVal = GetComponent<Attacker>().ability0UpgradeName;
+                    else if (character == Char.Char1)
+                        returnVal = GetComponent<Healer>().ability0UpgradeName;
+                }
                 break;
 
-            //case 1:
-            //    if (character == Char.Char0)
-            //        returnVal = GetComponent<Attacker>().ability1Name;
-            //    else if (character == Char.Char1)
-            //        returnVal = GetComponent<Healer>().ability1Name;
-            //    break;
+                //case 1:
+                //    if (character == Char.Char0)
+                //        returnVal = GetComponent<Attacker>().ability1Name;
+                //    else if (character == Char.Char1)
+                //        returnVal = GetComponent<Healer>().ability1Name;
+                //    break;
         }
 
         return returnVal;
@@ -124,10 +148,21 @@ public class PlayerActions : MonoBehaviour
         switch (i)
         {
             case 0:
-                if (character == Char.Char0)
-                    returnVal = GetComponent<Attacker>().ability0Cost;
-                else if (character == Char.Char1)
-                    returnVal = GetComponent<Healer>().ability0Cost;
+                if (!GetComponent<CharData>().learnedAbilities[0])
+                {
+                    if (character == Char.Char0)
+                        returnVal = GetComponent<Attacker>().ability0Cost;
+                    else if (character == Char.Char1)
+                        returnVal = GetComponent<Healer>().ability0Cost;
+                }
+
+                else
+                {
+                    if (character == Char.Char0)
+                        returnVal = GetComponent<Attacker>().ability0UpgradeCost;
+                    else if (character == Char.Char1)
+                        returnVal = GetComponent<Healer>().ability0UpgradeCost;
+                }
                 break;
 
                 //case 1:

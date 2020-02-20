@@ -23,6 +23,13 @@ public class Attacker : MonoBehaviour
     public int ability0Cost = 6;
     public Targeting ability0Target;
 
+    [Header("Ability0 Upgrade")]
+    public string ability0UpgradeName = "Guard Overhead";
+    public float ability0UpgradeMod = 3.0f;
+    public float ability0UpgradeDefMod = 1.25f;
+    public int ability0UpgradeCost = 8;
+    public Targeting ability0UpgradeTarget;
+
     // Perform a simple attack
     public void SetAttack()
     {
@@ -61,10 +68,23 @@ public class Attacker : MonoBehaviour
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
-        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, true, 0.5f);
+        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, false, 0.5f);
+
+        // Adds the self-debuff
+        Managers.CombatManager.Instance.SetTarget(6);
+        Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, true, 0.5f);
+    }
+    public void PerformAbility0Upgrade()
+    {
+        // Animation
+        charStats.currentTP -= ability0UpgradeCost;
+        charStats.gameObject.GetComponent<CharData>().ChangeTP();
+        Managers.CombatManager.Instance.DisplayAbilityName(ability0UpgradeName);
+        Managers.CombatManager.Instance.UseDelayedAbility(ability0UpgradeName, ability0UpgradeMod, 1, false, 0.5f);
 
         // Adds the self-debuff
         Managers.CombatManager.Instance.SetTarget(6);
         Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, false, 0.5f);
+        Managers.CombatManager.Instance.UseStatusAbility(1, ability0UpgradeDefMod, 1, true, 0.5f);
     }
 }
