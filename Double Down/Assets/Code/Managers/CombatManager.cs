@@ -264,7 +264,7 @@ namespace Managers
                     if (TurnManager.Instance.t1[0].tag == "Player")
                         moveTargets.Add(TurnManager.Instance.enemyCharsList[0]);
                     else
-                        moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+                        EnemySetPlayerTarget();
 
                     oneTarget = true;
                     break;
@@ -288,7 +288,7 @@ namespace Managers
                             moveTargets.Add(TurnManager.Instance.enemyCharsList[Random.Range(0, TurnManager.Instance.enemyCharsList.Count)]);
                     else
                         for (int i = 0; i < 2; ++i)
-                            moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+                            EnemySetPlayerTarget();
 
                     oneTarget = true;
                     break;
@@ -300,7 +300,7 @@ namespace Managers
                             moveTargets.Add(TurnManager.Instance.enemyCharsList[Random.Range(0, TurnManager.Instance.enemyCharsList.Count)]);
                     else
                         for (int i = 0; i < 3; ++i)
-                            moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+                            EnemySetPlayerTarget();
 
                     oneTarget = true;
                     break;
@@ -344,6 +344,26 @@ namespace Managers
             moveTargets.Add(newTarget);
             newTarget.GetComponent<CharData>().Targeted();
             TurnManager.Instance.tracker.HighlightSelectedTrackers(newTarget);
+        }
+
+        // Adds player characters to the enemy's target list; if they have aggro, guarantee the addition
+        private void EnemySetPlayerTarget()
+        {
+            bool set = false;
+            List<GameObject> tempList = new List<GameObject>();
+            for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+            {
+                if (TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().aggro > 0)
+                {
+                    tempList.Add(TurnManager.Instance.playerCharsList[i]);
+                    set = true;
+                }
+            }
+
+            if (!set)
+                moveTargets.Add(TurnManager.Instance.playerCharsList[Random.Range(0, TurnManager.Instance.playerCharsList.Count)]);
+            else
+                moveTargets.Add(tempList[Random.Range(0, tempList.Count)]);
         }
 
         private void AddEnemyTargets(Targeting t)
@@ -471,6 +491,8 @@ namespace Managers
                     moveTargets[i].GetComponent<Stats>().SetDefMod(mod, length);
                 if (type == 2)
                     moveTargets[i].GetComponent<Stats>().SetSpdMod(mod, length);
+                if (type == 3)
+                    moveTargets[i].GetComponent<Stats>().SetAggro(mod, length);
             }
 
             if (endTurn)

@@ -37,11 +37,11 @@ public class WinCanvasScript : MonoBehaviour
     public void Init()
     {
         levelText.SetText(charStats.level.ToString() + " (");
-        hpText.SetText(charStats.maxHP.ToString() + " (");
-        tpText.SetText(charStats.maxTP.ToString() + " (");
-        atkText.SetText(charStats.atk.ToString() + " (");
-        defText.SetText(charStats.def.ToString() + " (");
-        spdText.SetText(charStats.spd.ToString() + " (");
+        hpText.SetText(charStats.MaxHP().ToString() + " (");
+        tpText.SetText(charStats.MaxTP().ToString() + " (");
+        atkText.SetText(charStats.Attack().ToString() + " (");
+        defText.SetText(charStats.Defense().ToString() + " (");
+        spdText.SetText(charStats.Speed().ToString() + " (");
     }
 
     // Update is called once per frame
@@ -160,7 +160,7 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // HP GAIN
-            t = charStats.HPGain * num;
+            t = (charStats.HPGain + (int)(charStats.HPGain * charStats.HPPassives)) * num;
             d = 0;
             while (d < t)
             {
@@ -172,8 +172,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.maxHP;
-            d = charStats.maxHP - (charStats.HPGain * num);
+            t = charStats.MaxHP();
+            d = charStats.MaxHP() - ((charStats.HPGain + (int)(charStats.HPGain * charStats.HPPassives)) * num);
             while (d < t)
             {
                 d++;
@@ -185,7 +185,7 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // TP GAIN
-            t = charStats.TPGain * num;
+            t = (charStats.TPGain + (int)(charStats.TPGain * charStats.TPPassives)) * num;
             d = 0;
             while (d < t)
             {
@@ -197,8 +197,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.maxTP;
-            d = charStats.maxTP - (charStats.TPGain * num);
+            t = charStats.MaxTP();
+            d = charStats.MaxTP() - ((charStats.TPGain + (int)(charStats.TPGain * charStats.HPPassives)) * num);
             while (d < t)
             {
                 d++;
@@ -210,7 +210,7 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // ATK GAIN
-            t = charStats.atkGain * num;
+            t = (charStats.atkGain + (int)(charStats.atkGain * charStats.atkPassives)) * num;
             d = 0;
             while (d < t)
             {
@@ -222,8 +222,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.atk;
-            d = charStats.atk - (charStats.atkGain * num);
+            t = charStats.Attack();
+            d = charStats.Attack() - ((charStats.atkGain + (int)(charStats.atkGain * charStats.atkPassives)) * num);
             while (d < t)
             {
                 d++;
@@ -235,7 +235,7 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // DEF GAIN
-            t = charStats.defGain * num;
+            t = (charStats.defGain + (int)(charStats.defGain * charStats.defPassives)) * num;
             d = 0;
             while (d < t)
             {
@@ -247,8 +247,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.def;
-            d = charStats.def - (charStats.defGain * num);
+            t = charStats.Defense();
+            d = charStats.Defense() - ((charStats.defGain + (int)(charStats.defGain * charStats.defPassives)) * num);
             while (d < t)
             {
                 d++;
@@ -260,7 +260,7 @@ public class WinCanvasScript : MonoBehaviour
 
 
             // SPD GAIN
-            t = charStats.spdGain * num;
+            t = (charStats.spdGain + (int)(charStats.spdGain * charStats.spdPassives)) * num;
             d = 0;
             while (d < t)
             {
@@ -272,8 +272,8 @@ public class WinCanvasScript : MonoBehaviour
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
-            t = charStats.spd;
-            d = charStats.spd - (charStats.spdGain * num);
+            t = charStats.Speed();
+            d = charStats.Speed() - ((charStats.spdGain + (int)(charStats.spdGain * charStats.spdPassives)) * num);
             while (d < t)
             {
                 d++;

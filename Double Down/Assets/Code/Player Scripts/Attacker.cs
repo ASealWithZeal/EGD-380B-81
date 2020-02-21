@@ -30,6 +30,13 @@ public class Attacker : MonoBehaviour
     public int ability0UpgradeCost = 8;
     public Targeting ability0UpgradeTarget;
 
+    [Header("Ability1")]
+    public string ability1Name = "Provoke";
+    public int ability1Cost = 4;
+    public float ability1Effect = 1.0f;
+    public int ability1Duration = 3;
+    public Targeting ability1Target;
+
     // Perform a simple attack
     public void SetAttack()
     {
@@ -86,5 +93,20 @@ public class Attacker : MonoBehaviour
         Managers.CombatManager.Instance.SetTarget(6);
         Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, false, 0.5f);
         Managers.CombatManager.Instance.UseStatusAbility(1, ability0UpgradeDefMod, 1, true, 0.5f);
+    }
+
+    // Uses Provoke
+    public void SetAbility1()
+    {
+        Managers.CombatManager.Instance.SetTarget((int)ability1Target);
+        Managers.CombatManager.Instance.SetUpAction(3);
+    }
+    public void PerformAbility1()
+    {
+        // Animation
+        charStats.currentTP -= ability1Cost;
+        charStats.gameObject.GetComponent<CharData>().ChangeTP();
+        Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
+        Managers.CombatManager.Instance.UseStatusAbility(3, ability1Effect, ability1Duration, true, 0.5f);
     }
 }

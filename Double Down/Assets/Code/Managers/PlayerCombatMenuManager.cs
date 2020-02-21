@@ -72,12 +72,19 @@ public class PlayerCombatMenuManager : MonoBehaviour
         if (inter)
         {
             incs *= -1;
-            for (int i = 0; i < playerAbilitiesMenu.Count; ++i)
+            playerAbilitiesMenu[0].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityName(0));
+            playerAbilitiesMenu[0].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(0) + " TP");
+            for (int i = 1; i < playerAbilitiesMenu.Count - 1; ++i)
             {
-                if (i == 0)
+                if (chara.GetComponent<CharData>().learnedAbilities[i])
                 {
                     playerAbilitiesMenu[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityName(i));
                     playerAbilitiesMenu[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i) + " TP");
+                }
+                else
+                {
+                    playerAbilitiesMenu[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText("");
+                    playerAbilitiesMenu[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText("");
                 }
             }
 
@@ -90,7 +97,7 @@ public class PlayerCombatMenuManager : MonoBehaviour
         else
             for (int i = 0; i < playerAbilitiesMenu.Count; ++i)
             {
-                playerAbilitiesMenu[i].GetComponent<Button>().interactable = inter;
+                playerAbilitiesMenu[i].GetComponent<Button>().interactable = false;
             }
 
         //playerMenu[0].GetComponent<Button>().Select();
@@ -105,7 +112,6 @@ public class PlayerCombatMenuManager : MonoBehaviour
             yield return new WaitForSeconds(0.0125f);
         }
 
-        // Sets all buttons to be interactable
         if (!inter)
         {
             for (int i = 0; i < playerAbilitiesMenu.Count; ++i)
@@ -117,11 +123,14 @@ public class PlayerCombatMenuManager : MonoBehaviour
 
         else
         {
-            for (int i = 0; i < playerMenu.Count; ++i)
+            for (int i = 0; i < playerAbilitiesMenu.Count; ++i)
             {
-                if (Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i))
+                if (i == 0 && Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(0))
+                    playerAbilitiesMenu[0].GetComponent<Button>().interactable = inter;
+                else if (i > 0 && chara.GetComponent<CharData>().learnedAbilities[i] && Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i))
                     playerAbilitiesMenu[i].GetComponent<Button>().interactable = inter;
             }
+            playerAbilitiesMenu[playerAbilitiesMenu.Count - 1].GetComponent<Button>().interactable = inter;
             playerAbilitiesMenu[0].GetComponent<Button>().Select();
         }
 

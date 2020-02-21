@@ -47,7 +47,7 @@ public class BossEnemy : MonoBehaviour
         float chance = Random.Range(0, 99.9f);
 
         // At >50% HP, use this "block" of skills:
-        if (!special3Used && charStats.currentHP > (0.5f * charStats.maxHP))
+        if (!special3Used && charStats.currentHP > (0.5f * charStats.MaxHP()))
         {
             if (chance >= 0 && chance < attackPercent)
                 Attack();

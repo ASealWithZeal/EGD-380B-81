@@ -90,8 +90,8 @@ namespace Managers
 
             for (int i = 0; i < 2; ++i)
             {
-                cStats[i].currentHP = cStats[i].maxHP;
-                cStats[i].currentTP = cStats[i].maxTP;
+                cStats[i].currentHP = cStats[i].MaxHP();
+                cStats[i].currentTP = cStats[i].MaxTP();
             }
         }
     }

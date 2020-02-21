@@ -60,6 +60,14 @@ public class PlayerActions : MonoBehaviour
                 else if (character == Char.Char1)
                     GetComponent<Healer>().SetAbility0();
                 break;
+
+            // Sets the character's second ability
+            case (int)Actions.Ability1:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().SetAbility1();
+                else if (character == Char.Char1)
+                    GetComponent<Healer>().SetAbility1();
+                break;
         }
 
     }
@@ -102,6 +110,10 @@ public class PlayerActions : MonoBehaviour
                 break;
 
             case (int)Actions.Ability1:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().PerformAbility1();
+                else if (character == Char.Char1)
+                    GetComponent<Healer>().PerformAbility1();
                 break;
         }
     }
@@ -130,12 +142,12 @@ public class PlayerActions : MonoBehaviour
                 }
                 break;
 
-                //case 1:
-                //    if (character == Char.Char0)
-                //        returnVal = GetComponent<Attacker>().ability1Name;
-                //    else if (character == Char.Char1)
-                //        returnVal = GetComponent<Healer>().ability1Name;
-                //    break;
+            case 1:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability1Name;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability1Name;
+                break;
         }
 
         return returnVal;
@@ -165,12 +177,12 @@ public class PlayerActions : MonoBehaviour
                 }
                 break;
 
-                //case 1:
-                //    if (character == Char.Char0)
-                //        returnVal = GetComponent<Attacker>().ability1Name;
-                //    else if (character == Char.Char1)
-                //        returnVal = GetComponent<Healer>().ability1Name;
-                //    break;
+            case 1:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability1Cost;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability1Cost;
+                break;
         }
 
         return returnVal;

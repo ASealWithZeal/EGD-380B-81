@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CharData : MonoBehaviour
 {
+    public string name;
+
     public bool targeting;
     [HideInInspector] public bool isInCombat = true;
     public int t1Pos = 0;
@@ -39,7 +41,7 @@ public class CharData : MonoBehaviour
     {
         if (gameObject.tag == "Player")
         {
-            charUI.GetComponent<PlayerStatusUI>().SetNewHP(charStats.currentHP, charStats.maxHP, charStats.currentTP, charStats.maxTP);
+            charUI.GetComponent<PlayerStatusUI>().SetNewHP(charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
             charWinUI.Init();
         }
         else if (gameObject.tag == "Enemy")
@@ -103,9 +105,17 @@ public class CharData : MonoBehaviour
 
     public void CopyData(CharData c)
     {
-        c.isInCombat = isInCombat;
-        c.t1Pos = t1Pos;
-        c.t2Pos = t2Pos;
-        //c.charNum = charNum;
+        int temp = Mathf.Abs(learnedAbilities.Count - c.learnedAbilities.Count);
+        if (temp > 0)
+            for (int i = 0; i < temp; ++i)
+                learnedAbilities.Add(false);
+
+        for (int i = 0; i < c.learnedAbilities.Count; ++i)
+            learnedAbilities[i] = c.learnedAbilities[i];
+
+        isInCombat = c.isInCombat;
+        t1Pos = c.t1Pos;
+        t2Pos = c.t2Pos;
+        charNum = c.charNum;
     }
 }

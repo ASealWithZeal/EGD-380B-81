@@ -23,6 +23,7 @@ public class Stats : MonoBehaviour
     private int atkModTurns = 0;
     private int defModTurns = 0;
     private float spdModTurns = 0;
+    private int aggroModTurns = 0;
 
     [Header("Level Gains")]
     public int HPGain = 25;
@@ -40,6 +41,9 @@ public class Stats : MonoBehaviour
     public float defPassives = 0.0f;
     public float spdPassives = 0.0f;
 
+    [Header("Other")]
+    public float aggro = 0.0f;
+
     [Header("Level and Experience")]
     public int level = 1;
     [HideInInspector] public int startingLevel = 1;
@@ -51,8 +55,8 @@ public class Stats : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentHP = maxHP;
-        currentTP = maxTP;
+        currentHP = MaxHP();
+        currentTP = MaxTP();
         lastLevelUpEXP = 0;
         startingExp = 0;
     }
@@ -68,8 +72,13 @@ public class Stats : MonoBehaviour
         currentHP -= i;
         if (currentHP <= 0)
             currentHP = 0;
-        else if (currentHP > maxHP)
-            currentHP = maxHP;
+        else if (currentHP > MaxHP())
+            currentHP = MaxHP();
+    }
+
+    public int MaxHP()
+    {
+        return maxHP + (int)(maxHP * HPPassives);
     }
 
     // Returns the character's current HP
@@ -81,12 +90,17 @@ public class Stats : MonoBehaviour
     // Returns the character's current HP out of their Max HP
     public float HPPercent()
     {
-        return ((float)currentHP / maxHP);
+        return ((float)currentHP / MaxHP());
     }
 
     public float TPPercent()
     {
-        return ((float)currentTP / maxTP);
+        return ((float)currentTP / MaxTP());
+    }
+
+    public int MaxTP()
+    {
+        return maxTP + (int)(maxTP * TPPassives);
     }
 
     // Returns the character's current TP
@@ -159,6 +173,14 @@ public class Stats : MonoBehaviour
             spdMod = 1;
             spdModTurns = 0;
         }
+
+        // Ticks down aggro changes
+        aggroModTurns--;
+        if (aggroModTurns <= 0)
+        {
+            aggro = 0.0f;
+            aggroModTurns = 0;
+        }
     }
 
     public void SetAtkMod(float mod, int turns)
@@ -177,6 +199,12 @@ public class Stats : MonoBehaviour
     {
         spdMod = mod;
         spdModTurns = turns;
+    }
+
+    public void SetAggro(float mod, int turns)
+    {
+        aggro = mod;
+        aggroModTurns = turns;
     }
 
     // Give a character experience and let them level up, if possible
@@ -223,14 +251,14 @@ public class Stats : MonoBehaviour
         spd = s.spd;
 
         // Stat Modifiers
-        atkMod = s.atkMod;
-        defMod = s.defMod;
-        spdMod = s.spdMod;
-
+        //atkMod = s.atkMod;
+        //defMod = s.defMod;
+        //spdMod = s.spdMod;
+        //
         // Modifier Turns
-        atkModTurns = s.atkModTurns;
-        defModTurns = s.defModTurns;
-        spdModTurns = s.spdModTurns;
+        //atkModTurns = s.atkModTurns;
+        //defModTurns = s.defModTurns;
+        //spdModTurns = s.spdModTurns;
 
         // Level Up Gains
         HPGain = s.HPGain;
@@ -238,6 +266,12 @@ public class Stats : MonoBehaviour
         atkGain = s.atkGain;
         defGain = s.defGain;
         spdGain = s.spdGain;
+
+        HPPassives = s.HPPassives;
+        TPPassives = s.TPPassives;
+        atkPassives = s.atkPassives;
+        defPassives = s.defPassives;
+        spdPassives = s.spdPassives;
 
         // Levels and EXP Data
         level = s.level;
