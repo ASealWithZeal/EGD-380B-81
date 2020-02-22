@@ -67,8 +67,9 @@ public class WinCanvasScript : MonoBehaviour
         else if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
         {
             expText.SetText("+0");
-            neededEXPText.SetText("0");
+            neededEXPText.SetText("--");
             expMeter.fillAmount = 1.0f;
+            levelingUp = false;
         }
 
         while (levelingUp && charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1)
@@ -116,6 +117,12 @@ public class WinCanvasScript : MonoBehaviour
             {
                 expMeter.fillAmount = 0;
                 cEXP -= charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+            }
+            else if (charStats.startingLevel + levelUp == charStats.nextLevelExp.Count + 1)
+            {
+                expMeter.fillAmount = 1;
+                expText.SetText("+0");
+                neededEXPText.SetText("--");
             }
         }
 

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class EnemyUI : MonoBehaviour
 {
     public Image healthBar = null;
     public List<Color> colors = null;
     public Canvas parentCanvas = null;
+    public TextMeshProUGUI name = null;
 
     // Start is called before the first frame update
     void Start()
@@ -20,8 +22,10 @@ public class EnemyUI : MonoBehaviour
         StartCoroutine(AlterHealthBar(newHealthPercent));
     }
 
-    public void CreateUI(Transform objTransform)
+    public void CreateUI(string name, Transform objTransform)
     {
+        this.name.SetText(name);
+
         // Get the position on the canvas
         Vector2 uiOffset = new Vector2(parentCanvas.GetComponent<RectTransform>().sizeDelta.x / 2f, parentCanvas.GetComponent<RectTransform>().sizeDelta.y / 2f);
 
@@ -33,7 +37,7 @@ public class EnemyUI : MonoBehaviour
         Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(objTransform.position - size);
         Vector2 proportionalPosition = new Vector2(ViewportPosition.x * parentCanvas.GetComponent<RectTransform>().sizeDelta.x, ViewportPosition.y * parentCanvas.GetComponent<RectTransform>().sizeDelta.y);
         Vector2 actualPosition = proportionalPosition - uiOffset;
-        actualPosition.y = (actualPosition.y / objTransform.localScale.y) - 15.0f;
+        actualPosition.y = (actualPosition.y / objTransform.localScale.y) - ((0.5f + (objTransform.localScale.y / 10)) * objTransform.localScale.y) - (2.0f - objTransform.position.z);
 
         // Set the position and remove the screen offset
         gameObject.transform.localPosition = actualPosition;
@@ -52,7 +56,7 @@ public class EnemyUI : MonoBehaviour
         while ((decrease && healthBar.fillAmount > newHealthPercent)
             || (!decrease && healthBar.fillAmount < newHealthPercent))
         {
-            healthBar.fillAmount -= 0.005f * multiplier;
+            healthBar.fillAmount -= 0.01f * multiplier;
 
             if (healthBar.fillAmount > 0.5f)
                 healthBar.color = colors[0];
@@ -61,7 +65,7 @@ public class EnemyUI : MonoBehaviour
             else if (healthBar.fillAmount <= 0.25f)
                 healthBar.color = colors[2];
 
-            yield return new WaitForSeconds(0.005f);
+            yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
         }
 
         healthBar.fillAmount = newHealthPercent;

@@ -167,11 +167,20 @@ namespace Managers
 
             if (init)
             {
-                tracker.SetUpTrackers(t1, 1, true);
-                tracker.SetUpTrackers(t2, 2, false);
+                StartCoroutine(WaitForFirstSetup());
             }
             else
                 tracker.ReorderTrackers();
+        }
+
+        IEnumerator WaitForFirstSetup()
+        {
+            yield return new WaitForSeconds(0.02f);
+
+            tracker.SetUpTrackers(t1, 1, true);
+            tracker.SetUpTrackers(t2, 2, false);
+
+            yield return null;
         }
     }
 }

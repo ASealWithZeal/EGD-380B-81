@@ -34,18 +34,20 @@ public class CharData : MonoBehaviour
     private void Start()
     {
         if (gameObject.tag == "Enemy")
-            charUI.GetComponent<EnemyUI>().CreateUI(transform);
+            charUI.GetComponent<EnemyUI>().CreateUI(name, transform);
     }
 
     public void SetCharUI()
     {
         if (gameObject.tag == "Player")
         {
-            charUI.GetComponent<PlayerStatusUI>().SetNewHP(charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
+            charUI.GetComponent<PlayerStatusUI>().SetNewHP(name, charStats.level, charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
             charWinUI.Init();
         }
         else if (gameObject.tag == "Enemy")
-            charUI.GetComponent<EnemyUI>().CreateUI(transform);
+        {
+            charUI.GetComponent<EnemyUI>().CreateUI(name, transform);
+        }
     }
 
     public void ChangeHP()

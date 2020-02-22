@@ -18,6 +18,7 @@ public class Healer : MonoBehaviour
 
     [Header("Ability0")]
     public string ability0Name = "Blood Draw";
+    public string ability0Description = "Deal 1.0x damage, then restore 100% of that as HP split evenly between all allies.";
     public float ability0Mod = 1.0f;
     public int ability0Cost = 5;
     public Targeting ability0Target;
@@ -25,6 +26,7 @@ public class Healer : MonoBehaviour
 
     [Header("Ability0 Upgrade")]
     public string ability0UpgradeName = "Overdraw";
+    public string ability0UpgradeDescription = "Deal 1.35x damage, then restore 120% of that as HP split evenly between all allies.";
     public float ability0UpgradeMod = 1.35f;
     public int ability0UpgradeCost = 7;
     public Targeting ability0UpgradeTarget;
@@ -32,6 +34,7 @@ public class Healer : MonoBehaviour
 
     [Header("Ability1")]
     public string ability1Name = "Adrenalinjection";
+    public string ability1Description = "Give an ally +25% ATK for 3 turns.";
     public int ability1Cost = 4;
     public float ability1Effect = 1.25f;
     public int ability1Duration = 3;
@@ -107,7 +110,7 @@ public class Healer : MonoBehaviour
     public void PerformAbility1()
     {
         // Animation
-        charStats.currentTP -= ability0Cost;
+        charStats.currentTP -= ability1Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
         Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);

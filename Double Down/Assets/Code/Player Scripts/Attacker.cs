@@ -18,6 +18,7 @@ public class Attacker : MonoBehaviour
 
     [Header("Ability0")]
     public string ability0Name = "Heavy Slash";
+    public string ability0Description = "Gain -99% SPD for 1 turn. During your next turn, deal 2.5x damage to an enemy.";
     public float ability0Mod = 0.0f;
     public int ability0Delay = 1;
     public int ability0Cost = 6;
@@ -25,6 +26,7 @@ public class Attacker : MonoBehaviour
 
     [Header("Ability0 Upgrade")]
     public string ability0UpgradeName = "Guard Overhead";
+    public string ability0UpgradeDescription = "Gain -99% SPD and +50% DEF for 1 turn. During your next turn, deal 3.0x damage to an enemy.";
     public float ability0UpgradeMod = 3.0f;
     public float ability0UpgradeDefMod = 1.25f;
     public int ability0UpgradeCost = 8;
@@ -32,6 +34,7 @@ public class Attacker : MonoBehaviour
 
     [Header("Ability1")]
     public string ability1Name = "Provoke";
+    public string ability1Description = "All enemies will target the user for 3 turns.";
     public int ability1Cost = 4;
     public float ability1Effect = 1.0f;
     public int ability1Duration = 3;

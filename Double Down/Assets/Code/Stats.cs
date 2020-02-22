@@ -59,6 +59,7 @@ public class Stats : MonoBehaviour
         currentTP = MaxTP();
         lastLevelUpEXP = 0;
         startingExp = 0;
+        startingLevel = level;
     }
 
     // Update is called once per frame
@@ -140,9 +141,9 @@ public class Stats : MonoBehaviour
     public int NextSpeed(bool hasActed)
     {
         if (hasActed && spdModTurns - 1 < 0)
-            return spd;
+            return spd + (int)(spd * spdPassives);
         else if (!hasActed && spdModTurns - 2 < 0)
-            return spd;
+            return spd + (int)(spd * spdPassives);
         else
             return Speed();
     }
@@ -275,7 +276,6 @@ public class Stats : MonoBehaviour
 
         // Levels and EXP Data
         level = s.level;
-        startingLevel = s.startingLevel;
         exp = s.exp;
         startingExp = s.startingExp;
         nextLevelExp.Clear();

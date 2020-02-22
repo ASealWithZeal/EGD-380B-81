@@ -74,17 +74,20 @@ public class PlayerCombatMenuManager : MonoBehaviour
             incs *= -1;
             playerAbilitiesMenu[0].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityName(0));
             playerAbilitiesMenu[0].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(0) + " TP");
+            playerAbilitiesMenu[0].GetComponent<AbilityMenuButton>().SetDescriptionText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityDescription(0));
             for (int i = 1; i < playerAbilitiesMenu.Count - 1; ++i)
             {
                 if (chara.GetComponent<CharData>().learnedAbilities[i])
                 {
                     playerAbilitiesMenu[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityName(i));
                     playerAbilitiesMenu[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i) + " TP");
+                    playerAbilitiesMenu[i].GetComponent<AbilityMenuButton>().SetDescriptionText(Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityDescription(i));
                 }
                 else
                 {
                     playerAbilitiesMenu[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText("");
                     playerAbilitiesMenu[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().SetText("");
+                    playerAbilitiesMenu[i].GetComponent<AbilityMenuButton>().SetDescriptionText("");
                 }
             }
 

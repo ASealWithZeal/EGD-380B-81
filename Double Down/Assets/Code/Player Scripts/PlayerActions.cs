@@ -187,4 +187,39 @@ public class PlayerActions : MonoBehaviour
 
         return returnVal;
     }
+
+    public string GetAbilityDescription(int i)
+    {
+        string returnVal = "";
+
+        switch (i)
+        {
+            case 0:
+                if (!GetComponent<CharData>().learnedAbilities[0])
+                {
+                    if (character == Char.Char0)
+                        returnVal = GetComponent<Attacker>().ability0Description;
+                    else if (character == Char.Char1)
+                        returnVal = GetComponent<Healer>().ability0Description;
+                }
+
+                else
+                {
+                    if (character == Char.Char0)
+                        returnVal = GetComponent<Attacker>().ability0UpgradeDescription;
+                    else if (character == Char.Char1)
+                        returnVal = GetComponent<Healer>().ability0UpgradeDescription;
+                }
+                break;
+
+            case 1:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability1Description;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability1Description;
+                break;
+        }
+
+        return returnVal;
+    }
 }

@@ -77,6 +77,7 @@ public class OverallWinCanvasScript : MonoBehaviour
 
                 while (!charLearns[i].done)
                     yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
+                yield return new WaitForSeconds(0.5f);
 
                 while (abilityGroup.alpha > 0.0f)
                 {
@@ -89,7 +90,6 @@ public class OverallWinCanvasScript : MonoBehaviour
         }
 
         // TEMP
-        yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements * 300);
         Managers.SceneChangeManager.Instance.EndCombat();
 
         yield return null;

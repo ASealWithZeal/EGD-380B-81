@@ -18,13 +18,16 @@ public class PlayerStatusUI : MonoBehaviour
     public TextMeshProUGUI cTP;
     public TextMeshProUGUI mTP;
 
+    public TextMeshProUGUI name;
+    public TextMeshProUGUI level;
+
     // Start is called before the first frame update
     void Start()
     {
         healthBar.color = colors[0];
     }
 
-    public void SetNewHP(int nCHP, int nMHP, int nCTP, int nMTP)
+    public void SetNewHP(string name, int level, int nCHP, int nMHP, int nCTP, int nMTP)
     {
         lastHealth = nCHP;
         lastTP = nCTP;
@@ -33,6 +36,9 @@ public class PlayerStatusUI : MonoBehaviour
 
         cTP.SetText(nCTP.ToString());
         mTP.SetText(nMTP.ToString());
+
+        this.name.SetText(name);
+        this.level.SetText("Lv " + level.ToString());
     }
 
     public void ChangeHealth(float newHealthPercent, int currentHealth)
@@ -61,7 +67,7 @@ public class PlayerStatusUI : MonoBehaviour
         while ((decrease && healthBar.fillAmount > newHealthPercent) 
             || (!decrease && healthBar.fillAmount < newHealthPercent))
         {
-            healthBar.fillAmount -= 0.005f * multiplier;
+            healthBar.fillAmount -= 0.01f * multiplier;
 
             if ((decrease && lastHealth > currentHealth)
                 || (!decrease && lastHealth < currentHealth))
@@ -76,7 +82,7 @@ public class PlayerStatusUI : MonoBehaviour
             else if (healthBar.fillAmount <= 0.5f && healthBar.fillAmount > 0.25f)
                 healthBar.color = colors[1];
 
-            yield return new WaitForSeconds(0.005f);
+            yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
         }
 
         healthBar.fillAmount = newHealthPercent;
