@@ -112,7 +112,7 @@ public class Healer : MonoBehaviour
         // Animation
         charStats.currentTP -= ability1Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
-        Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
+        Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);
     }
 }

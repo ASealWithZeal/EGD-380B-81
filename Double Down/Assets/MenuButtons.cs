@@ -24,6 +24,9 @@ public class MenuButtons : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (Cursor.visible)
+            Cursor.visible = false;
+
         if (Cursor.lockState != CursorLockMode.Locked)
             Cursor.lockState = CursorLockMode.Locked;
 
