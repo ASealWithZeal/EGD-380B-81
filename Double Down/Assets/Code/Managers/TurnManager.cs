@@ -121,9 +121,16 @@ namespace Managers
         // Can be used to re-sort the order mid-turn
         private void SetTurnOrder(bool init)
         {
+            StartCoroutine(WaitForTurnSetup(init));
+        }
+
+        IEnumerator WaitForTurnSetup(bool init)
+        {
             bool sorted = false;
             bool sorting = true;
             GameObject temp = null;
+
+            yield return new WaitForSeconds(0.1f);
 
             while (sorting)
             {
@@ -167,18 +174,11 @@ namespace Managers
 
             if (init)
             {
-                StartCoroutine(WaitForFirstSetup());
+                tracker.SetUpTrackers(t1, 1, true);
+                tracker.SetUpTrackers(t2, 2, false);
             }
             else
                 tracker.ReorderTrackers();
-        }
-
-        IEnumerator WaitForFirstSetup()
-        {
-            yield return new WaitForSeconds(0.02f);
-
-            tracker.SetUpTrackers(t1, 1, true);
-            tracker.SetUpTrackers(t2, 2, false);
 
             yield return null;
         }
