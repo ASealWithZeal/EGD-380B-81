@@ -216,14 +216,14 @@ public class Stats : MonoBehaviour
         exp += winEXP;
         if (level < nextLevelExp.Count + 1 && exp >= nextLevelExp[level - 1])
         {
-            LevelUp(winEXP);
+            LevelUp();
         }
     }
 
-    public void LevelUp(int winEXP)
+    public void LevelUp()
     {
         level++;
-        exp = winEXP - nextLevelExp[level - 2];
+        exp = Mathf.Abs(exp - nextLevelExp[level - 2]);
         lastLevelUpEXP = nextLevelExp[level - 2];
 
         maxHP += HPGain;
@@ -234,7 +234,7 @@ public class Stats : MonoBehaviour
 
         if (level < nextLevelExp.Count + 1 && exp > nextLevelExp[level - 1])
         {
-            LevelUp(winEXP);
+            LevelUp();
         }
     }
 

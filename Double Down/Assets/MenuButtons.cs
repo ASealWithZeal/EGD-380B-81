@@ -58,7 +58,7 @@ public class MenuButtons : MonoBehaviour
                 Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
                 break;
             case (int)Menu.HowTo:
-                Managers.SceneChangeManager.Instance.ChangeScene("HowToScene");
+                Managers.SceneChangeManager.Instance.ChangeScene("ControlsScene");
                 break;
             case (int)Menu.Quit:
                 Application.Quit();

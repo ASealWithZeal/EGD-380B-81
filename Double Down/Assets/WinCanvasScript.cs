@@ -79,6 +79,7 @@ public class WinCanvasScript : MonoBehaviour
             n = charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp] - cStartingEXP;
 
             float fill = cEXP / (float)charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+            Debug.Log(fill);
             if (fill >= 1.0f)
             {
                 levelUp++;
@@ -108,17 +109,17 @@ public class WinCanvasScript : MonoBehaviour
                 neededEXPText.SetText("0");
             expMeter.fillAmount = fill;
 
-            if (charStats.exp == 0)
+            if (cEXP - charStats.nextLevelExp[(charStats.startingLevel - 1)] == 0)
             {
                 expMeter.fillAmount = 0;
                 levelingUp = false;
             }
-            else if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1 && charStats.exp != 0 && levelingUp)
+            else if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1 && cEXP - charStats.nextLevelExp[(charStats.startingLevel - 1)] != 0 && levelingUp)
             {
                 expMeter.fillAmount = 0;
-                cEXP -= charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp];
+                cEXP = Mathf.Abs(cEXP - charStats.nextLevelExp[(charStats.startingLevel - 1)]);
             }
-            else if (charStats.startingLevel + levelUp == charStats.nextLevelExp.Count + 1)
+            if (charStats.startingLevel + levelUp == charStats.nextLevelExp.Count + 1)
             {
                 expMeter.fillAmount = 1;
                 expText.SetText("+0");

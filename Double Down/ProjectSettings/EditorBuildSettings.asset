@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Start.unity
     guid: 82b30138d0bb1b24c84f31d5f73aa9b3
   - enabled: 1
-    path: Assets/Scenes/HowToScene.unity
-    guid: cbf22aa1f3758d74faa4a48f68db30f8
+    path: Assets/Scenes/ControlsScene.unity
+    guid: 418bc198e9610b1428d46ef93bb5fc47
   - enabled: 1
     path: Assets/Scenes/LoseScene.unity
     guid: b984c00d22fa04e489ce6b1fe617bb7c
