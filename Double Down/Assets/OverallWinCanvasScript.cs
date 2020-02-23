@@ -31,6 +31,8 @@ public class OverallWinCanvasScript : MonoBehaviour
 
     IEnumerator ShowCanvas(int earnedEXP)
     {
+        yield return new WaitForSeconds(0.75f);
+
         while (theGroup.alpha < 1.0f)
         {
             theGroup.alpha += 0.1f;

@@ -8533,11 +8533,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30bebd9d21da08042acb03f44443fb1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 3300
-  currentHP: 3300
+  maxHP: 1800
+  currentHP: 1800
   maxTP: 15
   currentTP: 15
-  atk: 14
+  atk: 13
   def: 10
   spd: 15
   HPGain: 0
@@ -8622,7 +8622,7 @@ MonoBehaviour:
   attackName: Attack
   attackMod: 1
   attackPercent: 50
-  attackPercent2: 40
+  attackPercent2: 30
   attackTarget: 0
   special0Name: Feather Storm
   special0Mod: 0.5
@@ -8638,7 +8638,7 @@ MonoBehaviour:
   special2Name: Inferno Breath
   special2Mod: 1.35
   special2Percent: 0
-  special2Percent2: 20
+  special2Percent2: 30
   special2Delay: 1
   special2Target: 1
   special3Name: The magpie sacrifices its defenses for more power!

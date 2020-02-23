@@ -98,6 +98,7 @@ namespace Managers
                 endingTurn = true;
                 bool canMoveOn = true;
                 for (int i = 0; i < TurnManager.Instance.combatChars.Count; ++i)
+                {
                     if (TurnManager.Instance.combatChars[i].GetComponent<Stats>().HP() <= 0)
                     {
                         if (TurnManager.Instance.combatChars[i].tag == "Player")
@@ -111,7 +112,10 @@ namespace Managers
 
                         TurnManager.Instance.combatChars[i].GetComponent<CharData>().KillChar();
                         TurnManager.Instance.combatChars.Remove(TurnManager.Instance.combatChars[i]);
+
+                        i = -1;
                     }
+                }
 
                 if (TurnManager.Instance.enemyCharsList.Count == 0)
                 {
@@ -123,8 +127,7 @@ namespace Managers
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {
                     canMoveOn = false;
-                    BattleDataScript.Instance.SetMaxCharValues();
-                    SceneChangeManager.Instance.ChangeScene("LoseScene");
+                    Invoke("EndCombatLoss", 0.75f);
                 }
 
                 if (canMoveOn)
@@ -147,6 +150,11 @@ namespace Managers
 
             else
                 DealDamage(storedMod);
+        }
+
+        private void EndCombatLoss()
+        {
+            SceneChangeManager.Instance.LoseCombat();
         }
 
         // Sets up an action before targeting the relevant character(s)

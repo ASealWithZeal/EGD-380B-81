@@ -17,5 +17,11 @@ namespace Managers
             Managers.BattleDataScript.Instance.SetMaxCharValues();
             ChangeScene("BattleSelectScene");
         }
+
+        public void LoseCombat()
+        {
+            Managers.BattleDataScript.Instance.SetMaxCharValues();
+            ChangeScene("LoseScene");
+        }
     }
 }
