@@ -14,17 +14,18 @@ namespace Managers
 {
     public class MovementManager : Singleton<MovementManager>
     {
-        public List<CharData> playerChars;
-        public bool canMoveChars = true;
+        public bool canMoveChars = false;
+        private bool setupMoveChars = false;
         private Vector3 movement = new Vector3();
+        public Camera cam = null;
 
         public float moveDistance = 0.1f;
         private Vector3[] moves = new Vector3[4]
         {
-        new Vector3(0, 0, 1),
-        new Vector3(0, 0, -1),
-        new Vector3(1, 0, 0),
-        new Vector3(-1, 0, 0),
+            new Vector3(0, 0, 1),
+            new Vector3(0, 0, -1),
+            new Vector3(1, 0, 0),
+            new Vector3(-1, 0, 0),
         };
 
         // Start is called before the first frame update
@@ -37,13 +38,35 @@ namespace Managers
         void FixedUpdate()
         {
             if (canMoveChars)
+            {
+                cam.transform.position = Vector3.Lerp(cam.transform.position, TurnManager.Instance.t1[0].transform.position + new Vector3(0, 2.15f, -4.5f), Time.deltaTime * 10);
                 MoveChars();
+            }
+            else if (setupMoveChars)
+            {
+                cam.transform.position = Vector3.Lerp(cam.transform.position, TurnManager.Instance.t1[0].transform.position + new Vector3(0, 2.15f, -4.5f), Time.deltaTime * 10);
+                CheckCameraForMovedChars();
+            }
         }
 
         private void MoveChars()
         {
             Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Physics.gravity.y * Time.fixedDeltaTime * moveDistance, Input.GetAxisRaw("Vertical"));
-            playerChars[0].gameObject.GetComponent<CharacterController>().Move(transform.TransformDirection(input * moveDistance * Time.fixedDeltaTime));
+            TurnManager.Instance.t1[0].GetComponent<CharacterController>().Move(transform.TransformDirection(input * moveDistance * Time.fixedDeltaTime));
+        }
+
+        private void CheckCameraForMovedChars()
+        {
+            if (cam.transform.position == TurnManager.Instance.t1[0].transform.position)
+            {
+                canMoveChars = true;
+                setupMoveChars = false;
+            }
+        }
+
+        public void StartRound()
+        {
+            setupMoveChars = true;
         }
     }
 }

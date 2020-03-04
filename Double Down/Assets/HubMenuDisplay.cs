@@ -51,7 +51,7 @@ public class HubMenuDisplay : MonoBehaviour
     {
         Managers.MovementManager.Instance.canMoveChars = false;
         //SetTextPerCharacter(Managers.TurnManager.Instance.playerCharsList[0].GetComponent<Stats>());
-        SetTextPerCharacter(GameObject.Find("Char1").GetComponent<Stats>());
+        SetTextPerCharacter(Managers.TurnManager.Instance.t1[0].GetComponent<Stats>());
         StartCoroutine(OpeningMenu());
     }
 

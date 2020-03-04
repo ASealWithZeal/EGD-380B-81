@@ -42,7 +42,7 @@ public class CharData : MonoBehaviour
         if (gameObject.tag == "Player")
         {
             charUI.GetComponent<PlayerStatusUI>().SetNewHP(name, charStats.level, charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
-            charWinUI.Init();
+            charWinUI?.Init();
         }
         else if (gameObject.tag == "Enemy")
         {

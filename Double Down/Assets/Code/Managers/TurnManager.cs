@@ -6,7 +6,7 @@ namespace Managers
 {
     public class TurnManager : Singleton<TurnManager>
     {
-        private bool inCombat = true;
+        private bool inCombat = false;
 
         public GameObject playerChars;
         public GameObject enemyChars;
@@ -79,9 +79,11 @@ namespace Managers
             //  CHANGE TO ONLY AFFECT RELEVANT CHARACTER IN THE FUTURE
             if (inCombat)
                 CombatManager.Instance.StartRound();
-
             else
-                EndRound();
+                MovementManager.Instance.StartRound();
+
+            //else
+            //    EndRound();
         }
 
         // Ends the current round of combat
