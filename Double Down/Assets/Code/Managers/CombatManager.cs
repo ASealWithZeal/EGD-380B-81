@@ -37,6 +37,12 @@ namespace Managers
         private bool endingTurn = false;
         private bool settingTarget = false;
 
+        private void Start()
+        {
+            // Starts combat! - Temp
+            StartRound();
+        }
+
         private void Update()
         {
             SelectTargets();

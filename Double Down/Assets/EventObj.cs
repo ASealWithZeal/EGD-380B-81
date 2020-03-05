@@ -14,11 +14,13 @@ public class EventObj : MonoBehaviour
     public string text;
     public EventTextBox box = null;
     public List<GameObject> enemies = null;
+    public GameObject player;
 
     public void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
         {
+            player = other.gameObject;
             box.PassEventIn(text, gameObject);
         }
     }
@@ -31,7 +33,7 @@ public class EventObj : MonoBehaviour
         }
         else if (type == HubEvents.Battle && @bool)
         {
-            Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
+            Managers.CombatTransitionManager.Instance.CreateNewCombatInstance(player, enemies);
         }
         else if (!@bool)
         {

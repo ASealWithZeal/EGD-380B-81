@@ -7,10 +7,13 @@ public class CharData : MonoBehaviour
     public string name;
 
     public bool targeting;
-    [HideInInspector] public bool isInCombat = true;
     public int t1Pos = 0;
     public int t2Pos = 0;
     public int charNum = -1;
+
+    [Header("Combat Info")]
+    public bool isInCombat = false;
+    public int combatInst = -1;
 
     [Header("Abilities")]
     public List<bool> learnedAbilities = new List<bool>();
