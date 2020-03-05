@@ -10,30 +10,32 @@ public enum HubEvents
 
 public class EventObj : MonoBehaviour
 {
-    HubEvents type;
-
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public HubEvents type;
+    public string text;
+    public EventTextBox box = null;
+    public List<GameObject> enemies = null;
 
     public void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
         {
-            if (type == HubEvents.Pass)
-            {
-                Managers.TurnManager.Instance.EndRound();
-            }
+            box.PassEventIn(text, gameObject);
+        }
+    }
+
+    public void PassResponse(bool @bool)
+    {
+        if (type == HubEvents.Pass && @bool)
+        {
+            Managers.TurnManager.Instance.EndRound();
+        }
+        else if (type == HubEvents.Battle && @bool)
+        {
+            Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
+        }
+        else if (!@bool)
+        {
+            Managers.MovementManager.Instance.canMoveChars = true;
         }
     }
 }

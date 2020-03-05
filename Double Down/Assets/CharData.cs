@@ -33,8 +33,8 @@ public class CharData : MonoBehaviour
 
     private void Start()
     {
-        if (gameObject.tag == "Enemy")
-            charUI.GetComponent<EnemyUI>().CreateUI(name, transform);
+        //if (gameObject.tag == "Enemy")
+        //    charUI.GetComponent<EnemyUI>().CreateUI(name, transform);
     }
 
     public void SetCharUI()

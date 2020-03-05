@@ -36,7 +36,7 @@ public class HubMenuDisplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && !open)
+        if (Managers.MovementManager.Instance.canMoveChars && Input.GetKeyDown(KeyCode.Escape) && !open)
             OpenMenu();
         else if (Input.GetKeyDown(KeyCode.Escape) && open)
             StartCoroutine(ClosingMenu());
@@ -118,7 +118,6 @@ public class HubMenuDisplay : MonoBehaviour
         for (int i = 0; i < statButtons.Count; ++i)
             statButtons[i].interactable = true;
         yield return new WaitForSeconds(0.0125f);
-        Debug.Log(statButtons[0].interactable);
         statButtons[0].Select();
 
         open = true;

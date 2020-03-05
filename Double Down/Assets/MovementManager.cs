@@ -57,7 +57,8 @@ namespace Managers
 
         private void CheckCameraForMovedChars()
         {
-            if (cam.transform.position == TurnManager.Instance.t1[0].transform.position)
+            if ((cam.transform.position.x + 0.01f > TurnManager.Instance.t1[0].transform.position.x && cam.transform.position.x - 0.01f < TurnManager.Instance.t1[0].transform.position.x)
+                || (cam.transform.position.z + 0.01f > TurnManager.Instance.t1[0].transform.position.z && cam.transform.position.z - 0.01f < TurnManager.Instance.t1[0].transform.position.z))
             {
                 canMoveChars = true;
                 setupMoveChars = false;
