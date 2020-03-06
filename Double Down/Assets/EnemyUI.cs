@@ -25,6 +25,7 @@ public class EnemyUI : MonoBehaviour
     public void CreateUI(string name, Transform objTransform)
     {
         this.name.SetText(name);
+        parentCanvas = GameObject.Find("_CombatCanvas").GetComponent<Canvas>();
 
         // Get the position on the canvas
         Vector2 uiOffset = new Vector2(parentCanvas.GetComponent<RectTransform>().sizeDelta.x / 2f, parentCanvas.GetComponent<RectTransform>().sizeDelta.y / 2f);

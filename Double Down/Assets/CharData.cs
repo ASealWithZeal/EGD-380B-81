@@ -9,7 +9,13 @@ public class CharData : MonoBehaviour
     public bool targeting;
     public int t1Pos = 0;
     public int t2Pos = 0;
+    public Vector3 hubPosition = new Vector3();
+    public Vector3 combatPosition = new Vector3();
     public int charNum = -1;
+
+    [Header("Event Info")]
+    public bool dead = false;
+    public int attachedEventNum = 0;
 
     [Header("Combat Info")]
     public bool isInCombat = false;
@@ -36,8 +42,8 @@ public class CharData : MonoBehaviour
 
     private void Start()
     {
-        //if (gameObject.tag == "Enemy")
-        //    charUI.GetComponent<EnemyUI>().CreateUI(name, transform);
+        if (gameObject.tag == "Player")
+            SetCharUI();
     }
 
     public void SetCharUI()
@@ -93,6 +99,7 @@ public class CharData : MonoBehaviour
 
     IEnumerator DeathAnim()
     {
+        dead = true;
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
         isInCombat = false;
 
@@ -104,7 +111,7 @@ public class CharData : MonoBehaviour
 
         if (gameObject.tag != "Player")
             charUI.SetActive(false);
-        Destroy(gameObject);
+        //gameObject.SetActive(false);
         yield return null;
     }
 

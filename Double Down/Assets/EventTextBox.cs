@@ -31,6 +31,13 @@ public class EventTextBox : MonoBehaviour
         StartCoroutine(HideBox(@bool));
     }
 
+    public void DisableBox()
+    {
+        group.alpha = 0;
+        for (int i = 0; i < buttons.Count; ++i)
+            buttons[i].interactable = false;
+    }
+
     IEnumerator ShowBox()
     {
         while (group.alpha < 1)

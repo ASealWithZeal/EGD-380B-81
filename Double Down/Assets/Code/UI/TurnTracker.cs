@@ -17,6 +17,7 @@ public class TurnTracker : MonoBehaviour
 
     public float seconds = 3.0f;
     public float timeIncrements = 0.005f;
+    public bool listSorted = false;
 
     // Start is called before the first frame update
     void Start()
@@ -30,10 +31,10 @@ public class TurnTracker : MonoBehaviour
             t1.Add(null);
 
         if (j == 1)
-            StartCoroutine(CreateT1TrackerUI(l));
+            StartCoroutine(CreateT1TrackerUI(l, true));
 
         else if (j == 2)
-            StartCoroutine(CreateT2TrackerUI(l));
+            StartCoroutine(CreateT2TrackerUI(l, true));
     }
 
     public void HighlightSelectedTrackers(GameObject obj)
@@ -68,33 +69,96 @@ public class TurnTracker : MonoBehaviour
         //    t2.Remove(t2[0]);
         //}
         
-        StartCoroutine(ShiftNonDestroyedTrackers());
+        DestroyEmptyTrackers(true);
 
         //SetUpTrackers(l2, 2, false);
     }
 
-    public void ReorderTrackers()
+    public void DestroyEmptyTrackers(bool end)
+    {
+        // Destroy all T1 trackers
+        for (int i = 0; i < t1.Count; ++i)
+        {
+            Debug.Log(t1[i].GetComponent<TurnTrackerObj>().objData.dead);
+            if (t1[i].GetComponent<TurnTrackerObj>().objData.dead)
+                StartCoroutine(DestroyTracker(t1[i]));
+        }
+
+        // Destroy all T2 trackers
+        for (int i = 0; i < t2.Count; ++i)
+        {
+            Debug.Log(t2[i].GetComponent<TurnTrackerObj>().objData.dead);
+            if (t2[i].GetComponent<TurnTrackerObj>().objData.dead)
+                StartCoroutine(DestroyTracker(t2[i]));
+        }
+
+        StartCoroutine(ShiftNonDestroyedTrackers(end));
+    }
+
+    public void DestroyNonCombatTrackers(bool end)
+    {
+        // Destroy all T1 trackers
+        for (int i = 0; i < t1.Count; ++i)
+        {
+            if (!t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
+                StartCoroutine(DestroyTracker(t1[i]));
+        }
+
+        // Destroy all T2 trackers
+        for (int i = 0; i < t2.Count; ++i)
+        {
+            if (!t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
+                StartCoroutine(DestroyTracker(t2[i]));
+        }
+
+        StartCoroutine(ShiftNonDestroyedTrackers(end));
+    }
+
+    public void DestroyNonPlayerCombatTrackers(bool end)
+    {
+        // Destroy all T1 trackers
+        for (int i = 0; i < t1.Count; ++i)
+        {
+            if (t1[i].GetComponent<TurnTrackerObj>().obj == null || (t1[i].GetComponent<TurnTrackerObj>().obj.tag != "Player" && t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat))
+                StartCoroutine(DestroyTracker(t1[i]));
+        }
+
+        // Destroy all T2 trackers
+        for (int i = 0; i < t2.Count; ++i)
+        {
+            if (t2[i].GetComponent<TurnTrackerObj>().obj == null || (t2[i].GetComponent<TurnTrackerObj>().obj.tag != "Player" && t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat))
+                StartCoroutine(DestroyTracker(t2[i]));
+        }
+
+        StartCoroutine(ShiftNonDestroyedTrackers(end));
+    }
+
+    public void ReorderTrackers(bool wait)
     {
         bool sorted = false;
         GameObject temp;
         Vector3 origPos = new Vector3();
+        Vector3 origScale = new Vector3();
         while (!sorted)
         {
             sorted = true;
 
             for (int i = 0; i < t1.Count; ++i)
             {
-                //Debug.Log(t1[0].GetComponent<TurnTrackerObj>().obj + ", " + l1[0]);
                 if (t1[0] != null && t1.Count > 0 && i > 0 && t1[i].GetComponent<TurnTrackerObj>().objData.t1Pos < t1[i - 1].GetComponent<TurnTrackerObj>().objData.t1Pos)
                 {
                     sorted = false;
 
                     origPos = t1[i].transform.position;
+                    origScale = t1[i].transform.localScale;
                     temp = t1[i];
-                    temp.transform.position = t1[i].transform.position;
+
                     t1[i].transform.position = t1[i - 1].transform.position;
+                    t1[i].transform.localScale = t1[i - 1].transform.localScale;
                     t1[i] = t1[i - 1];
+                    
                     t1[i - 1].transform.position = origPos;
+                    t1[i - 1].transform.localScale = origScale;
                     t1[i - 1] = temp;
                 }
             }
@@ -106,14 +170,41 @@ public class TurnTracker : MonoBehaviour
                     sorted = false;
 
                     origPos = t2[i].transform.position;
+                    origScale = t2[i].transform.localScale;
                     temp = t2[i];
                     t2[i].transform.position = t2[i - 1].transform.position;
+                    t2[i].transform.localScale = t2[i - 1].transform.localScale;
                     t2[i] = t2[i - 1];
                     t2[i - 1].transform.position = origPos;
+                    t2[i - 1].transform.localScale = origScale;
                     t2[i - 1] = temp;
                 }
             }
         }
+
+        if (wait)
+            listSorted = true;
+    }
+
+    // Add turn trackers between screen resets
+    public void AddTurnTrackers(List<GameObject> t1, List<GameObject> t2, GameObject player)
+    {
+        List<GameObject> l1 = new List<GameObject>();
+        for (int i = 0; i < t1.Count; ++i)
+        {
+            if (t1[i] != player)
+                l1.Add(t1[i]);
+        }
+
+        List<GameObject> l2 = new List<GameObject>();
+        for (int i = 0; i < t2.Count; ++i)
+        {
+            if (t2[i] != player)
+                l2.Add(t2[i]);
+        }
+
+        StartCoroutine(CreateT1TrackerUI(l1, false));
+        StartCoroutine(CreateT2TrackerUI(l2, false));
     }
 
     // Creates a tracker at a specific index
@@ -154,9 +245,13 @@ public class TurnTracker : MonoBehaviour
     }
 
     // Sets up the T1TrackerUI at the beginning of the game
-    IEnumerator CreateT1TrackerUI(List<GameObject> l)
+    IEnumerator CreateT1TrackerUI(List<GameObject> l, bool end)
     {
         float incs = (250 / seconds) * timeIncrements;
+
+        int j = 0;
+        if (end)
+            j = 1;
 
         for (int i = 0; i < l.Count; ++i)
         {
@@ -167,15 +262,15 @@ public class TurnTracker : MonoBehaviour
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
 
-            g.transform.position = t1Tracker[i + 1].rectTransform.position;
-            g.transform.localScale = t1Tracker[i + 1].rectTransform.localScale * 2;
+            g.transform.position = t1Tracker[i + j].rectTransform.position;
+            g.transform.localScale = t1Tracker[i + j].rectTransform.localScale * 2;
 
             t1.Add(g);
         }
 
-        while (t1[1].GetComponent<Image>().color.a < 1 && t1[1].transform.localScale.x > t1Tracker[1].rectTransform.localScale.x)
+        while (t1[j].GetComponent<Image>().color.a < 1 && t1[j].transform.localScale.x > t1Tracker[1].rectTransform.localScale.x)
         {
-            for (int i = 1; i < t1.Count; ++i)
+            for (int i = j; i < t1.Count; ++i)
             {
                 t1[i].GetComponent<Image>().color += new Color(0, 0, 0, incs * 0.025f);
                 t1[i].transform.localScale -= new Vector3(incs * 0.025f, incs * 0.025f, incs * 0.025f);
@@ -184,7 +279,7 @@ public class TurnTracker : MonoBehaviour
             yield return new WaitForSeconds(timeIncrements);
         }
 
-        for (int i = 1; i < t1.Count; ++i)
+        for (int i = j; i < t1.Count; ++i)
         {
             t1[i].GetComponent<Image>().color += new Color(0, 0, 0, 1);
             t1[i].transform.localScale = t1Tracker[i].rectTransform.localScale;
@@ -194,7 +289,7 @@ public class TurnTracker : MonoBehaviour
     }
 
     // Sets up the T2 tracker UI at the beginning of each turn
-    IEnumerator CreateT2TrackerUI(List<GameObject> l)
+    IEnumerator CreateT2TrackerUI(List<GameObject> l, bool end)
     {
         float incs = (250 / seconds) * timeIncrements;
 
@@ -230,31 +325,22 @@ public class TurnTracker : MonoBehaviour
             t2[i].transform.localScale = t2Tracker[i].rectTransform.localScale;
         }
 
-        if (t1.Count > 0)
-            Managers.TurnManager.Instance.StartRound();
+        if (end)
+        {
+            if (t1.Count > 0)
+                Managers.TurnManager.Instance.StartRound();
+            else
+                Managers.TurnManager.Instance.EndRound();
+        }
         else
-            Managers.TurnManager.Instance.EndRound();
+            Managers.TurnManager.Instance.SetTurnOrder(2);
 
         yield return null;
     }
 
     // Moves the turn order to the LEFT whenever a character performs an action
-    IEnumerator ShiftNonDestroyedTrackers()
+    IEnumerator ShiftNonDestroyedTrackers(bool endRound)
     {
-        // Destroy all T1 trackers
-        for (int i = 0; i < t1.Count; ++i)
-        {
-            if (!t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
-                StartCoroutine(DestroyTracker(t1[i]));
-        }
-
-        // Destroy all T2 trackers
-        for (int i = 0; i < t2.Count; ++i)
-        {
-            if (!t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
-                StartCoroutine(DestroyTracker(t2[i]));
-        }
-
         yield return new WaitForSeconds(0.1f + (1 / 0.1f) * timeIncrements);
 
         float mainInc = (240 / seconds) * timeIncrements;
@@ -311,7 +397,8 @@ public class TurnTracker : MonoBehaviour
         }
 
         // Ends the round of combat
-        Managers.TurnManager.Instance.EndRound();
+        if (endRound)
+            Managers.TurnManager.Instance.EndRound();
 
         yield return null;
     }

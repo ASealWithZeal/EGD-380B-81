@@ -12,10 +12,10 @@ namespace Managers
             SceneManager.LoadScene(sceneName);
         }
 
-        public void EndCombat()
+        public void WinCombat(List<GameObject> players)
         {
-            Managers.BattleDataScript.Instance.SetMaxCharValues();
-            ChangeScene("BattleSelectScene");
+            //BattleDataScript.Instance.SetMaxCharValues();
+            CombatTransitionManager.Instance.DestroyCombatInstance(players);
         }
 
         public void LoseCombat()

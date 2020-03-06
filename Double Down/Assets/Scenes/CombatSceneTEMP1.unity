@@ -6218,10 +6218,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Rab
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0, y: 0, z: 0}
+  combatPosition: {x: 0, y: 0, z: 0}
   charNum: 1
+  isInCombat: 1
+  combatInst: -1
   learnedAbilities: 00000000
   delayedAbilityName: 
   delayedAttack: 0
@@ -8623,10 +8626,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: 
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0, y: 0, z: 0}
+  combatPosition: {x: 0, y: 0, z: 0}
   charNum: -1
+  isInCombat: 1
+  combatInst: -1
   learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0
@@ -10836,10 +10842,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Wenger
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0, y: 0, z: 0}
+  combatPosition: {x: 0, y: 0, z: 0}
   charNum: 0
+  isInCombat: 1
+  combatInst: -1
   learnedAbilities: 00000000
   delayedAbilityName: 
   delayedAttack: 0
@@ -14280,10 +14289,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Embird
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0, y: 0, z: 0}
+  combatPosition: {x: 0, y: 0, z: 0}
   charNum: -1
+  isInCombat: 1
+  combatInst: -1
   learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0
@@ -14734,6 +14746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1767a16769437443a645da6467f11d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scene: 1
 --- !u!1 &1171509782
 GameObject:
   m_ObjectHideFlags: 0
@@ -18116,10 +18129,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Embird
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0, y: 0, z: 0}
+  combatPosition: {x: 0, y: 0, z: 0}
   charNum: -1
+  isInCombat: 1
+  combatInst: -1
   learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0
@@ -25224,10 +25240,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: 
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0, y: 0, z: 0}
+  combatPosition: {x: 0, y: 0, z: 0}
   charNum: -1
+  isInCombat: 1
+  combatInst: -1
   learnedAbilities: 
   delayedAbilityName: 
   delayedAttack: 0

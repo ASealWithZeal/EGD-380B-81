@@ -14,6 +14,7 @@ public class OverallWinCanvasScript : MonoBehaviour
     void Start()
     {
         theGroup = GetComponent<CanvasGroup>();
+
         theGroup.alpha = 0.0f;
         abilityGroup.alpha = 0.0f;
     }
@@ -26,6 +27,7 @@ public class OverallWinCanvasScript : MonoBehaviour
 
     public void ShowWinCanvas(int earnedEXP)
     {
+        Managers.TurnManager.Instance.tracker.DestroyEmptyTrackers(false);
         StartCoroutine(ShowCanvas(earnedEXP));
     }
 
@@ -38,16 +40,13 @@ public class OverallWinCanvasScript : MonoBehaviour
             theGroup.alpha += 0.1f;
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
         }
-
-        for (int i = 0; i < charScripts.Count; ++i)
+        
+        for (int i = 0; i < Managers.TurnManager.Instance.combatChars.Count; ++i)
         {
-            if (charScripts[i].charStats != null)
-                charScripts[i].UpdateUI(earnedEXP);
-            else
-                charScripts[i].done = true;
+            charScripts[i].UpdateUI(earnedEXP);
         }
 
-        for (int i = 0; i < charScripts.Count; ++i)
+        for (int i = 0; i < Managers.TurnManager.Instance.combatChars.Count; ++i)
             while (!charScripts[i].done)
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
@@ -91,8 +90,19 @@ public class OverallWinCanvasScript : MonoBehaviour
             }
         }
 
+        while (theGroup.alpha > 0.0f)
+        {
+            theGroup.alpha -= 0.1f;
+            yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
+        }
+
+        List<GameObject> l = new List<GameObject>();
+        for (int i = 0; i < charScripts.Count; ++i)
+            if (charScripts[i].charStats.gameObject.GetComponent<CharData>().isInCombat)
+                l.Add(charScripts[i].charStats.gameObject);
+
         // TEMP
-        Managers.SceneChangeManager.Instance.EndCombat();
+        Managers.SceneChangeManager.Instance.WinCombat(l);
 
         yield return null;
     }

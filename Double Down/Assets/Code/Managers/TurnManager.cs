@@ -9,15 +9,19 @@ namespace Managers
         private bool inCombat = false;
 
         public GameObject playerChars;
+        public GameObject nonCombatPlayer;
         public GameObject enemyChars;
+        public GameObject nonCombatEnemies;
         public TurnTracker tracker;
         [HideInInspector] public List<GameObject> playerCharsList = null;
         [HideInInspector] public List<GameObject> enemyCharsList = null;
         [HideInInspector] public List<GameObject> combatChars = null;
-        [HideInInspector] public List<GameObject> t1 = null;
-        [HideInInspector] public List<GameObject> t2 = null;
+        //[HideInInspector]
+        public List<GameObject> t1 = null;
+        //[HideInInspector]
+        public List<GameObject> t2 = null;
 
-        private void Start()
+        public void Init()
         {
             for (int i = 0; i < playerChars.transform.childCount; ++i)
             {
@@ -37,25 +41,140 @@ namespace Managers
                 t2.Add(combatChars[i]);
             }
 
-            SetTurnOrder(true);
+            SetTurnOrder(0);
         }
 
-        // Resets the turn order to account for dead enemies
-        public void ResetTurns()
+        private void RemoveTurns()
         {
             for (int i = 0; i < t1.Count; ++i)
             {
-                if (t1[i] == null)
+                if (t1[i].GetComponent<CharData>().dead)
                     t1.Remove(t1[i]);
             }
 
             for (int i = 0; i < t2.Count; ++i)
             {
-                if (t2[i] == null)
+                if (t2[i].GetComponent<CharData>().dead)
                     t2.Remove(t2[i]);
             }
+        }
 
+        // Resets the turn order to account for dead enemies
+        public void ResetTurns()
+        {
+            RemoveTurns();
             tracker.ResetTrackers();
+        }
+
+        // Resets the turn order to account for new enemies
+        public void PrepCombatTurns()
+        {
+            RemoveTurns();
+            tracker.DestroyNonCombatTrackers(false);
+
+            FillCombatTurns();
+            SetTurnOrder(1);
+        }
+
+        // Fills the combat list with enemies
+        // In the future, ALSO ADD THE NEW PLAYER CHAR, IF APPLICABLE
+        public void FillCombatTurns()
+        {
+            GameObject player = t1[0];
+
+            // Clears all lists to ensure everything is refilled properly
+            playerCharsList.Clear();
+            enemyCharsList.Clear();
+            combatChars.Clear();
+            t1.Clear();
+            t2.Clear();
+
+            // Refills lists with relevant information
+            for (int i = 0; i < playerChars.transform.childCount; ++i)
+            {
+                playerCharsList.Add(playerChars.transform.GetChild(i).gameObject);
+                combatChars.Add(playerChars.transform.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < enemyChars.transform.childCount; ++i)
+            {
+                enemyCharsList.Add(enemyChars.transform.GetChild(i).gameObject);
+                combatChars.Add(enemyChars.transform.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < combatChars.Count; ++i)
+            {
+                t1.Add(combatChars[i]);
+                t2.Add(combatChars[i]);
+            }
+
+            StartCoroutine(SortBetweenScenes(player));
+            //tracker.AddTurnTrackers(t1, t2, player);
+        }
+
+        // Resets the turn order to account for new enemies
+        public void PrepNonCombatTurns()
+        {
+            RemoveTurns();
+            tracker.DestroyNonPlayerCombatTrackers(false);
+
+            FillNonCombatTurns();
+            SetTurnOrder(1);
+        }
+        // Resets the turn order upon returning to the hub
+        public void FillNonCombatTurns()
+        {
+            GameObject player = t1[0];
+
+            // Clears all lists to ensure everything is refilled properly
+            playerCharsList.Clear();
+            enemyCharsList.Clear();
+            combatChars.Clear();
+            t1.Clear();
+            t2.Clear();
+
+            // Refills lists with relevant information
+            for (int i = 0; i < playerChars.transform.childCount; ++i)
+            {
+                playerCharsList.Add(playerChars.transform.GetChild(i).gameObject);
+                combatChars.Add(playerChars.transform.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < combatChars.Count; ++i)
+            {
+                if (!combatChars[i].GetComponent<CharData>().hasActed)
+                    t1.Add(combatChars[i]);
+                t2.Add(combatChars[i]);
+            }
+
+            StartCoroutine(SortBetweenScenes(player));
+            //tracker.AddTurnTrackers(t1, t2, player);
+        }
+
+        public void EnterSceneResetTurns()
+        {
+            // Reset turns completely
+            playerCharsList.Clear();
+            combatChars.Clear();
+            t1.Clear();
+            t2.Clear();
+
+            for (int i = 0; i < playerChars.transform.childCount; ++i)
+            {
+                playerCharsList.Add(playerChars.transform.GetChild(i).gameObject);
+                combatChars.Add(playerChars.transform.GetChild(i).gameObject);
+            }
+
+            for (int i = 0; i < enemyChars.transform.childCount; ++i)
+            {
+                enemyCharsList.Add(enemyChars.transform.GetChild(i).gameObject);
+                combatChars.Add(enemyChars.transform.GetChild(i).gameObject);
+            }
+
+            for (int i = 0; i < combatChars.Count; ++i)
+            {
+                t1.Add(combatChars[i]);
+                t2.Add(combatChars[i]);
+            }
+
+            SetTurnOrder(1);
         }
 
         public void StartGlobalTurn()
@@ -68,8 +187,7 @@ namespace Managers
         // Starts a turn of gameplay
         public void StartRound()
         {
-            SetTurnOrder(false);
-            t1[0].GetComponent<CharData>().hasActed = true;
+            SetTurnOrder(1);
             tracker.MoveTracker(0);
         }
 
@@ -77,7 +195,7 @@ namespace Managers
         {
             // If either player is engaged in combat, start them in it
             //  CHANGE TO ONLY AFFECT RELEVANT CHARACTER IN THE FUTURE
-            if (inCombat)
+            if (t1[0].GetComponent<CharData>().isInCombat)
                 CombatManager.Instance.StartRound();
             else
                 MovementManager.Instance.StartRound();
@@ -89,7 +207,10 @@ namespace Managers
         // Ends the current round of combat
         public void EndRound()
         {
+            t1[0].GetComponent<CharData>().hasActed = true;
             t1[0].GetComponent<CharData>().t1Pos--;
+
+            Debug.Log(combatChars.Count);
             if (combatChars.Count != t2.Count)
                 ResetTurns();
 
@@ -121,12 +242,12 @@ namespace Managers
 
         // Sorts the character order for each turn
         // Can be used to re-sort the order mid-turn
-        private void SetTurnOrder(bool init)
+        public void SetTurnOrder(int initVal)
         {
-            StartCoroutine(WaitForTurnSetup(init));
+            StartCoroutine(WaitForTurnSetup(initVal));
         }
 
-        IEnumerator WaitForTurnSetup(bool init)
+        IEnumerator WaitForTurnSetup(int initVal)
         {
             bool sorted = false;
             bool sorting = true;
@@ -174,13 +295,75 @@ namespace Managers
                 t2[i].GetComponent<CharData>().t2Pos = i;
             }
 
-            if (init)
+            if (initVal == 0)
             {
                 tracker.SetUpTrackers(t1, 1, true);
                 tracker.SetUpTrackers(t2, 2, false);
             }
-            else
-                tracker.ReorderTrackers();
+            else if (initVal == 1)
+            {
+                yield return new WaitForSeconds(0.2f);
+                tracker.ReorderTrackers(false);
+            }
+            else if (initVal == 2)
+            {
+                yield return new WaitForSeconds(0.2f);
+                tracker.ReorderTrackers(true);
+            }
+
+            yield return null;
+        }
+
+        IEnumerator SortBetweenScenes(GameObject player)
+        {
+            bool sorted = false;
+            bool sorting = true;
+            GameObject temp = null;
+
+            yield return new WaitForSeconds(0.1f);
+
+            while (sorting)
+            {
+                for (int i = 0; i < combatChars.Count; ++i)
+                {
+                    if (t1.Count > i && t1.Count > 0 && i != 0 && t1[i].GetComponent<Stats>().Speed() > t1[i - 1].GetComponent<Stats>().Speed() && !t1[i - 1].GetComponent<CharData>().hasActed)
+                    {
+                        sorted = false;
+
+                        temp = t1[i];
+                        t1[i] = t1[i - 1];
+                        t1[i - 1] = temp;
+                    }
+
+                    if (t2.Count > 0 && i != 0 && t2[i].GetComponent<Stats>().NextSpeed(t2[i].GetComponent<CharData>().hasActed) > t2[i - 1].GetComponent<Stats>().NextSpeed(t2[i - 1].GetComponent<CharData>().hasActed))
+                    {
+                        sorted = false;
+
+                        temp = t2[i];
+                        t2[i] = t2[i - 1];
+                        t2[i - 1] = temp;
+                    }
+                }
+
+                if (!sorted)
+                    sorted = true;
+
+                else
+                    sorting = false;
+            }
+
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                t1[i].GetComponent<CharData>().t1Pos = i;
+            }
+
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                t2[i].GetComponent<CharData>().t2Pos = i;
+            }
+
+            yield return new WaitForSeconds(0.2f);
+            tracker.AddTurnTrackers(t1, t2, player);
 
             yield return null;
         }
