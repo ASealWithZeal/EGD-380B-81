@@ -139,7 +139,7 @@ namespace Managers
                     canMoveOn = false;
                     for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
                         TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(winEXP / TurnManager.Instance.playerCharsList.Count);
-                    winCanvas.ShowWinCanvas(winEXP / TurnManager.Instance.playerCharsList.Count);
+                    winCanvas.ShowWinCanvas(winEXP / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst);
                 }
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {

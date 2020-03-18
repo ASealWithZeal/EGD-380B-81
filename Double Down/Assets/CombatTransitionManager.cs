@@ -36,7 +36,7 @@ namespace Managers
             for (int i = 0; i < temp; ++i)
                 playerChars.GetChild(0).parent = nonCombatPlayerChars;
 
-            // Adds the player characters to the combat list
+            // Adds the participating player character to the combat list
             player.transform.parent = playerChars;
             player.GetComponent<CharData>().isInCombat = true;
             player.GetComponent<CharData>().combatInst = combatInsts;
@@ -53,23 +53,66 @@ namespace Managers
             transitionUI.ExitScene("CombatScene");
         }
 
+        public void EnterExistingCombatInstance(int combatInst, GameObject player, List<GameObject> enemies)
+        {
+            // Temporarily removes all player characters from the combat list
+            int temp = playerChars.childCount;
+            for (int i = 0; i < temp; ++i)
+                playerChars.GetChild(0).parent = nonCombatPlayerChars;
+
+            // Adds the participating player character to the combat list
+            player.transform.parent = playerChars;
+            player.GetComponent<CharData>().isInCombat = true;
+            player.GetComponent<CharData>().combatInst = combatInsts;
+
+            for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
+                if (nonCombatPlayerChars.GetChild(i).GetComponent<CharData>().combatInst == combatInst)
+                    nonCombatPlayerChars.GetChild(i).parent = playerChars;
+
+            // Adds the enemies to the combat list
+            for (int i = 0; i < enemies.Count; ++i)
+            {
+                enemies[i].transform.parent = enemyChars;
+                enemies[i].GetComponent<CharData>().isInCombat = true;
+                enemies[i].GetComponent<CharData>().combatInst = combatInsts;
+            }
+
+            SetCharacterHubPositions();
+            transitionUI.ExitScene("CombatScene");
+        }
+
+        public void ExitExistingCombatInstance(List<GameObject> players)
+        {
+            // Adds all player characters back to the combat list
+            int temp = nonCombatPlayerChars.childCount;
+            for (int i = 0; i < temp; ++i)
+                nonCombatPlayerChars.GetChild(0).parent = playerChars;
+
+            // Removes all enemies from the combat list
+            for (int i = 0; i < enemyChars.childCount; ++i)
+                enemyChars.transform.GetChild(i).parent = nonCombatEnemyChars;
+
+            transitionUI.ExitScene("Hub");
+        }
+
         public void DestroyCombatInstance(List<GameObject> players)
         {
             // Increments the number of combat instances appropriately
             combatInsts--;
 
-            // Temporarily removes all player characters from the combat list
-            int temp = nonCombatPlayerChars.childCount;
-            for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
-                nonCombatPlayerChars.GetChild(0).parent = playerChars;
-
-            // Adds the player characters to the combat list
+            // Sets all involved characters as not currently being involved in combat
             for (int i = 0; i < players.Count; ++i)
             {
                 players[i].GetComponent<CharData>().isInCombat = false;
                 players[i].GetComponent<CharData>().combatInst = -1;
             }
 
+            // Adds all "missing" characters to the combat list
+            int temp = nonCombatPlayerChars.childCount;
+            for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
+                nonCombatPlayerChars.GetChild(0).parent = playerChars;
+
+            // Removes all enemies, IF ANY EXIST, from the combat list
             for (int i = 0; i < enemyChars.childCount; ++i)
                 enemyChars.transform.GetChild(i).parent = nonCombatEnemyChars;
             

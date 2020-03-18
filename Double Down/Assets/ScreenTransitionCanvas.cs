@@ -49,8 +49,8 @@ public class ScreenTransitionCanvas : MonoBehaviour
 
         if (init)
         {
-            // If in combat, continues; if not, ends the round
-            if (Managers.TurnManager.Instance.t1[0].GetComponent<CharData>().isInCombat)
+            Debug.Log(Managers.TurnManager.Instance.t1.Count);
+            if (Managers.TurnManager.Instance.t1[0].GetComponent<CharData>().isInCombat && !Managers.TurnManager.Instance.t1[0].GetComponent<CharData>().hasActed)
                 Managers.CombatManager.Instance.StartCombat();
             else
                 Managers.TurnManager.Instance.EndRound();

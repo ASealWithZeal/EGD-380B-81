@@ -63643,7 +63643,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerChars: {fileID: 925081910}
-  nonCombatPlayer: {fileID: 0}
+  nonCombatPlayer: {fileID: 2127678271}
   enemyChars: {fileID: 186076404}
   nonCombatEnemies: {fileID: 373561935}
   tracker: {fileID: 244191515}
@@ -71974,6 +71974,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Char2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5825642891471250189, guid: c0aef67434970884b89838bae2baa4f6,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7275758698224571560, guid: c0aef67434970884b89838bae2baa4f6,
         type: 3}

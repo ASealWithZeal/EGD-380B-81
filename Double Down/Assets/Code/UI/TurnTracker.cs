@@ -79,7 +79,6 @@ public class TurnTracker : MonoBehaviour
         // Destroy all T1 trackers
         for (int i = 0; i < t1.Count; ++i)
         {
-            Debug.Log(t1[i].GetComponent<TurnTrackerObj>().objData.dead);
             if (t1[i].GetComponent<TurnTrackerObj>().objData.dead)
                 StartCoroutine(DestroyTracker(t1[i]));
         }
@@ -87,7 +86,6 @@ public class TurnTracker : MonoBehaviour
         // Destroy all T2 trackers
         for (int i = 0; i < t2.Count; ++i)
         {
-            Debug.Log(t2[i].GetComponent<TurnTrackerObj>().objData.dead);
             if (t2[i].GetComponent<TurnTrackerObj>().objData.dead)
                 StartCoroutine(DestroyTracker(t2[i]));
         }

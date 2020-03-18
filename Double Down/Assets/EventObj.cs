@@ -58,7 +58,7 @@ public class EventObj : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == Managers.TurnManager.Instance.t1[0] && other.gameObject.tag == "Player")
+        if (other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed && other.gameObject.tag == "Player")
         {
             player = other.gameObject;
             box.PassEventIn(text, gameObject);

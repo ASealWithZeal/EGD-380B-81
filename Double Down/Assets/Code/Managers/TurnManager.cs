@@ -12,6 +12,7 @@ namespace Managers
         public GameObject nonCombatPlayer;
         public GameObject enemyChars;
         public GameObject nonCombatEnemies;
+        private GameObject firstT1Char = null;
         public TurnTracker tracker;
         [HideInInspector] public List<GameObject> playerCharsList = null;
         [HideInInspector] public List<GameObject> enemyCharsList = null;
@@ -80,7 +81,7 @@ namespace Managers
         // In the future, ALSO ADD THE NEW PLAYER CHAR, IF APPLICABLE
         public void FillCombatTurns()
         {
-            GameObject player = t1[0];
+            GameObject player = firstT1Char;
 
             // Clears all lists to ensure everything is refilled properly
             playerCharsList.Clear();
@@ -122,7 +123,7 @@ namespace Managers
         // Resets the turn order upon returning to the hub
         public void FillNonCombatTurns()
         {
-            GameObject player = t1[0];
+            GameObject player = firstT1Char;
 
             // Clears all lists to ensure everything is refilled properly
             playerCharsList.Clear();
@@ -137,6 +138,8 @@ namespace Managers
                 playerCharsList.Add(playerChars.transform.GetChild(i).gameObject);
                 combatChars.Add(playerChars.transform.GetChild(i).gameObject);
             }
+
+            t1.Add(firstT1Char);
             for (int i = 0; i < combatChars.Count; ++i)
             {
                 if (!combatChars[i].GetComponent<CharData>().hasActed)
@@ -195,13 +198,11 @@ namespace Managers
         {
             // If either player is engaged in combat, start them in it
             //  CHANGE TO ONLY AFFECT RELEVANT CHARACTER IN THE FUTURE
+            firstT1Char = t1[0];
             if (t1[0].GetComponent<CharData>().isInCombat)
                 CombatManager.Instance.StartRound();
             else
                 MovementManager.Instance.StartRound();
-
-            //else
-            //    EndRound();
         }
 
         // Ends the current round of combat
@@ -210,17 +211,14 @@ namespace Managers
             t1[0].GetComponent<CharData>().hasActed = true;
             t1[0].GetComponent<CharData>().t1Pos--;
 
-            Debug.Log(combatChars.Count);
+            //Debug.Log(combatChars.Count);
             if (combatChars.Count != t2.Count)
                 ResetTurns();
-
             else
             {
                 t1.Remove(t1[0]);
-
                 if (t1.Count > 0)
                     StartRound();
-
                 else
                     EndGlobalTurn();
             }
@@ -228,6 +226,18 @@ namespace Managers
 
         // Ends the overall global turn of combat
         public void EndGlobalTurn()
+        {
+            // CHECK IF ALL CHARACTERS ARE CURRENTLY IN THE SAME BATTLE; 
+            //  IF SO, IMMEDIATELY END THE GLOBAL TURN AND CONTINUE COMBAT
+            //  IF NOT, END THE COMBAT INSTANCE
+            
+            if (nonCombatPlayer.transform.childCount == 0)
+                SetNextGlobalTurnData();
+            else
+                CombatTransitionManager.Instance.ExitExistingCombatInstance(playerCharsList);
+        }
+
+        public void SetNextGlobalTurnData()
         {
             for (int i = 0; i < t2.Count; ++i)
                 t1.Add(t2[i]);

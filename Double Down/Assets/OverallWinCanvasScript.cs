@@ -19,19 +19,13 @@ public class OverallWinCanvasScript : MonoBehaviour
         abilityGroup.alpha = 0.0f;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public void ShowWinCanvas(int earnedEXP)
+    public void ShowWinCanvas(int earnedEXP, int inst)
     {
         Managers.TurnManager.Instance.tracker.DestroyEmptyTrackers(false);
-        StartCoroutine(ShowCanvas(earnedEXP));
+        StartCoroutine(ShowCanvas(earnedEXP, inst));
     }
 
-    IEnumerator ShowCanvas(int earnedEXP)
+    IEnumerator ShowCanvas(int earnedEXP, int inst)
     {
         yield return new WaitForSeconds(0.75f);
 
@@ -41,13 +35,16 @@ public class OverallWinCanvasScript : MonoBehaviour
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
         }
         
-        for (int i = 0; i < Managers.TurnManager.Instance.combatChars.Count; ++i)
-        {
-            charScripts[i].UpdateUI(earnedEXP);
-        }
+        List<WinCanvasScript> tempScript = new List<WinCanvasScript>();
+        for (int i = 0; i < charScripts.Count; ++i)
+            if (charScripts[i].charStats.gameObject.GetComponent<CharData>().combatInst == inst)
+                tempScript.Add(charScripts[i]);
 
-        for (int i = 0; i < Managers.TurnManager.Instance.combatChars.Count; ++i)
-            while (!charScripts[i].done)
+        for (int i = 0; i < tempScript.Count; ++i)
+            tempScript[i].UpdateUI(earnedEXP);
+
+        for (int i = 0; i < tempScript.Count; ++i)
+            while (!tempScript[i].done)
                 yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
 
         yield return new WaitForSeconds(2.0f);
