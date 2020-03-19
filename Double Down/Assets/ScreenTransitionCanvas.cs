@@ -15,6 +15,10 @@ public class ScreenTransitionCanvas : MonoBehaviour
     IEnumerator EnterSceneWipe(SceneType type)
     {
         Debug.Log(type.ToString());
+        GameObject temp = null;
+        if (init && Managers.TurnManager.Instance.t1.Count > 0)
+            temp = Managers.TurnManager.Instance.t1[0];
+
         // Resets the turn order
         //if (type == SceneType.Hub)
         //    Managers.TurnManager.Instance.FillTurns();
@@ -44,13 +48,9 @@ public class ScreenTransitionCanvas : MonoBehaviour
             yield return new WaitForSeconds(0.0125f);
         }
 
-        //if (type == SceneType.Combat)
-        //    Managers.TurnManager.Instance.FillCombatTurns();
-
         if (init)
         {
-            Debug.Log(Managers.TurnManager.Instance.t1.Count);
-            if (Managers.TurnManager.Instance.t1[0].GetComponent<CharData>().isInCombat && !Managers.TurnManager.Instance.t1[0].GetComponent<CharData>().hasActed)
+            if (Managers.TurnManager.Instance.firstT1Char.GetComponent<CharData>().isInCombat && !Managers.TurnManager.Instance.firstT1Char.GetComponent<CharData>().hasActed)
                 Managers.CombatManager.Instance.StartCombat();
             else
                 Managers.TurnManager.Instance.EndRound();

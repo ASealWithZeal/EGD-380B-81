@@ -14223,7 +14223,7 @@ MonoBehaviour:
   combatPosition: {x: 4, y: -0.25, z: -2}
   charNum: -1
   dead: 0
-  attachedEventNum: 0
+  attachedEventNum: 1
   isInCombat: 0
   combatInst: -1
   learnedAbilities: 
@@ -16978,7 +16978,7 @@ MonoBehaviour:
   combatPosition: {x: 4, y: -0.25, z: -2}
   charNum: -1
   dead: 0
-  attachedEventNum: 0
+  attachedEventNum: 1
   isInCombat: 0
   combatInst: -1
   learnedAbilities: 
@@ -34656,7 +34656,7 @@ MonoBehaviour:
   - {fileID: 382622228}
   - {fileID: 487341951}
   player: {fileID: 0}
-  eventNum: 0
+  eventNum: 1
 --- !u!65 &1016786692
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63646,6 +63646,7 @@ MonoBehaviour:
   nonCombatPlayer: {fileID: 2127678271}
   enemyChars: {fileID: 186076404}
   nonCombatEnemies: {fileID: 373561935}
+  firstT1Char: {fileID: 0}
   tracker: {fileID: 244191515}
   playerCharsList: []
   enemyCharsList: []

@@ -612,8 +612,7 @@ namespace Managers
 
         IEnumerator MovePlayerCharacterAtStart(Vector3 targetPos)
         {
-            CharData c = TurnManager.Instance.playerCharsList[0].GetComponent<CharData>();
-
+            Debug.Log(targetPos);
             while (TurnManager.Instance.playerCharsList[0].transform.position != targetPos)
             {
                 TurnManager.Instance.playerCharsList[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.playerCharsList[0].transform.position, targetPos, 0.125f);

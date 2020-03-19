@@ -185,20 +185,36 @@ public class TurnTracker : MonoBehaviour
     }
 
     // Add turn trackers between screen resets
-    public void AddTurnTrackers(List<GameObject> t1, List<GameObject> t2, GameObject player)
+    public void AddTurnTrackers(List<GameObject> g1, List<GameObject> g2, GameObject player)
     {
+        bool @bool = false;
+
         List<GameObject> l1 = new List<GameObject>();
-        for (int i = 0; i < t1.Count; ++i)
+        for (int i = 0; i < g1.Count; ++i)
         {
-            if (t1[i] != player)
-                l1.Add(t1[i]);
+            @bool = true;
+            for (int j = 0; j < t1.Count; ++j)
+            {
+                if (g1[i] == t1[j].GetComponent<TurnTrackerObj>().obj)
+                    @bool = false;
+            }
+            
+            if (@bool)
+                l1.Add(g1[i]);
         }
 
         List<GameObject> l2 = new List<GameObject>();
-        for (int i = 0; i < t2.Count; ++i)
+        for (int i = 0; i < g2.Count; ++i)
         {
-            if (t2[i] != player)
-                l2.Add(t2[i]);
+            @bool = true;
+            for (int j = 0; j < t2.Count; ++j)
+            {
+                if (g2[i] == t2[j].GetComponent<TurnTrackerObj>().obj)
+                    @bool = false;
+            }
+            
+            if (@bool)
+                l2.Add(g2[i]);
         }
 
         StartCoroutine(CreateT1TrackerUI(l1, false));

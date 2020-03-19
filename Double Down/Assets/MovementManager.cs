@@ -60,6 +60,7 @@ namespace Managers
             if ((cam.transform.position.x + 0.01f > TurnManager.Instance.t1[0].transform.position.x && cam.transform.position.x - 0.01f < TurnManager.Instance.t1[0].transform.position.x)
                 || (cam.transform.position.z + 0.01f > TurnManager.Instance.t1[0].transform.position.z && cam.transform.position.z - 0.01f < TurnManager.Instance.t1[0].transform.position.z))
             {
+                TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = true;
                 canMoveChars = true;
                 setupMoveChars = false;
             }
@@ -67,6 +68,7 @@ namespace Managers
 
         public void StartRound()
         {
+            TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = false;
             setupMoveChars = true;
         }
     }

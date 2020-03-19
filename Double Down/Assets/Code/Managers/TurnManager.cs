@@ -12,7 +12,7 @@ namespace Managers
         public GameObject nonCombatPlayer;
         public GameObject enemyChars;
         public GameObject nonCombatEnemies;
-        private GameObject firstT1Char = null;
+        [HideInInspector] public GameObject firstT1Char = null;
         public TurnTracker tracker;
         [HideInInspector] public List<GameObject> playerCharsList = null;
         [HideInInspector] public List<GameObject> enemyCharsList = null;
@@ -101,9 +101,12 @@ namespace Managers
                 enemyCharsList.Add(enemyChars.transform.GetChild(i).gameObject);
                 combatChars.Add(enemyChars.transform.GetChild(i).gameObject);
             }
+
+            t1.Add(firstT1Char);
             for (int i = 0; i < combatChars.Count; ++i)
             {
-                t1.Add(combatChars[i]);
+                if (!combatChars[i].GetComponent<CharData>().hasActed && combatChars[i] != firstT1Char)
+                    t1.Add(combatChars[i]);
                 t2.Add(combatChars[i]);
             }
 
@@ -142,7 +145,7 @@ namespace Managers
             t1.Add(firstT1Char);
             for (int i = 0; i < combatChars.Count; ++i)
             {
-                if (!combatChars[i].GetComponent<CharData>().hasActed)
+                if (!combatChars[i].GetComponent<CharData>().hasActed && combatChars[i] != firstT1Char)
                     t1.Add(combatChars[i]);
                 t2.Add(combatChars[i]);
             }
@@ -199,7 +202,7 @@ namespace Managers
             // If either player is engaged in combat, start them in it
             //  CHANGE TO ONLY AFFECT RELEVANT CHARACTER IN THE FUTURE
             firstT1Char = t1[0];
-            if (t1[0].GetComponent<CharData>().isInCombat)
+            if (t1[0].GetComponent<CharData>().isInCombat && CombatManager.Instance != null)
                 CombatManager.Instance.StartRound();
             else
                 MovementManager.Instance.StartRound();

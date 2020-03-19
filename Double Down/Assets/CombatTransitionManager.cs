@@ -26,11 +26,8 @@ namespace Managers
 
         }
 
-        public void CreateNewCombatInstance(GameObject player, List<GameObject> enemies)
+        public void CreateNewCombatInstance(int combatInst, GameObject player, List<GameObject> enemies)
         {
-            // Increments the number of combat instances appropriately
-            combatInsts++;
-
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;
             for (int i = 0; i < temp; ++i)
@@ -39,14 +36,14 @@ namespace Managers
             // Adds the participating player character to the combat list
             player.transform.parent = playerChars;
             player.GetComponent<CharData>().isInCombat = true;
-            player.GetComponent<CharData>().combatInst = combatInsts;
+            player.GetComponent<CharData>().combatInst = combatInst;
 
             // Adds the enemies to the combat list
             for (int i = 0; i < enemies.Count; ++i)
             {
                 enemies[i].transform.parent = enemyChars;
                 enemies[i].GetComponent<CharData>().isInCombat = true;
-                enemies[i].GetComponent<CharData>().combatInst = combatInsts;
+                enemies[i].GetComponent<CharData>().combatInst = combatInst;
             }
 
             SetCharacterHubPositions();
@@ -63,18 +60,21 @@ namespace Managers
             // Adds the participating player character to the combat list
             player.transform.parent = playerChars;
             player.GetComponent<CharData>().isInCombat = true;
-            player.GetComponent<CharData>().combatInst = combatInsts;
+            player.GetComponent<CharData>().combatInst = combatInst;
 
+            Debug.Log(nonCombatPlayerChars.childCount);
             for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
+            {
                 if (nonCombatPlayerChars.GetChild(i).GetComponent<CharData>().combatInst == combatInst)
                     nonCombatPlayerChars.GetChild(i).parent = playerChars;
+            }
 
             // Adds the enemies to the combat list
             for (int i = 0; i < enemies.Count; ++i)
             {
                 enemies[i].transform.parent = enemyChars;
                 enemies[i].GetComponent<CharData>().isInCombat = true;
-                enemies[i].GetComponent<CharData>().combatInst = combatInsts;
+                enemies[i].GetComponent<CharData>().combatInst = combatInst;
             }
 
             SetCharacterHubPositions();
@@ -83,6 +83,8 @@ namespace Managers
 
         public void ExitExistingCombatInstance(List<GameObject> players)
         {
+            SetCharacterCombatPositions();
+
             // Adds all player characters back to the combat list
             int temp = nonCombatPlayerChars.childCount;
             for (int i = 0; i < temp; ++i)
@@ -91,7 +93,7 @@ namespace Managers
             // Removes all enemies from the combat list
             for (int i = 0; i < enemyChars.childCount; ++i)
                 enemyChars.transform.GetChild(i).parent = nonCombatEnemyChars;
-
+            
             transitionUI.ExitScene("Hub");
         }
 
@@ -115,7 +117,8 @@ namespace Managers
             // Removes all enemies, IF ANY EXIST, from the combat list
             for (int i = 0; i < enemyChars.childCount; ++i)
                 enemyChars.transform.GetChild(i).parent = nonCombatEnemyChars;
-            
+
+            ResetCharacterCombatPositions();
             transitionUI.ExitScene("Hub");
         }
 
@@ -129,6 +132,20 @@ namespace Managers
                 nonCombatPlayerChars.GetChild(i).GetComponent<CharData>().hubPosition = nonCombatPlayerChars.GetChild(i).localPosition;
             for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)
                 nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().hubPosition = nonCombatEnemyChars.GetChild(i).localPosition;
+        }
+
+        private void SetCharacterCombatPositions()
+        {
+            for (int i = 0; i < playerChars.childCount; ++i)
+                playerChars.GetChild(i).GetComponent<CharData>().combatPosition = playerChars.GetChild(i).localPosition;
+            for (int i = 0; i < enemyChars.childCount; ++i)
+                enemyChars.GetChild(i).GetComponent<CharData>().combatPosition = enemyChars.GetChild(i).localPosition;
+        }
+
+        private void ResetCharacterCombatPositions()
+        {
+            for (int i = 0; i < playerChars.childCount; ++i)
+                playerChars.GetChild(i).GetComponent<CharData>().combatPosition = new Vector3(-9f, -0.5f, -2f);
         }
 
         public void RetrieveCharacterHubPositions()
@@ -149,6 +166,10 @@ namespace Managers
                 playerChars.GetChild(i).localPosition = playerChars.GetChild(i).GetComponent<CharData>().combatPosition;
             for (int i = 0; i < enemyChars.childCount; ++i)
                 enemyChars.GetChild(i).localPosition = enemyChars.GetChild(i).GetComponent<CharData>().combatPosition;
+            for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
+                nonCombatPlayerChars.GetChild(i).localPosition = new Vector3(-2000f, -0.5f, -2f);
+            for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)
+                nonCombatEnemyChars.GetChild(i).localPosition = new Vector3(-2000f, -0.5f, -2f);
         }
     }
 }
