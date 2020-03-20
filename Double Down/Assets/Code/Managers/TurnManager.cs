@@ -60,6 +60,21 @@ namespace Managers
             }
         }
 
+        private void RemoveEnemyTurns()
+        {
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                if (t1[i].tag != "Player")
+                    t1.Remove(t1[i]);
+            }
+
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                if (t2[i].tag != "Player")
+                    t2.Remove(t2[i]);
+            }
+        }
+
         // Resets the turn order to account for dead enemies
         public void ResetTurns()
         {
@@ -185,9 +200,20 @@ namespace Managers
 
         public void StartGlobalTurn()
         {
-            for (int i = 0; i < combatChars.Count; ++i)
-                combatChars[i].GetComponent<CharData>().hasActed = false;
+            ResetCharActions();
             tracker.SetUpTrackers(t2, 2, false);
+        }
+
+        private void ResetCharActions()
+        {
+            for (int i = 0; i < playerChars.transform.childCount; ++i)
+                playerChars.transform.GetChild(i).GetComponent<CharData>().hasActed = false;
+            for (int i = 0; i < nonCombatPlayer.transform.childCount; ++i)
+                nonCombatPlayer.transform.GetChild(i).GetComponent<CharData>().hasActed = false;
+            for (int i = 0; i < enemyChars.transform.childCount; ++i)
+                enemyChars.transform.GetChild(i).GetComponent<CharData>().hasActed = false;
+            for (int i = 0; i < nonCombatEnemies.transform.childCount; ++i)
+                nonCombatEnemies.transform.GetChild(i).GetComponent<CharData>().hasActed = false;
         }
 
         // Starts a turn of gameplay
@@ -202,10 +228,19 @@ namespace Managers
             // If either player is engaged in combat, start them in it
             //  CHANGE TO ONLY AFFECT RELEVANT CHARACTER IN THE FUTURE
             firstT1Char = t1[0];
-            if (t1[0].GetComponent<CharData>().isInCombat && CombatManager.Instance != null)
-                CombatManager.Instance.StartRound();
+            if (t1[0].tag == "Player" && t1[0].GetComponent<CharData>().dead)
+                t1[0].GetComponent<CharData>().CountDownDeathTurns();
+
+            if (!t1[0].GetComponent<CharData>().dead)
+            {
+                if (t1[0].GetComponent<CharData>().isInCombat && CombatManager.Instance != null)
+                    CombatManager.Instance.StartRound();
+                else
+                    MovementManager.Instance.StartRound();
+            }
+            // If a character is dead, end the turn
             else
-                MovementManager.Instance.StartRound();
+                EndRound();
         }
 
         // Ends the current round of combat

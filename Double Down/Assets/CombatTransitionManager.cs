@@ -91,22 +91,23 @@ namespace Managers
                 nonCombatPlayerChars.GetChild(0).parent = playerChars;
 
             // Removes all enemies from the combat list
-            for (int i = 0; i < enemyChars.childCount; ++i)
-                enemyChars.transform.GetChild(i).parent = nonCombatEnemyChars;
+            temp = enemyChars.childCount;
+            for (int i = 0; i < temp; ++i)
+                enemyChars.transform.GetChild(0).parent = nonCombatEnemyChars;
             
             transitionUI.ExitScene("Hub");
         }
 
         public void DestroyCombatInstance(List<GameObject> players)
         {
-            // Increments the number of combat instances appropriately
-            combatInsts--;
-
             // Sets all involved characters as not currently being involved in combat
             for (int i = 0; i < players.Count; ++i)
             {
                 players[i].GetComponent<CharData>().isInCombat = false;
                 players[i].GetComponent<CharData>().combatInst = -1;
+
+                if (!players[i].GetComponent<CharData>().dead)
+                    players[i].GetComponent<CharData>().FullRestore();
             }
 
             // Adds all "missing" characters to the combat list
@@ -115,8 +116,14 @@ namespace Managers
                 nonCombatPlayerChars.GetChild(0).parent = playerChars;
 
             // Removes all enemies, IF ANY EXIST, from the combat list
-            for (int i = 0; i < enemyChars.childCount; ++i)
-                enemyChars.transform.GetChild(i).parent = nonCombatEnemyChars;
+            temp = enemyChars.childCount;
+            for (int i = 0; i < temp; ++i)
+            {
+                enemyChars.GetChild(0).GetComponent<CharData>().isInCombat = false;
+                enemyChars.GetChild(0).GetComponent<CharData>().combatInst = -1;
+                enemyChars.GetChild(0).GetComponent<CharData>().FullRestore();
+                enemyChars.GetChild(0).parent = nonCombatEnemyChars;
+            }
 
             ResetCharacterCombatPositions();
             transitionUI.ExitScene("Hub");

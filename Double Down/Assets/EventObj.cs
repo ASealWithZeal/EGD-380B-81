@@ -16,6 +16,8 @@ public class EventObj : MonoBehaviour
     public List<GameObject> enemies = null;
     public GameObject player;
     private bool combatActive = false;
+    private bool contactActive = true;
+    private bool init = false;
     public int eventNum = 0;
 
     private void Start()
@@ -41,7 +43,9 @@ public class EventObj : MonoBehaviour
         }
 
         if (type == HubEvents.Pass)
+        {
             check = true;
+        }
 
         if (!check)
         {
@@ -61,7 +65,7 @@ public class EventObj : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed 
+        if (contactActive && other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed 
             && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player")
         {
             player = other.gameObject;

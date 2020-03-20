@@ -171,7 +171,16 @@ namespace Managers
 
         private void EndCombatLoss()
         {
-            SceneChangeManager.Instance.LoseCombat();
+            bool allDead = true;
+            // Checks if all player characters are dead before making a decision:
+            for (int i = 0; i < TurnManager.Instance.nonCombatPlayer.transform.childCount; ++i)
+                if (!TurnManager.Instance.nonCombatPlayer.transform.GetChild(i).GetComponent<CharData>().dead)
+                    allDead = false;
+
+            if (allDead)
+                SceneChangeManager.Instance.LoseCombat();
+            else
+                CombatTransitionManager.Instance.DestroyCombatInstance(TurnManager.Instance.playerCharsList);
         }
 
         // Sets up an action before targeting the relevant character(s)

@@ -267,6 +267,10 @@ public class TurnTracker : MonoBehaviour
         if (end)
             j = 1;
 
+        int posAdjust = 0;
+        if (t1[0] != null && t1.Count > 0)
+            posAdjust = t1.Count;
+
         for (int i = 0; i < l.Count; ++i)
         {
             GameObject g = Instantiate(image, t1Storage);
@@ -276,8 +280,8 @@ public class TurnTracker : MonoBehaviour
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
 
-            g.transform.position = t1Tracker[i + j].rectTransform.position;
-            g.transform.localScale = t1Tracker[i + j].rectTransform.localScale * 2;
+            g.transform.position = t1Tracker[i + j + posAdjust].rectTransform.position;
+            g.transform.localScale = t1Tracker[i + j + posAdjust].rectTransform.localScale * 2;
 
             t1.Add(g);
         }
@@ -307,6 +311,10 @@ public class TurnTracker : MonoBehaviour
     {
         float incs = (250 / seconds) * timeIncrements;
 
+        int posAdjust = 0;
+        if (t2.Count > 0)
+            posAdjust = t2.Count;
+
         for (int i = 0; i < l.Count; ++i)
         {
             GameObject g = Instantiate(image, t2Storage);
@@ -316,8 +324,8 @@ public class TurnTracker : MonoBehaviour
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
 
-            g.transform.position = t2Tracker[i].rectTransform.position;
-            g.transform.localScale = t2Tracker[i].rectTransform.localScale * 2;
+            g.transform.position = t2Tracker[i + posAdjust].rectTransform.position;
+            g.transform.localScale = t2Tracker[i + posAdjust].rectTransform.localScale * 2;
 
             t2.Add(g);
         }

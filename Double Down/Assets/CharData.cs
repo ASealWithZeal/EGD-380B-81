@@ -9,12 +9,14 @@ public class CharData : MonoBehaviour
     public bool targeting;
     public int t1Pos = 0;
     public int t2Pos = 0;
+    private Vector3 initialPos = new Vector3();
     public Vector3 hubPosition = new Vector3();
     public Vector3 combatPosition = new Vector3();
     public int charNum = -1;
 
     [Header("Event Info")]
     public bool dead = false;
+    private int deathTurns = 2;
     public int attachedEventNum = 0;
 
     [Header("Combat Info")]
@@ -42,6 +44,7 @@ public class CharData : MonoBehaviour
 
     private void Start()
     {
+        initialPos = gameObject.transform.localPosition;
         if (gameObject.tag == "Player")
             SetCharUI();
     }
@@ -55,7 +58,19 @@ public class CharData : MonoBehaviour
         }
         else if (gameObject.tag == "Enemy")
         {
-            charUI.GetComponent<EnemyUI>().CreateUI(name, transform);
+            charUI.GetComponent<EnemyUI>().CreateUI(name, transform, charStats.HPPercent());
+        }
+    }
+
+    public void FullRestore()
+    {
+        charStats.currentHP = charStats.MaxHP();
+        charStats.currentTP = charStats.MaxTP();
+
+        if (gameObject.tag == "Player")
+        {
+            ChangeHP();
+            ChangeTP();
         }
     }
 
@@ -97,17 +112,41 @@ public class CharData : MonoBehaviour
         StartCoroutine(DeathAnim());
     }
 
+    // Counts down the turns until a character revives
+    public void CountDownDeathTurns()
+    {
+        deathTurns--;
+
+        // When all turns have passed, revive the character at their starting position
+        if (deathTurns == 0)
+        {
+            deathTurns = 2;
+            dead = false;
+            GetComponent<SpriteRenderer>().color += new Color(0, 0, 0, 1);
+
+            charStats.currentHP = charStats.MaxHP();
+            charStats.currentTP = charStats.MaxTP();
+            ChangeHP();
+            ChangeTP();
+
+            gameObject.transform.localPosition = initialPos;
+            gameObject.SetActive(true);
+        }
+    }
+
     IEnumerator DeathAnim()
     {
         dead = true;
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
         isInCombat = false;
 
+        Color storedColor = sr.color;
         while (sr.color.a > 0)
         {
             sr.color -= new Color(0.07f, 0.07f, 0.07f, 0.1f);
             yield return new WaitForSeconds(0.025f);
         }
+        sr.color = new Color(storedColor.r, storedColor.g, storedColor.b, 0);
 
         if (gameObject.tag != "Player")
             charUI.SetActive(false);

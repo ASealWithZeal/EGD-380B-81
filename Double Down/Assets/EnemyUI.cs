@@ -22,9 +22,10 @@ public class EnemyUI : MonoBehaviour
         StartCoroutine(AlterHealthBar(newHealthPercent));
     }
 
-    public void CreateUI(string name, Transform objTransform)
+    public void CreateUI(string name, Transform objTransform, float healthPercent)
     {
         this.name.SetText(name);
+        healthBar.fillAmount = healthPercent;
         parentCanvas = GameObject.Find("_CombatCanvas").GetComponent<Canvas>();
 
         // Get the position on the canvas

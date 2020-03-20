@@ -42,6 +42,42 @@ public class WinCanvasScript : MonoBehaviour
         atkText.SetText(charStats.Attack().ToString() + " (");
         defText.SetText(charStats.Defense().ToString() + " (");
         spdText.SetText(charStats.Speed().ToString() + " (");
+
+        ResetText(levelGainText);
+        ResetText(hpGainText);
+        ResetText(tpGainText);
+        ResetText(atkGainText);
+        ResetText(defGainText);
+        ResetText(spdGainText);
+
+        levelUpGroup.alpha = 0.0f;
+    }
+
+    public void ResetValues()
+    {
+        Init();
+    }
+
+    private void ResetText(TextMeshProUGUI txt)
+    {
+        txt.SetText("+0");
+        txt.color = Color.white;
+    }
+
+    public void UpdateNonCombatUI()
+    {
+        if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
+        {
+            expText.SetText("+0");
+            neededEXPText.SetText("--");
+            expMeter.fillAmount = 1.0f;
+        }
+
+        else
+        {
+            expText.SetText("+0");
+            neededEXPText.SetText((charStats.nextLevelExp[(charStats.startingLevel - 1)] - charStats.startingExp).ToString());
+        }
     }
 
     // Update is called once per frame
