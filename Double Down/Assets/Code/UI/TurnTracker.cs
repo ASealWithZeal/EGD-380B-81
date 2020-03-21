@@ -93,38 +93,38 @@ public class TurnTracker : MonoBehaviour
         StartCoroutine(ShiftNonDestroyedTrackers(end));
     }
 
-    public void DestroyNonCombatTrackers(bool end)
+    public void DestroyNonCombatTrackers(bool end, CharData objData)
     {
         // Destroy all T1 trackers
         for (int i = 0; i < t1.Count; ++i)
         {
-            if (!t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
+            if (!t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat || objData.combatInst != t1[i].GetComponent<TurnTrackerObj>().objData.combatInst)
                 StartCoroutine(DestroyTracker(t1[i]));
         }
-
+        
         // Destroy all T2 trackers
         for (int i = 0; i < t2.Count; ++i)
         {
-            if (!t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat)
+            if (!t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat || objData.combatInst != t2[i].GetComponent<TurnTrackerObj>().objData.combatInst)
                 StartCoroutine(DestroyTracker(t2[i]));
         }
 
         StartCoroutine(ShiftNonDestroyedTrackers(end));
     }
 
-    public void DestroyNonPlayerCombatTrackers(bool end)
+    public void DestroyNonPlayerTrackers(bool end)
     {
         // Destroy all T1 trackers
         for (int i = 0; i < t1.Count; ++i)
         {
-            if (t1[i].GetComponent<TurnTrackerObj>().obj == null || (t1[i].GetComponent<TurnTrackerObj>().obj.tag != "Player" && t1[i].GetComponent<TurnTrackerObj>().objData.isInCombat))
+            if (t1[i].GetComponent<TurnTrackerObj>().obj == null || t1[i].GetComponent<TurnTrackerObj>().obj.tag != "Player")
                 StartCoroutine(DestroyTracker(t1[i]));
         }
 
         // Destroy all T2 trackers
         for (int i = 0; i < t2.Count; ++i)
         {
-            if (t2[i].GetComponent<TurnTrackerObj>().obj == null || (t2[i].GetComponent<TurnTrackerObj>().obj.tag != "Player" && t2[i].GetComponent<TurnTrackerObj>().objData.isInCombat))
+            if (t2[i].GetComponent<TurnTrackerObj>().obj == null || t2[i].GetComponent<TurnTrackerObj>().obj.tag != "Player")
                 StartCoroutine(DestroyTracker(t2[i]));
         }
 

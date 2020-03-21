@@ -148,6 +148,20 @@ public class PlayerActions : MonoBehaviour
                 else if (character == Char.Char1)
                     returnVal = GetComponent<Healer>().ability1Name;
                 break;
+
+            case 2:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability2Name;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability2Name;
+                break;
+
+            case 3:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability3Name;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability3Name;
+                break;
         }
 
         return returnVal;
@@ -191,7 +205,6 @@ public class PlayerActions : MonoBehaviour
     public string GetAbilityDescription(int i)
     {
         string returnVal = "";
-
         switch (i)
         {
             case 0:
@@ -218,8 +231,58 @@ public class PlayerActions : MonoBehaviour
                 else if (character == Char.Char1)
                     returnVal = GetComponent<Healer>().ability1Description;
                 break;
+
+            case 2:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability2Description;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability2Description;
+                break;
+
+            case 3:
+                if (character == Char.Char0)
+                    returnVal = GetComponent<Attacker>().ability3Description;
+                else if (character == Char.Char1)
+                    returnVal = GetComponent<Healer>().ability3Description;
+                break;
         }
 
         return returnVal;
+    }
+
+    public bool GetAbilityActive(int i)
+    {
+        switch (i)
+        {
+            case 0:
+                if (character == Char.Char0)
+                    return GetComponent<Attacker>().ability0Active;
+                else if (character == Char.Char1)
+                    return GetComponent<Healer>().ability0Active;
+                break;
+
+            case 1:
+                if (character == Char.Char0)
+                    return GetComponent<Attacker>().ability1Active;
+                else if (character == Char.Char1)
+                    return GetComponent<Healer>().ability1Active;
+                break;
+
+            case 2:
+                if (character == Char.Char0)
+                    return GetComponent<Attacker>().ability2Active;
+                else if (character == Char.Char1)
+                    return GetComponent<Healer>().ability2Active;
+                break;
+
+            case 3:
+                if (character == Char.Char0)
+                    return GetComponent<Attacker>().ability3Active;
+                else if (character == Char.Char1)
+                    return GetComponent<Healer>().ability3Active;
+                break;
+        }
+
+        return false;
     }
 }

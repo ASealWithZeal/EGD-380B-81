@@ -18,6 +18,7 @@ public class Attacker : MonoBehaviour
 
     [Header("Ability0")]
     public string ability0Name = "Heavy Slash";
+    public bool ability0Active = true;
     public string ability0Description = "Gain -99% SPD for 1 turn. During your next turn, deal 2.5x damage to an enemy.";
     public float ability0Mod = 0.0f;
     public int ability0Delay = 1;
@@ -34,11 +35,22 @@ public class Attacker : MonoBehaviour
 
     [Header("Ability1")]
     public string ability1Name = "Provoke";
+    public bool ability1Active = true;
     public string ability1Description = "All enemies will target the user for 3 turns.";
     public int ability1Cost = 4;
     public float ability1Effect = 1.0f;
     public int ability1Duration = 3;
     public Targeting ability1Target;
+
+    [Header("PassiveAbility1")]
+    public string ability2Name = "HP +25%";
+    public bool ability2Active = false;
+    public string ability2Description = "User's HP permanently increases by 25%.";
+
+    [Header("PassiveAbility2")]
+    public string ability3Name = "ATK +25%";
+    public bool ability3Active = false;
+    public string ability3Description = "User's ATK permanently increases by 25%.";
 
     // Perform a simple attack
     public void SetAttack()

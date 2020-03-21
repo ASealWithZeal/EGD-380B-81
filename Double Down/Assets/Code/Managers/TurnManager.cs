@@ -60,6 +60,23 @@ namespace Managers
             }
         }
 
+        // Removes turns for all characters not currently involved in combat
+        // WHILE ENTERING a non-combat scene
+        private void RemoveNonCombatTurns()
+        {
+            for (int i = 0; i < t1.Count; ++i)
+            {
+                if (i > 0 && (!t1[i].GetComponent<CharData>().isInCombat || t1[0].GetComponent<CharData>().combatInst != t1[i].GetComponent<CharData>().combatInst))
+                    t1.Remove(t1[i]);
+            }
+
+            for (int i = 0; i < t2.Count; ++i)
+            {
+                if (i > 0 && (!t2[i].GetComponent<CharData>().isInCombat || t2[0].GetComponent<CharData>().combatInst != t2[i].GetComponent<CharData>().combatInst))
+                    t2.Remove(t2[i]);
+            }
+        }
+
         private void RemoveEnemyTurns()
         {
             for (int i = 0; i < t1.Count; ++i)
@@ -86,7 +103,7 @@ namespace Managers
         public void PrepCombatTurns()
         {
             RemoveTurns();
-            tracker.DestroyNonCombatTrackers(false);
+            tracker.DestroyNonCombatTrackers(false, firstT1Char.GetComponent<CharData>());
 
             FillCombatTurns();
             SetTurnOrder(1);
@@ -133,7 +150,7 @@ namespace Managers
         public void PrepNonCombatTurns()
         {
             RemoveTurns();
-            tracker.DestroyNonPlayerCombatTrackers(false);
+            tracker.DestroyNonPlayerTrackers(false);
 
             FillNonCombatTurns();
             SetTurnOrder(1);

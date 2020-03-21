@@ -26,6 +26,7 @@ public class Healer : MonoBehaviour
 
     [Header("Ability0 Upgrade")]
     public string ability0UpgradeName = "Overdraw";
+    public bool ability0Active = true;
     public string ability0UpgradeDescription = "Deal 1.35x damage, then restore 120% of that as HP split evenly between all allies.";
     public float ability0UpgradeMod = 1.35f;
     public int ability0UpgradeCost = 7;
@@ -33,12 +34,23 @@ public class Healer : MonoBehaviour
     public Targeting ability0UpgradeHealTarget;
 
     [Header("Ability1")]
-    public string ability1Name = "Adrenalinjection";
+    public string ability1Name = "Injection";
+    public bool ability1Active = true;
     public string ability1Description = "Give an ally +25% ATK for 3 turns.";
     public int ability1Cost = 4;
     public float ability1Effect = 1.25f;
     public int ability1Duration = 3;
     public Targeting ability1Target;
+
+    [Header("PassiveAbility1")]
+    public string ability2Name = "TP +25%";
+    public bool ability2Active = false;
+    public string ability2Description = "User's TP permanently increases by 25%.";
+
+    [Header("PassiveAbility2")]
+    public string ability3Name = "SPD +25%";
+    public bool ability3Active = false;
+    public string ability3Description = "User's SPD permanently increases by 25%.";
 
     // Perform a simple attack
     public void SetAttack()

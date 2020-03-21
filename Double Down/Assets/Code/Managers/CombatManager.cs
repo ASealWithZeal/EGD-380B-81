@@ -219,7 +219,7 @@ namespace Managers
                     combatMenu.GetComponent<PlayerCombatMenuManager>().MakeButtonVisible(true);
                 }
 
-                else if (oneTarget && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow)))
+                else if (oneTarget && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S)))
                 {
                     if (moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
                         TargetDown(TurnManager.Instance.playerCharsList);
@@ -228,7 +228,7 @@ namespace Managers
                         TargetDown(TurnManager.Instance.enemyCharsList);
                 }
 
-                else if (oneTarget && (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow)))
+                else if (oneTarget && (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.W)))
                 {
                     if (moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
                         TargetUp(TurnManager.Instance.playerCharsList);

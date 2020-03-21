@@ -69,7 +69,7 @@ public class WinCanvasScript : MonoBehaviour
         if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
         {
             expText.SetText("+0");
-            neededEXPText.SetText("--");
+            neededEXPText.SetText("MAX");
             expMeter.fillAmount = 1.0f;
         }
 
@@ -103,7 +103,7 @@ public class WinCanvasScript : MonoBehaviour
         else if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
         {
             expText.SetText("+0");
-            neededEXPText.SetText("--");
+            neededEXPText.SetText("MAX");
             expMeter.fillAmount = 1.0f;
             levelingUp = false;
         }

@@ -217,11 +217,11 @@ MonoBehaviour:
   targeting: 0
   t1Pos: 0
   t2Pos: 0
-  hubPosition: {x: -6.5, y: 1.5, z: 5}
-  combatPosition: {x: 4, y: -0.25, z: -2}
+  hubPosition: {x: -7.5, y: 1, z: 5.5}
+  combatPosition: {x: 4, y: -0.25, z: -3.5}
   charNum: -1
   dead: 0
-  attachedEventNum: 1
+  attachedEventNum: 3
   isInCombat: 0
   combatInst: -1
   learnedAbilities: 
