@@ -13,7 +13,9 @@ namespace Managers
         public GameObject enemyChars;
         public GameObject nonCombatEnemies;
         [HideInInspector] public GameObject firstT1Char = null;
+        public GameObject firstT1PlayerChar = null;
         public TurnTracker tracker;
+        public RevivalText revivalText;
         [HideInInspector] public List<GameObject> playerCharsList = null;
         [HideInInspector] public List<GameObject> enemyCharsList = null;
         [HideInInspector] public List<GameObject> combatChars = null;
@@ -113,7 +115,7 @@ namespace Managers
         // In the future, ALSO ADD THE NEW PLAYER CHAR, IF APPLICABLE
         public void FillCombatTurns()
         {
-            GameObject player = firstT1Char;
+            GameObject player = firstT1PlayerChar;
 
             // Clears all lists to ensure everything is refilled properly
             playerCharsList.Clear();
@@ -133,11 +135,11 @@ namespace Managers
                 enemyCharsList.Add(enemyChars.transform.GetChild(i).gameObject);
                 combatChars.Add(enemyChars.transform.GetChild(i).gameObject);
             }
-
-            t1.Add(firstT1Char);
+            
+            t1.Add(firstT1PlayerChar);
             for (int i = 0; i < combatChars.Count; ++i)
             {
-                if (!combatChars[i].GetComponent<CharData>().hasActed && combatChars[i] != firstT1Char)
+                if (!combatChars[i].GetComponent<CharData>().hasActed && combatChars[i] != firstT1PlayerChar)
                     t1.Add(combatChars[i]);
                 t2.Add(combatChars[i]);
             }
@@ -158,7 +160,7 @@ namespace Managers
         // Resets the turn order upon returning to the hub
         public void FillNonCombatTurns()
         {
-            GameObject player = firstT1Char;
+            GameObject player = firstT1PlayerChar;
 
             // Clears all lists to ensure everything is refilled properly
             playerCharsList.Clear();
@@ -173,11 +175,11 @@ namespace Managers
                 playerCharsList.Add(playerChars.transform.GetChild(i).gameObject);
                 combatChars.Add(playerChars.transform.GetChild(i).gameObject);
             }
-
-            t1.Add(firstT1Char);
+            
+            t1.Add(firstT1PlayerChar);
             for (int i = 0; i < combatChars.Count; ++i)
             {
-                if (!combatChars[i].GetComponent<CharData>().hasActed && combatChars[i] != firstT1Char)
+                if (!combatChars[i].GetComponent<CharData>().hasActed && combatChars[i] != firstT1PlayerChar)
                     t1.Add(combatChars[i]);
                 t2.Add(combatChars[i]);
             }
@@ -243,11 +245,11 @@ namespace Managers
         public void CheckForRoundType()
         {
             // If either player is engaged in combat, start them in it
-            //  CHANGE TO ONLY AFFECT RELEVANT CHARACTER IN THE FUTURE
             firstT1Char = t1[0];
-            if (t1[0].tag == "Player" && t1[0].GetComponent<CharData>().dead)
-                t1[0].GetComponent<CharData>().CountDownDeathTurns();
 
+            if (t1[0].tag == "Player")
+                firstT1PlayerChar = t1[0];
+            CheckCharacterDeath();
             if (!t1[0].GetComponent<CharData>().dead)
             {
                 if (t1[0].GetComponent<CharData>().isInCombat && CombatManager.Instance != null)
@@ -255,14 +257,24 @@ namespace Managers
                 else
                     MovementManager.Instance.StartRound();
             }
-            // If a character is dead, end the turn
+            // If a character is dead, focus on them, show an animation, and end the turn
             else
-                EndRound();
+                StartCoroutine(CharacterDeathAnimation());
+        }
+
+        private void CheckCharacterDeath()
+        {
+            if (t1[0].tag == "Player" && t1[0].GetComponent<CharData>().dead)
+            {
+                t1[0].GetComponent<CharData>().CountDownDeathTurns();
+            }
         }
 
         // Ends the current round of combat
         public void EndRound()
         {
+            if (t1[0].tag == "Player")
+                t1[0].GetComponent<CharData>().MoveCharUI(false);
             t1[0].GetComponent<CharData>().hasActed = true;
             t1[0].GetComponent<CharData>().t1Pos--;
 
@@ -285,8 +297,12 @@ namespace Managers
             // CHECK IF ALL CHARACTERS ARE CURRENTLY IN THE SAME BATTLE; 
             //  IF SO, IMMEDIATELY END THE GLOBAL TURN AND CONTINUE COMBAT
             //  IF NOT, END THE COMBAT INSTANCE
+            bool @bool = true;
+            for (int i = 0; i < playerChars.transform.childCount; ++i)
+                if (playerChars.transform.GetChild(i).GetComponent<CharData>().dead || playerChars.transform.GetChild(i).GetComponent<CharData>().combatInst != playerChars.transform.GetChild(0).GetComponent<CharData>().combatInst)
+                    @bool = false;
             
-            if (nonCombatPlayer.transform.childCount == 0)
+            if ((nonCombatPlayer.transform.childCount == 0 && @bool) || SceneChangeManager.Instance.type == SceneType.Hub)
                 SetNextGlobalTurnData();
             else
                 CombatTransitionManager.Instance.ExitExistingCombatInstance(playerCharsList);
@@ -430,6 +446,25 @@ namespace Managers
             yield return new WaitForSeconds(0.2f);
             tracker.AddTurnTrackers(t1, t2, player);
 
+            yield return null;
+        }
+
+        IEnumerator CharacterDeathAnimation()
+        {
+            Camera cam = Camera.main;
+            
+            cam.GetComponent<CameraManager>().LerpToTarget(t1[0], new Vector3(0, 2.15f, -4.5f));
+            while ((cam.transform.position.x + 0.01f > t1[0].transform.position.x && cam.transform.position.x - 0.01f < t1[0].transform.position.x)
+                || (cam.transform.position.z + 0.01f > t1[0].transform.position.z && cam.transform.position.z - 0.01f < t1[0].transform.position.z))
+                yield return new WaitForSeconds(0.02f);
+
+            Debug.Log("I AM HERE");
+            revivalText.ShowRevivalText(t1[0].GetComponent<CharData>());
+            revivalText.done = false;
+            while (!revivalText.done)
+                yield return new WaitForSeconds(0.02f);
+
+            EndRound();
             yield return null;
         }
     }

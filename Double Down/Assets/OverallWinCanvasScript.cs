@@ -57,6 +57,7 @@ public class OverallWinCanvasScript : MonoBehaviour
             else
                 nonTempScript.Add(charScripts[i]);
         }
+        
         for (int i = 0; i < tempScript.Count; ++i)
             tempScript[i].UpdateUI(earnedEXP);
         for (int i = 0; i < nonTempScript.Count; ++i)
@@ -119,7 +120,8 @@ public class OverallWinCanvasScript : MonoBehaviour
             if (charScripts[i].charStats.gameObject.GetComponent<CharData>().isInCombat && charScripts[i].charStats.gameObject.GetComponent<CharData>().combatInst == inst)
                 l.Add(charScripts[i].charStats.gameObject);
 
-        // TEMP
+        for (int i = 0; i < charScripts.Count; ++i)
+            charScripts[i].levelUpGroup.alpha = 0.0f;
         ResetWinCanvas(tempScript);
         Managers.SceneChangeManager.Instance.WinCombat(l);
 

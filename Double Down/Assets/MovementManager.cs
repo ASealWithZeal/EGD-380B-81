@@ -4,9 +4,9 @@ using UnityEngine;
 
 public enum MovementArrows
 {
-    Up = KeyCode.W | KeyCode.UpArrow,
-    Down = KeyCode.S | KeyCode.DownArrow,
-    Left = KeyCode.A | KeyCode.LeftArrow,
+    Up =    KeyCode.W | KeyCode.UpArrow,
+    Down =  KeyCode.S | KeyCode.DownArrow,
+    Left =  KeyCode.A | KeyCode.LeftArrow,
     Right = KeyCode.D | KeyCode.RightArrow
 }
 
@@ -31,7 +31,7 @@ namespace Managers
         // Start is called before the first frame update
         void Start()
         {
-
+            cam = Camera.main;
         }
 
         // Update is called once per frame
@@ -69,6 +69,7 @@ namespace Managers
         public void StartRound()
         {
             TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = false;
+            TurnManager.Instance.t1[0].GetComponent<CharData>().MoveCharUI(true);
             setupMoveChars = true;
         }
     }

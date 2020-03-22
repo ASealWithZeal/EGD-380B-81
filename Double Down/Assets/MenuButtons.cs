@@ -13,11 +13,7 @@ public class MenuButtons : MonoBehaviour
         Quit,
         Menu,
 
-        Battle1,
-        Battle2,
-        Battle3,
-
-        PreCombatScene
+        Hub
     }
 
     public Button startButton;
@@ -55,31 +51,31 @@ public class MenuButtons : MonoBehaviour
         switch (i)
         {
             case (int)Menu.Start:
-                Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
+                Managers.SceneChangeManager.Instance.ChangeSceneWithFade("Hub");
                 break;
             case (int)Menu.HowTo:
-                Managers.SceneChangeManager.Instance.ChangeScene("ControlsScene");
+                Managers.SceneChangeManager.Instance.ChangeSceneWithFade("ControlsScene");
                 break;
             case (int)Menu.Quit:
                 Application.Quit();
                 break;
             case (int)Menu.Menu:
-                Managers.SceneChangeManager.Instance.ChangeScene("Start");
+                Managers.SceneChangeManager.Instance.ChangeSceneWithFade("Start");
                 break;
 
 
-            case (int)Menu.PreCombatScene:
-                Managers.SceneChangeManager.Instance.ChangeScene("BattleSelectScene");
-                break;
-            case (int)Menu.Battle1:
-                Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP2");
-                break;
-            case (int)Menu.Battle2:
-                Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP1");
-                break;
-            case (int)Menu.Battle3:
-                Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
-                break;
+            //case (int)Menu.PreCombatScene:
+            //    Managers.SceneChangeManager.Instance.ChangeScene("BattleSelectScene");
+            //    break;
+            //case (int)Menu.Battle1:
+            //    Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP2");
+            //    break;
+            //case (int)Menu.Battle2:
+            //    Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP1");
+            //    break;
+            //case (int)Menu.Battle3:
+            //    Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
+            //    break;
         }
     }
 }

@@ -22,7 +22,7 @@ public class Stats : MonoBehaviour
     // Modifier Turns
     private int atkModTurns = 0;
     private int defModTurns = 0;
-    private float spdModTurns = 0;
+    private int spdModTurns = 0;
     private int aggroModTurns = 0;
 
     [Header("Level Gains")]
@@ -182,6 +182,12 @@ public class Stats : MonoBehaviour
             aggro = 0.0f;
             aggroModTurns = 0;
         }
+    }
+
+    public void DestroyMods()
+    {
+        atkMod = defMod = spdMod = aggro = 1.0f;
+        atkModTurns = defModTurns = spdModTurns = aggroModTurns = 0;
     }
 
     public void SetAtkMod(float mod, int turns)

@@ -55,9 +55,9 @@ public class HubMenuDisplay : MonoBehaviour
             OpenMenu();
         else if (Input.GetKeyDown(KeyCode.Escape) && open)
             StartCoroutine(ClosingMenu());
-        else if (Input.GetKeyDown(KeyCode.Q) && open)
+        else if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && open)
             SwapPages(menuPage - 1);
-        else if (Input.GetKeyDown(KeyCode.E) && open)
+        else if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && open)
             SwapPages(menuPage + 1);
     }
 
@@ -126,10 +126,15 @@ public class HubMenuDisplay : MonoBehaviour
             num += charStats.nextLevelExp[i];
         expString[0].SetText("EXP: "+ (num + charStats.exp).ToString());
         if (charStats.level < charStats.nextLevelExp.Count + 1)
+        {
+            expBar.fillAmount = (float)charStats.exp / charStats.nextLevelExp[charStats.level - 1];
             expString[1].SetText((charStats.nextLevelExp[charStats.level - 1] - charStats.exp).ToString());
+        }
         else
+        {
+            expBar.fillAmount = 1;
             expString[1].SetText("MAX");
-        expBar.fillAmount = (float)charStats.exp / charStats.nextLevelExp[charStats.level - 1];
+        }
 
 
         // Stats Information

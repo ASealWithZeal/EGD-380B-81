@@ -26,7 +26,12 @@ namespace Managers
                 DontDestroyOnLoad(gameObject);
             }
 
-            CreateData();
+            //CreateData();
+        }
+
+        public void DestroyObj()
+        {
+            Destroy(gameObject);
         }
 
         public void CopyCharData(Stats s, CharData c, int i)

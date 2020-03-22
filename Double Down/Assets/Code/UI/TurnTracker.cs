@@ -47,6 +47,16 @@ public class TurnTracker : MonoBehaviour
                 t2[i].GetComponent<TurnTrackerObj>().Select();
     }
 
+    public bool CheckForChar(GameObject obj)
+    {
+        Debug.Log("HERE");
+        for (int i = 0; i < t1.Count; ++i)
+            if (t1[i].GetComponent<TurnTrackerObj>().obj == obj)
+                return true;
+
+        return false;
+    }
+
     public void ResetTrackers()
     {
         //int c = t1.Count;
@@ -268,14 +278,15 @@ public class TurnTracker : MonoBehaviour
             j = 1;
 
         int posAdjust = 0;
-        if (t1[0] != null && t1.Count > 0)
+        if (t1.Count > 0 && t1[0] != null)
             posAdjust = t1.Count;
 
         for (int i = 0; i < l.Count; ++i)
         {
             GameObject g = Instantiate(image, t1Storage);
             //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
-            g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
+            //g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
+            g.GetComponent<Image>().color = l[i].GetComponent<CharData>().GetColor();
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
@@ -319,7 +330,8 @@ public class TurnTracker : MonoBehaviour
         {
             GameObject g = Instantiate(image, t2Storage);
             //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
-            g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
+            //g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
+            g.GetComponent<Image>().color = l[i].GetComponent<CharData>().GetColor();
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
@@ -402,7 +414,7 @@ public class TurnTracker : MonoBehaviour
             yield return new WaitForSeconds(timeIncrements);
 
             // Sets T1 and T2 to make sure the new positions are accurate
-            if (t1[t1.Count - 1].transform.position.x <= t1Tracker[t1.Count - 1].transform.position.x + 0.01f &&
+            if (t1.Count > 0 && t1[t1.Count - 1].transform.position.x <= t1Tracker[t1.Count - 1].transform.position.x + 0.01f &&
                 t2[t2.Count - 1].transform.position.x <= t2Tracker[t2.Count - 1].transform.position.x + 0.01f)
             {
                 for (int i = 0; i < t1.Count; ++i)

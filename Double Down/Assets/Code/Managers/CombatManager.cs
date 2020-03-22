@@ -22,6 +22,7 @@ namespace Managers
         public DamageTextUI dText = null;
         public AbilityNameDisplay aDisplay = null;
         public OverallWinCanvasScript winCanvas = null;
+        public ExpContainer container = null;
         public List<Vector3> positions = null;
 
         private List<GameObject> moveTargets = new List<GameObject>();
@@ -32,6 +33,7 @@ namespace Managers
         private int newTarget = 0;
         private float storedMod = 0.0f;
         private int winEXP = 0;
+
         private int storedAbility = -1;
 
         private Vector3 origPos;
@@ -42,12 +44,19 @@ namespace Managers
         {
             // Starts combat! - Temp
             // StartRound();
+            container = GameObject.Find("_ExpContainer").GetComponent<ExpContainer>();
             winCanvas = GameObject.Find("WinCanvas").GetComponent<OverallWinCanvasScript>();
         }
 
         public void StartCombat()
         {
-            StartCoroutine(MovePlayerCharacterAtStart(positions[TurnManager.Instance.playerCharsList.Count - 1]));
+            if (TurnManager.Instance.playerCharsList.Count == 1)
+                StartCoroutine(MovePlayerCharacterAtStart(positions[0], 0, true));
+            else
+            {
+                StartCoroutine(MovePlayerCharacterAtStart(positions[1], 0, true));
+                StartCoroutine(MovePlayerCharacterAtStart(positions[2], 1, false));
+            }
         }
 
         private void Update()
@@ -117,12 +126,12 @@ namespace Managers
                         if (TurnManager.Instance.combatChars[i].tag == "Player")
                         {
                             TurnManager.Instance.playerCharsList.Remove(TurnManager.Instance.combatChars[i]);
-                            TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatPlayer.transform;
+                            //TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatPlayer.transform;
                         }
                         else
                         {
                             // Increases the battle's EXP point gain
-                            winEXP += TurnManager.Instance.combatChars[i].GetComponent<Stats>().exp;
+                            container.AddWinExp(TurnManager.Instance.combatChars[i].GetComponent<Stats>().exp);
                             TurnManager.Instance.enemyCharsList.Remove(TurnManager.Instance.combatChars[i]);
                             TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatEnemies.transform;
                         }
@@ -138,8 +147,8 @@ namespace Managers
                 {
                     canMoveOn = false;
                     for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
-                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(winEXP / TurnManager.Instance.playerCharsList.Count);
-                    winCanvas.ShowWinCanvas(winEXP / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst);
+                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count);
+                    winCanvas.ShowWinCanvas(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst);
                 }
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {
@@ -180,7 +189,7 @@ namespace Managers
             if (allDead)
                 SceneChangeManager.Instance.LoseCombat();
             else
-                CombatTransitionManager.Instance.DestroyCombatInstance(TurnManager.Instance.playerCharsList);
+                CombatTransitionManager.Instance.ResetCombatInstance(TurnManager.Instance.playerCharsList);
         }
 
         // Sets up an action before targeting the relevant character(s)
@@ -592,6 +601,7 @@ namespace Managers
         {
             CharData c = TurnManager.Instance.t1[0].GetComponent<CharData>();
 
+            c.MoveCharUI(true);
             while (TurnManager.Instance.t1[0].transform.position != targetPos)
             {
                 TurnManager.Instance.t1[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.t1[0].transform.position, targetPos, 0.125f);
@@ -619,17 +629,17 @@ namespace Managers
             yield return null;
         }
 
-        IEnumerator MovePlayerCharacterAtStart(Vector3 targetPos)
+        IEnumerator MovePlayerCharacterAtStart(Vector3 targetPos, int index, bool end)
         {
-            Debug.Log(targetPos);
-            while (TurnManager.Instance.playerCharsList[0].transform.position != targetPos)
+            while (TurnManager.Instance.playerCharsList[index].transform.position != targetPos)
             {
-                TurnManager.Instance.playerCharsList[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.playerCharsList[0].transform.position, targetPos, 0.125f);
+                TurnManager.Instance.playerCharsList[index].transform.position = Vector3.MoveTowards(TurnManager.Instance.playerCharsList[index].transform.position, targetPos, 0.125f);
                 yield return new WaitForSeconds(0.0125f);
             }
-
+            
             yield return new WaitForSeconds(0.1f);
-            StartRound();
+            if (end)
+                StartRound();
         }
     }
 }

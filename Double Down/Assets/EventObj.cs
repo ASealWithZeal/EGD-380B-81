@@ -5,7 +5,8 @@ using UnityEngine;
 public enum HubEvents
 {
     Pass,
-    Battle
+    Battle,
+    Boss
 }
 
 public class EventObj : MonoBehaviour
@@ -38,7 +39,7 @@ public class EventObj : MonoBehaviour
 
         for (int i = 0; i < enemies.Count; ++i)
         {
-            if (type == HubEvents.Battle && !enemies[i].GetComponent<CharData>().dead)
+            if ((type == HubEvents.Battle || type == HubEvents.Boss) && !enemies[i].GetComponent<CharData>().dead)
                 check = true;
         }
 
@@ -84,9 +85,9 @@ public class EventObj : MonoBehaviour
     {
         if (type == HubEvents.Pass && @bool)
             Managers.TurnManager.Instance.EndRound();
-        else if (type == HubEvents.Battle && @bool && !combatActive)
+        else if ((type == HubEvents.Battle || type == HubEvents.Boss) && @bool && !combatActive)
             Managers.CombatTransitionManager.Instance.CreateNewCombatInstance(eventNum, player, enemies);
-        else if (type == HubEvents.Battle && @bool && combatActive)
+        else if ((type == HubEvents.Battle || type == HubEvents.Boss) && @bool && combatActive)
             PassExistingCombat();
         else if (!@bool)
             Managers.MovementManager.Instance.canMoveChars = true;

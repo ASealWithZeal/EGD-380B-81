@@ -132,4 +132,34 @@ public class PlayerStatusUI : MonoBehaviour
 
         yield return null;
     }
+
+    public void MoveUI(bool forward)
+    {
+        StartCoroutine(MoveUIOut(forward));
+    }
+
+    IEnumerator MoveUIOut(bool forward)
+    {
+        RectTransform rt = GetComponent<RectTransform>();
+        if (forward)
+        {
+            while (rt.localPosition.x < -300)
+            {
+                rt.localPosition += new Vector3(1.5f, 0, 0);
+                yield return new WaitForSeconds(0.0125f);
+            }
+            rt.localPosition = new Vector3(-300f, rt.localPosition.y, 0);
+        }
+        else
+        {
+            while (rt.localPosition.x > -315)
+            {
+                rt.localPosition -= new Vector3(1.5f, 0, 0);
+                yield return new WaitForSeconds(0.0125f);
+            }
+            rt.localPosition = new Vector3(-315f, rt.localPosition.y, 0);
+        }
+
+        yield return null;
+    }
 }

@@ -6,6 +6,8 @@ namespace Managers
 {
     public class CombatTransitionManager : Singleton<CombatTransitionManager>
     {
+        public CameraManager cam;
+        public ExpContainer container;
         public Transform playerChars;
         public Transform nonCombatPlayerChars;
         public Transform enemyChars;
@@ -28,6 +30,8 @@ namespace Managers
 
         public void CreateNewCombatInstance(int combatInst, GameObject player, List<GameObject> enemies)
         {
+            container.SetCombatInst(combatInst);
+
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;
             for (int i = 0; i < temp; ++i)
@@ -47,11 +51,14 @@ namespace Managers
             }
 
             SetCharacterHubPositions();
+            cam.StoreCameraHubPos();
             transitionUI.ExitScene("CombatScene");
         }
 
         public void EnterExistingCombatInstance(int combatInst, GameObject player, List<GameObject> enemies)
         {
+            container.SetCombatInst(combatInst);
+
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;
             for (int i = 0; i < temp; ++i)
@@ -72,18 +79,23 @@ namespace Managers
             // Adds the enemies to the combat list
             for (int i = 0; i < enemies.Count; ++i)
             {
-                enemies[i].transform.parent = enemyChars;
-                enemies[i].GetComponent<CharData>().isInCombat = true;
-                enemies[i].GetComponent<CharData>().combatInst = combatInst;
+                if (!enemies[i].GetComponent<CharData>().dead)
+                {
+                    enemies[i].transform.parent = enemyChars;
+                    enemies[i].GetComponent<CharData>().isInCombat = true;
+                    enemies[i].GetComponent<CharData>().combatInst = combatInst;
+                }
             }
 
             SetCharacterHubPositions();
+            cam.StoreCameraHubPos();
             transitionUI.ExitScene("CombatScene");
         }
 
         public void ExitExistingCombatInstance(List<GameObject> players)
         {
             SetCharacterCombatPositions();
+            cam.StoreCameraCombatPos();
 
             // Adds all player characters back to the combat list
             int temp = nonCombatPlayerChars.childCount;
@@ -100,14 +112,20 @@ namespace Managers
 
         public void DestroyCombatInstance(List<GameObject> players)
         {
+            container.FlushWinExp();
+
             // Sets all involved characters as not currently being involved in combat
             for (int i = 0; i < players.Count; ++i)
             {
                 players[i].GetComponent<CharData>().isInCombat = false;
                 players[i].GetComponent<CharData>().combatInst = -1;
+                players[i].GetComponent<Stats>().DestroyMods();
 
                 if (!players[i].GetComponent<CharData>().dead)
+                {
+                    players[i].GetComponent<CharData>().ChangeCharUIDisplay();
                     players[i].GetComponent<CharData>().FullRestore();
+                }
             }
 
             // Adds all "missing" characters to the combat list
@@ -126,6 +144,56 @@ namespace Managers
             }
 
             ResetCharacterCombatPositions();
+            //cam.StoreCameraCombatPos();
+            transitionUI.ExitScene("Hub");
+        }
+
+        // Resets a combat instance when all player characters die
+        // "Revives" all enemies
+        public void ResetCombatInstance(List<GameObject> players)
+        {
+            container.FlushWinExp();
+
+            // Sets all involved characters as not currently being involved in combat
+            for (int i = 0; i < players.Count; ++i)
+            {
+                players[i].GetComponent<CharData>().isInCombat = false;
+                players[i].GetComponent<CharData>().combatInst = -1;
+                players[i].GetComponent<Stats>().DestroyMods();
+            }
+
+            // Adds all "missing" characters to the combat list
+            int temp = nonCombatPlayerChars.childCount;
+            for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
+                nonCombatPlayerChars.GetChild(0).parent = playerChars;
+
+            // Removes all enemies, IF ANY EXIST, from the combat list
+            temp = nonCombatEnemyChars.childCount;
+            for (int i = 0; i < temp; ++i)
+            {
+                if (nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().attachedEventNum == enemyChars.GetChild(0).GetComponent<CharData>().attachedEventNum)
+                {
+                    nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().dead = false;
+                    nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().FullRestore();
+                    nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().ChangeColor();
+                }
+            }
+
+            // Removes all enemies, IF ANY EXIST, from the combat list
+            temp = enemyChars.childCount;
+            for (int i = 0; i < temp; ++i)
+            {
+                enemyChars.GetChild(0).GetComponent<CharData>().isInCombat = false;
+                enemyChars.GetChild(0).GetComponent<CharData>().dead = false;
+                enemyChars.GetChild(0).GetComponent<CharData>().combatInst = -1;
+                enemyChars.GetChild(0).GetComponent<CharData>().FullRestore();
+                enemyChars.GetChild(0).GetComponent<CharData>().ChangeColor();
+
+                enemyChars.GetChild(0).parent = nonCombatEnemyChars;
+            }
+
+            ResetCharacterCombatPositions();
+            //cam.StoreCameraCombatPos();
             transitionUI.ExitScene("Hub");
         }
 
@@ -165,6 +233,8 @@ namespace Managers
                 nonCombatPlayerChars.GetChild(i).localPosition = nonCombatPlayerChars.GetChild(i).GetComponent<CharData>().hubPosition;
             for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)
                 nonCombatEnemyChars.GetChild(i).localPosition = nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().hubPosition;
+
+            cam.SetCameraPos(0);
         }
 
         public void RetrieveCharacterCombatPositions()
@@ -177,6 +247,8 @@ namespace Managers
                 nonCombatPlayerChars.GetChild(i).localPosition = new Vector3(-2000f, -0.5f, -2f);
             for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)
                 nonCombatEnemyChars.GetChild(i).localPosition = new Vector3(-2000f, -0.5f, -2f);
+
+            cam.SetCameraPos(1);
         }
     }
 }

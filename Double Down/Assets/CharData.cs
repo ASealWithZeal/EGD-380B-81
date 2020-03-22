@@ -16,7 +16,7 @@ public class CharData : MonoBehaviour
 
     [Header("Event Info")]
     public bool dead = false;
-    private int deathTurns = 2;
+    [HideInInspector] public int deathTurns = 3;
     public int attachedEventNum = 0;
 
     [Header("Combat Info")]
@@ -36,6 +36,7 @@ public class CharData : MonoBehaviour
     [Header("Sprites")]
     public Sprite[] nonTargetSprite;
     public Sprite[] targetSprite;
+    public Color[] colors;
 
     public GameObject charUI;
     public WinCanvasScript charWinUI;
@@ -62,6 +63,27 @@ public class CharData : MonoBehaviour
         }
     }
 
+    public void ChangeCharUIDisplay()
+    {
+        charUI.GetComponent<PlayerStatusUI>().SetNewHP(name, charStats.level, charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
+    }
+
+    public void ChangeColor()
+    {
+        if (!dead)
+            gameObject.GetComponent<SpriteRenderer>().color = colors[0];
+        else
+            gameObject.GetComponent<SpriteRenderer>().color = colors[1];
+    }
+
+    public Color GetColor()
+    {
+        if (!dead)
+            return colors[0];
+        else
+            return colors[0];
+    }
+
     public void FullRestore()
     {
         charStats.currentHP = charStats.MaxHP();
@@ -85,6 +107,12 @@ public class CharData : MonoBehaviour
     public void ChangeTP()
     {
         charUI.GetComponent<PlayerStatusUI>().ChangeTP(charStats.TPPercent(), charStats.currentTP);
+    }
+
+    // Juts out a character's UI to show they are currently acting
+    public void MoveCharUI(bool forward)
+    {
+        charUI.GetComponent<PlayerStatusUI>().MoveUI(forward);
     }
 
     // Sets up the user so they can pull off a delayed attack when relevant
@@ -120,25 +148,44 @@ public class CharData : MonoBehaviour
         // When all turns have passed, revive the character at their starting position
         if (deathTurns == 0)
         {
-            deathTurns = 2;
+            deathTurns = 3;
             dead = false;
-            GetComponent<SpriteRenderer>().color += new Color(0, 0, 0, 1);
-
+            ChangeColor();
+            
             charStats.currentHP = charStats.MaxHP();
             charStats.currentTP = charStats.MaxTP();
             ChangeHP();
             ChangeTP();
 
-            gameObject.transform.localPosition = initialPos;
+            //gameObject.transform.localPosition = initialPos;
             gameObject.SetActive(true);
         }
+    }
+
+    // After transitioning into the hub, check all player characters to see if anyone's dead
+    public void CheckDeath()
+    {
+        if (dead)
+        {
+            GetComponent<SpriteRenderer>().color = colors[1];
+            transform.position = initialPos;
+        }
+    }
+
+    private void ResetOnDeath()
+    {
+        isInCombat = false;
+        combatInst = -1;
+        deathTurns = 3;
+
+        delayedAttack = false;
     }
 
     IEnumerator DeathAnim()
     {
         dead = true;
+        ResetOnDeath();
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
-        isInCombat = false;
 
         Color storedColor = sr.color;
         while (sr.color.a > 0)
@@ -150,7 +197,6 @@ public class CharData : MonoBehaviour
 
         if (gameObject.tag != "Player")
             charUI.SetActive(false);
-        //gameObject.SetActive(false);
         yield return null;
     }
 
