@@ -61,6 +61,7 @@ public class Attacker : MonoBehaviour
     public void PerformAttack()
     {
         // Animation
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(attackName);
         Managers.CombatManager.Instance.DealDamage(attackMod);
     }
@@ -74,6 +75,7 @@ public class Attacker : MonoBehaviour
     public void PerformDefend()
     {
         // Animation
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
         Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true, 0.5f);
     }
@@ -90,6 +92,7 @@ public class Attacker : MonoBehaviour
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, false, 0.5f);
 
         // Adds the self-debuff
@@ -101,6 +104,8 @@ public class Attacker : MonoBehaviour
         // Animation
         charStats.currentTP -= ability0UpgradeCost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
+
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0UpgradeName);
         Managers.CombatManager.Instance.UseDelayedAbility(ability0UpgradeName, ability0UpgradeMod, 1, false, 0.5f);
 
@@ -121,6 +126,8 @@ public class Attacker : MonoBehaviour
         // Animation
         charStats.currentTP -= ability1Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
+
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         Managers.CombatManager.Instance.UseStatusAbility(3, ability1Effect, ability1Duration, true, 0.5f);
     }

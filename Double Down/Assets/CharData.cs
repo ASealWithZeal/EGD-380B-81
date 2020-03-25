@@ -37,6 +37,7 @@ public class CharData : MonoBehaviour
     public Sprite[] nonTargetSprite;
     public Sprite[] targetSprite;
     public Color[] colors;
+    public bool hasFinishedActionAnimation = false;
 
     public GameObject charUI;
     public WinCanvasScript charWinUI;
@@ -135,6 +136,32 @@ public class CharData : MonoBehaviour
         transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
     }
 
+    public void DisplayActionAnimation()
+    {
+        hasFinishedActionAnimation = false;
+        StartCoroutine(ActionCoroutine());
+    }
+
+    IEnumerator ActionCoroutine()
+    {
+        if (tag != "Player")
+        {
+            transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
+            yield return new WaitForSeconds(0.05f);
+            transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
+            yield return new WaitForSeconds(0.05f);
+            transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
+            yield return new WaitForSeconds(0.05f);
+            transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        hasFinishedActionAnimation = true;
+        yield return null;
+    }
+
+
+
     public void KillChar()
     {
         StartCoroutine(DeathAnim());
@@ -197,6 +224,8 @@ public class CharData : MonoBehaviour
 
         if (gameObject.tag != "Player")
             charUI.SetActive(false);
+        else
+            transform.position = new Vector3(-9, -0.5f, -2);
         yield return null;
     }
 

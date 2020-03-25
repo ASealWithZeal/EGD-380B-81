@@ -41,6 +41,11 @@ public class AbilityNameDisplay : MonoBehaviour
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
         }
 
+        if (!i)
+            theGroup.alpha = 0.0f;
+        else
+            theGroup.alpha = 1.0f;
+
         yield return null;
     }
 }

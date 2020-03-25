@@ -452,13 +452,12 @@ namespace Managers
         IEnumerator CharacterDeathAnimation()
         {
             Camera cam = Camera.main;
-            
+            yield return new WaitForSeconds(0.1f);
             cam.GetComponent<CameraManager>().LerpToTarget(t1[0], new Vector3(0, 2.15f, -4.5f));
-            while ((cam.transform.position.x + 0.01f > t1[0].transform.position.x && cam.transform.position.x - 0.01f < t1[0].transform.position.x)
-                || (cam.transform.position.z + 0.01f > t1[0].transform.position.z && cam.transform.position.z - 0.01f < t1[0].transform.position.z))
+            
+            while (cam.GetComponent<CameraManager>().lerping)
                 yield return new WaitForSeconds(0.02f);
 
-            Debug.Log("I AM HERE");
             revivalText.ShowRevivalText(t1[0].GetComponent<CharData>());
             revivalText.done = false;
             while (!revivalText.done)

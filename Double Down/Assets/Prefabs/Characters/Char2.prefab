@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 112811365251606056}
   - component: {fileID: 7275758698224571560}
   - component: {fileID: 4647696549477024482}
+  - component: {fileID: 196496092}
   m_Layer: 0
   m_Name: Char2
   m_TagString: Player
@@ -108,7 +109,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5825642891471250189}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.85, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_Children:
@@ -228,10 +229,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Rab
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: 0.5, y: 0.85, z: 0}
+  combatPosition: {x: -9, y: -0.5, z: -2}
   charNum: 1
+  dead: 0
+  deathTurns: 3
+  attachedEventNum: 0
+  isInCombat: 0
+  combatInst: -1
   learnedAbilities: 00000000
   delayedAbilityName: 
   delayedAttack: 0
@@ -240,6 +247,10 @@ MonoBehaviour:
   target: []
   nonTargetSprite: []
   targetSprite: []
+  colors:
+  - {r: 0, g: 0.5623107, b: 1, a: 1}
+  - {r: 0.5882353, g: 0.5882353, b: 0.78431374, a: 1}
+  hasFinishedActionAnimation: 0
   charUI: {fileID: 0}
   charWinUI: {fileID: 0}
   charStats: {fileID: 3788396643805275717}
@@ -271,6 +282,7 @@ MonoBehaviour:
   ability0Target: 0
   ability0HealTarget: 5
   ability0UpgradeName: Blood Draw+
+  ability0Active: 1
   ability0UpgradeDescription: Deal 1.35x damage, then restore 120% of that as HP split
     evenly between all allies.
   ability0UpgradeMod: 1.35
@@ -278,8 +290,33 @@ MonoBehaviour:
   ability0UpgradeTarget: 0
   ability0UpgradeHealTarget: 5
   ability1Name: Injection
+  ability1Active: 1
   ability1Description: Give an ally +25% ATK for 3 turns.
   ability1Cost: 4
   ability1Effect: 1.25
   ability1Duration: 3
   ability1Target: 4
+  ability2Name: TP +25%
+  ability2Active: 0
+  ability2Description: User's TP permanently increases by 25%.
+  ability3Name: SPD +25%
+  ability3Active: 0
+  ability3Description: User's SPD permanently increases by 25%.
+--- !u!143 &196496092
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5825642891471250189}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 0.12
+  m_Radius: 0.025
+  m_SlopeLimit: 30
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}

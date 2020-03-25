@@ -12,12 +12,15 @@ public class MenuButtons : MonoBehaviour
         HowTo,
         Quit,
         Menu,
+        Controls,
 
         Hub
     }
 
     public Button startButton;
     GameObject lastselect;
+    public GameObject[] images;
+    private int index = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -62,20 +65,39 @@ public class MenuButtons : MonoBehaviour
             case (int)Menu.Menu:
                 Managers.SceneChangeManager.Instance.ChangeSceneWithFade("Start");
                 break;
+            case (int)Menu.Controls:
+                SwapImages();
+                break;
 
 
-            //case (int)Menu.PreCombatScene:
-            //    Managers.SceneChangeManager.Instance.ChangeScene("BattleSelectScene");
-            //    break;
-            //case (int)Menu.Battle1:
-            //    Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP2");
-            //    break;
-            //case (int)Menu.Battle2:
-            //    Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP1");
-            //    break;
-            //case (int)Menu.Battle3:
-            //    Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
-            //    break;
+                //case (int)Menu.PreCombatScene:
+                //    Managers.SceneChangeManager.Instance.ChangeScene("BattleSelectScene");
+                //    break;
+                //case (int)Menu.Battle1:
+                //    Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP2");
+                //    break;
+                //case (int)Menu.Battle2:
+                //    Managers.SceneChangeManager.Instance.ChangeScene("CombatSceneTEMP1");
+                //    break;
+                //case (int)Menu.Battle3:
+                //    Managers.SceneChangeManager.Instance.ChangeScene("CombatScene");
+                //    break;
+        }
+    }
+
+    // Simple image swap
+    public void SwapImages()
+    {
+        index++;
+        if (index >= images.Length)
+            index = 0;
+
+        for (int i = 0; i < images.Length; ++i)
+        {
+            if (i == index)
+                images[i].SetActive(true);
+            else
+                images[i].SetActive(false);
         }
     }
 }

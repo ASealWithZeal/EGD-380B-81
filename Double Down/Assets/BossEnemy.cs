@@ -105,7 +105,7 @@ public class BossEnemy : MonoBehaviour
         // Animation
         Managers.CombatManager.Instance.DisplayAbilityName(special2DelayName);
         Managers.CombatManager.Instance.SetTarget((int)special2Target);
-        Managers.CombatManager.Instance.UseDelayedAbility(special2Name, special2Mod, special2Delay, true, 1.0f);
+        Managers.CombatManager.Instance.UseDelayedAbility(special2Name, special2Mod, special2Delay, true, 1.5f);
     }
 
     public void UseBurningMist()
@@ -116,6 +116,6 @@ public class BossEnemy : MonoBehaviour
         charStats.def -= 2;
         Managers.CombatManager.Instance.DisplayAbilityName(special3Name);
         Managers.CombatManager.Instance.SetTarget((int)special3Target);
-        Managers.CombatManager.Instance.UseStatusAbility(-1, 0, 0, true, 1.0f);
+        Managers.CombatManager.Instance.UseStatusAbility(-1, 0, 0, true, 2.0f);
     }
 }

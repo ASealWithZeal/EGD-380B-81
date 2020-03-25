@@ -186,7 +186,8 @@ public class Stats : MonoBehaviour
 
     public void DestroyMods()
     {
-        atkMod = defMod = spdMod = aggro = 1.0f;
+        atkMod = defMod = spdMod = 1.0f;
+        aggro = 0.0f;
         atkModTurns = defModTurns = spdModTurns = aggroModTurns = 0;
     }
 

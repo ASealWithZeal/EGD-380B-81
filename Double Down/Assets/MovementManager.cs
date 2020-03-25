@@ -16,6 +16,7 @@ namespace Managers
     {
         public bool canMoveChars = false;
         private bool setupMoveChars = false;
+        public bool movedVar = false;
         private Vector3 movement = new Vector3();
         public Camera cam = null;
 
@@ -63,14 +64,23 @@ namespace Managers
                 TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = true;
                 canMoveChars = true;
                 setupMoveChars = false;
+                StartCoroutine(AllowMove());
             }
         }
 
         public void StartRound()
         {
+            movedVar = false;
+            setupMoveChars = true;
             TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = false;
             TurnManager.Instance.t1[0].GetComponent<CharData>().MoveCharUI(true);
-            setupMoveChars = true;
+        }
+
+        IEnumerator AllowMove()
+        {
+            yield return new WaitForSeconds(0.02f);
+            movedVar = true;
+            yield return null;
         }
     }
 }

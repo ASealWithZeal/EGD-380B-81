@@ -104,7 +104,10 @@ namespace Managers
             {
                 CharData c = TurnManager.Instance.t1[0].GetComponent<CharData>();
                 if (!c.delayedAttack || c.delayTimer > 0)
+                {
+                    c.DisplayActionAnimation();
                     TurnManager.Instance.t1[0].GetComponent<EnemyActions>().PerformAction();
+                }
                 else
                     PerformDelayedAbility(c);
             }
@@ -148,7 +151,7 @@ namespace Managers
                     canMoveOn = false;
                     for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
                         TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count);
-                    winCanvas.ShowWinCanvas(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst);
+                    winCanvas.ShowWinCanvas(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst, container.CheckForBossEvent());
                 }
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {
@@ -216,7 +219,7 @@ namespace Managers
                 if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
                     PerformAction();
 
-                else if (Input.GetKeyDown(KeyCode.Escape))
+                else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.RightControl))
                 {
                     for (int i = 0; i < moveTargets.Count; ++i)
                     {
@@ -424,6 +427,17 @@ namespace Managers
             aDisplay.ChangeDisplayOpacity(true);
         }
 
+        IEnumerator DisplayAbilityNameAfterAnimation(string newString)
+        {
+            CharData c = TurnManager.Instance.t1[0].GetComponent<CharData>();
+
+            c.DisplayActionAnimation();
+            while (!c.hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            yield return null;
+        }
+
         public void EndTurnImmediately()
         {
 
@@ -432,6 +446,14 @@ namespace Managers
         // Deals damage to the current target(s) based on a shared modifier
         public void DealDamage(float modifier)
         {
+            StartCoroutine(DealDamageCoroutine(modifier));
+        }
+
+        IEnumerator DealDamageCoroutine(float modifier)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
             int targ = newTarget + 1;
             storedMod = modifier;
             if (!oneTarget)
@@ -455,6 +477,8 @@ namespace Managers
                 doneAttacking = true;
             else
                 newTarget++;
+
+            yield return null;
         }
 
         // Deal damage AS A START / END OF TURN EFFECT
@@ -487,19 +511,43 @@ namespace Managers
             for (int i = 0; i < targ; ++i)
             {
                 damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
+            }
 
+            StartCoroutine(DealDamageWithAbsorbCoroutine(modifier, damage));
+            return damage;
+        }
+
+        IEnumerator DealDamageWithAbsorbCoroutine(float modifier, int damage)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+            
+            int targ = 1;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = 0; i < targ; ++i)
+            {
                 moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
                 moveTargets[i].GetComponent<CharData>().ChangeHP();
 
                 dText.DamageNumbers(damage, moveTargets[i].transform, false);
             }
 
-            return damage;
+            yield return null;
         }
 
         // Restores health to all specified targets
         public void RestoreHealth(int amount)
         {
+            StartCoroutine(RestoreHealthCoroutine(amount));
+        }
+
+        IEnumerator RestoreHealthCoroutine(int amount)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
             int targ = 1;
             bool canEnd = false;
             if (!oneTarget)
@@ -517,11 +565,20 @@ namespace Managers
             }
 
             doneAttacking = true;
+            yield return null;
         }
 
         // Performs an ability with a non-damaging effect
         public void UseStatusAbility(int type, float mod, int length, bool endTurn, float textDuration)
         {
+            StartCoroutine(UseStatusAbilityCoroutine(type, mod, length, endTurn, textDuration));
+        }
+
+        IEnumerator UseStatusAbilityCoroutine(int type, float mod, int length, bool endTurn, float textDuration)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
             int targ = 1;
             if (!oneTarget)
                 targ = moveTargets.Count;
@@ -540,21 +597,40 @@ namespace Managers
 
             if (endTurn)
                 StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
+            yield return null;
         }
 
         // Prepares to let the user perform a delayed attack
         public void UseDelayedAbility(string name, float mod, int delay, bool endTurn, float textDuration)
         {
+            StartCoroutine(UseDelayedAbilityCoroutine(name, mod, delay, endTurn, textDuration));
+        }
+
+        IEnumerator UseDelayedAbilityCoroutine(string name, float mod, int delay, bool endTurn, float textDuration)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
             TurnManager.Instance.t1[0].GetComponent<CharData>().SetDelayedAttack(name, delay, mod, moveTargets);
 
             if (endTurn)
                 StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
+            yield return null;
         }
 
         private void PerformDelayedAbility(CharData c)
         {
             c.delayedAttack = false;
             DisplayAbilityName(c.delayedAbilityName);
+            c.DisplayActionAnimation();
+
+            StartCoroutine(PerformDelayedAbilityCoroutine(c));
+        }
+
+        IEnumerator PerformDelayedAbilityCoroutine(CharData c)
+        {
+            while (!c.hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
 
             for (int i = 0; i < moveTargets.Count; ++i)
                 moveTargets.Remove(moveTargets[i]);
@@ -569,8 +645,9 @@ namespace Managers
 
             if (c.target.Count > 1)
                 oneTarget = false;
-
             DealDamage(c.storedModifier);
+
+            yield return null;
         }
 
         IEnumerator EndNonDamageTextDisplay(float time, bool followUp)

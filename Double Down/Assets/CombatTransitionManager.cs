@@ -28,9 +28,10 @@ namespace Managers
 
         }
 
-        public void CreateNewCombatInstance(int combatInst, GameObject player, List<GameObject> enemies)
+        public void CreateNewCombatInstance(HubEvents type, int combatInst, GameObject player, List<GameObject> enemies)
         {
             container.SetCombatInst(combatInst);
+            container.battleType = type;
 
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;
@@ -55,9 +56,10 @@ namespace Managers
             transitionUI.ExitScene("CombatScene");
         }
 
-        public void EnterExistingCombatInstance(int combatInst, GameObject player, List<GameObject> enemies)
+        public void EnterExistingCombatInstance(HubEvents type, int combatInst, GameObject player, List<GameObject> enemies)
         {
             container.SetCombatInst(combatInst);
+            container.battleType = type;
 
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;

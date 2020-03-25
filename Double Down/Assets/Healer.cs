@@ -61,6 +61,7 @@ public class Healer : MonoBehaviour
     public void PerformAttack()
     {
         // Animation
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(attackName);
         Managers.CombatManager.Instance.DealDamage(attackMod);
     }
@@ -74,6 +75,7 @@ public class Healer : MonoBehaviour
     public void PerformDefend()
     {
         // Animation
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
         Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true, 0.5f);
     }
@@ -92,6 +94,7 @@ public class Healer : MonoBehaviour
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
 
         // Deals damage as absorption
+        GetComponent<CharData>().DisplayActionAnimation();
         int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod);
 
         // Restores health to all allies
@@ -106,6 +109,7 @@ public class Healer : MonoBehaviour
         Managers.CombatManager.Instance.DisplayAbilityName(ability0UpgradeName);
 
         // Deals damage as absorption
+        GetComponent<CharData>().DisplayActionAnimation();
         int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod);
 
         // Restores health to all allies
@@ -124,6 +128,7 @@ public class Healer : MonoBehaviour
         // Animation
         charStats.currentTP -= ability1Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
+        GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);
     }

@@ -7,7 +7,7 @@ public class CameraManager : MonoBehaviour
     public Vector3 cameraHubPos;
     public Vector3 cameraCombatPos;
 
-    private bool lerping = false;
+    public bool lerping = false;
     private GameObject lerpTarget = null;
     private Vector3 lerpOffset;
 

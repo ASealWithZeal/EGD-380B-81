@@ -66,17 +66,17 @@ public class WinCanvasScript : MonoBehaviour
 
     public void UpdateNonCombatUI()
     {
-        if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
+        if (charStats.level == charStats.nextLevelExp.Count + 1)
         {
             expText.SetText("+0");
-            neededEXPText.SetText("MAX");
+            neededEXPText.SetText("--");
             expMeter.fillAmount = 1.0f;
         }
 
         else
         {
             expText.SetText("+0");
-            neededEXPText.SetText((charStats.nextLevelExp[(charStats.startingLevel - 1)] - charStats.startingExp).ToString());
+            neededEXPText.SetText((charStats.nextLevelExp[(charStats.level - 1)] - charStats.exp).ToString());
         }
     }
 
@@ -103,7 +103,7 @@ public class WinCanvasScript : MonoBehaviour
         else if (charStats.startingLevel == charStats.nextLevelExp.Count + 1)
         {
             expText.SetText("+0");
-            neededEXPText.SetText("MAX");
+            neededEXPText.SetText("--");
             expMeter.fillAmount = 1.0f;
             levelingUp = false;
         }

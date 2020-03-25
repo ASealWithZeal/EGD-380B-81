@@ -66,18 +66,28 @@ public class EventObj : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
+        // Combat init
         if (contactActive && other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed 
-            && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player")
+            && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && (type == HubEvents.Battle || type == HubEvents.Boss))
         {
             player = other.gameObject;
             box.PassEventIn(text, gameObject);
         }
 
-        else if (other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed 
-            && other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player")
+        // Pass
+        if (contactActive && other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed
+            && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && type == HubEvents.Pass && Managers.MovementManager.Instance.movedVar)
         {
             player = other.gameObject;
-            PassExistingCombat();
+            box.PassEventIn(text, gameObject);
+        }
+
+        // Combat re-enter
+        else if (other.gameObject == Managers.TurnManager.Instance.t1[0] && !other.gameObject.GetComponent<CharData>().hasActed 
+            && other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && (type == HubEvents.Battle || type == HubEvents.Boss))
+        {
+            player = other.gameObject;
+            PassExistingCombat(type);
         }
     }
 
@@ -86,17 +96,17 @@ public class EventObj : MonoBehaviour
         if (type == HubEvents.Pass && @bool)
             Managers.TurnManager.Instance.EndRound();
         else if ((type == HubEvents.Battle || type == HubEvents.Boss) && @bool && !combatActive)
-            Managers.CombatTransitionManager.Instance.CreateNewCombatInstance(eventNum, player, enemies);
+            Managers.CombatTransitionManager.Instance.CreateNewCombatInstance(type, eventNum, player, enemies);
         else if ((type == HubEvents.Battle || type == HubEvents.Boss) && @bool && combatActive)
-            PassExistingCombat();
+            PassExistingCombat(type);
         else if (!@bool)
             Managers.MovementManager.Instance.canMoveChars = true;
     }
 
-    public void PassExistingCombat()
+    public void PassExistingCombat(HubEvents type)
     {
         Debug.Log("HERE");
         Managers.TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = false;
-        Managers.CombatTransitionManager.Instance.EnterExistingCombatInstance(eventNum, player, enemies);
+        Managers.CombatTransitionManager.Instance.EnterExistingCombatInstance(type, eventNum, player, enemies);
     }
 }

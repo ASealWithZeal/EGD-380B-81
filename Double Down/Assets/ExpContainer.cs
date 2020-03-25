@@ -5,6 +5,7 @@ using UnityEngine;
 public class ExpContainer : MonoBehaviour
 {
     public List<int> winExp = null;
+    public HubEvents battleType;
     public int currentCombatInst = -1;
 
     public void SetCombatInst(int inst)
@@ -25,5 +26,13 @@ public class ExpContainer : MonoBehaviour
     public void FlushWinExp()
     {
         winExp[currentCombatInst] = 0;
+    }
+
+    public bool CheckForBossEvent()
+    {
+        if (battleType == HubEvents.Boss)
+            return true;
+        else
+            return false;
     }
 }

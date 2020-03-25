@@ -14,7 +14,7 @@ public class EnemyUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        healthBar.color = colors[0];
+        //healthBar.color = colors[0];
     }
 
     public void ChangeHealth(float newHealthPercent)
@@ -26,6 +26,7 @@ public class EnemyUI : MonoBehaviour
     {
         this.name.SetText(name);
         healthBar.fillAmount = healthPercent;
+        healthBar.color = HealthPercentColor();
         parentCanvas = GameObject.Find("_CombatCanvas").GetComponent<Canvas>();
 
         // Get the position on the canvas
@@ -59,13 +60,7 @@ public class EnemyUI : MonoBehaviour
             || (!decrease && healthBar.fillAmount < newHealthPercent))
         {
             healthBar.fillAmount -= 0.01f * multiplier;
-
-            if (healthBar.fillAmount > 0.5f)
-                healthBar.color = colors[0];
-            else if (healthBar.fillAmount <= 0.5f && healthBar.fillAmount > 0.25f)
-                healthBar.color = colors[1];
-            else if (healthBar.fillAmount <= 0.25f)
-                healthBar.color = colors[2];
+            healthBar.color = HealthPercentColor();
 
             yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
         }
@@ -73,5 +68,19 @@ public class EnemyUI : MonoBehaviour
         healthBar.fillAmount = newHealthPercent;
 
         yield return null;
+    }
+
+    private Color HealthPercentColor()
+    {
+        Color c = new Color();
+
+        if (healthBar.fillAmount > 0.5f)
+            c = colors[0];
+        else if (healthBar.fillAmount <= 0.5f && healthBar.fillAmount > 0.25f)
+            c = colors[1];
+        else if (healthBar.fillAmount <= 0.25f)
+            c = colors[2];
+
+        return c;
     }
 }

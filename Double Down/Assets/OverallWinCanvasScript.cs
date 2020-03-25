@@ -32,13 +32,13 @@ public class OverallWinCanvasScript : MonoBehaviour
             charLearns[i].done = false;
     }
 
-    public void ShowWinCanvas(int earnedEXP, int inst)
+    public void ShowWinCanvas(int earnedEXP, int inst, bool bossEvent)
     {
         Managers.TurnManager.Instance.tracker.DestroyEmptyTrackers(false);
-        StartCoroutine(ShowCanvas(earnedEXP, inst));
+        StartCoroutine(ShowCanvas(earnedEXP, inst, bossEvent));
     }
 
-    IEnumerator ShowCanvas(int earnedEXP, int inst)
+    IEnumerator ShowCanvas(int earnedEXP, int inst, bool bossEvent)
     {
         yield return new WaitForSeconds(0.75f);
 
@@ -123,7 +123,10 @@ public class OverallWinCanvasScript : MonoBehaviour
         for (int i = 0; i < charScripts.Count; ++i)
             charScripts[i].levelUpGroup.alpha = 0.0f;
         ResetWinCanvas(tempScript);
-        Managers.SceneChangeManager.Instance.WinCombat(l);
+        if (bossEvent)
+            Managers.SceneChangeManager.Instance.WinGameplayInstance();
+        else
+            Managers.SceneChangeManager.Instance.WinCombat(l);
 
         yield return null;
     }

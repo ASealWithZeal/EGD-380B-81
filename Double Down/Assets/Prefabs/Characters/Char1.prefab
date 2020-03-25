@@ -29,7 +29,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7802881689616012625}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5, y: 0.85, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_Children:
@@ -155,6 +155,7 @@ MonoBehaviour:
   defendMod: 0
   defendTarget: 6
   ability0Name: Heavy Slash
+  ability0Active: 1
   ability0Description: Gain -99% SPD for 1 turn. During your next turn, deal 2.5x
     damage to an enemy.
   ability0Mod: 2.5
@@ -169,11 +170,18 @@ MonoBehaviour:
   ability0UpgradeCost: 8
   ability0UpgradeTarget: 0
   ability1Name: Provoke
+  ability1Active: 1
   ability1Description: All enemies will target the user for 3 turns.
   ability1Cost: 4
   ability1Effect: 1
   ability1Duration: 3
   ability1Target: 6
+  ability2Name: HP +25%
+  ability2Active: 0
+  ability2Description: User's HP permanently increases by 25%.
+  ability3Name: ATK +25%
+  ability3Active: 0
+  ability3Description: User's ATK permanently increases by 25%.
 --- !u!114 &7802881689616012630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,10 +196,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Wenger
   targeting: 0
-  isInCombat: 1
   t1Pos: 0
   t2Pos: 0
+  hubPosition: {x: -0.5, y: 0.85, z: 0}
+  combatPosition: {x: -9, y: -0.5, z: -2}
   charNum: 0
+  dead: 0
+  deathTurns: 3
+  attachedEventNum: 0
+  isInCombat: 0
+  combatInst: -1
   learnedAbilities: 00000000
   delayedAbilityName: 
   delayedAttack: 0
@@ -200,6 +214,10 @@ MonoBehaviour:
   target: []
   nonTargetSprite: []
   targetSprite: []
+  colors:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0.78431374, g: 0.39215687, b: 0.39215687, a: 1}
+  hasFinishedActionAnimation: 0
   charUI: {fileID: 0}
   charWinUI: {fileID: 0}
   charStats: {fileID: 7802881689616012629}
@@ -217,7 +235,7 @@ CharacterController:
   serializedVersion: 2
   m_Height: 0.12
   m_Radius: 0.025
-  m_SlopeLimit: 60
+  m_SlopeLimit: 30
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001

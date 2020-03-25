@@ -117,7 +117,7 @@ public class HubMenuDisplay : MonoBehaviour
         // General Information
         charNameData[0].SetText(charData.name);
         charNameData[1].SetText("Lv " + charStats.level.ToString());
-        // portrait
+        charPortrait.color = charData.colors[0];
 
 
         // Level Information
@@ -133,7 +133,7 @@ public class HubMenuDisplay : MonoBehaviour
         else
         {
             expBar.fillAmount = 1;
-            expString[1].SetText("MAX");
+            expString[1].SetText("--");
         }
 
 
