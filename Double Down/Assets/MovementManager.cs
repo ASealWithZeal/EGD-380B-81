@@ -43,7 +43,8 @@ namespace Managers
                 cam.transform.position = Vector3.Lerp(cam.transform.position, TurnManager.Instance.t1[0].transform.position + new Vector3(0, 2.15f, -4.5f), Time.deltaTime * 10);
                 MoveChars();
             }
-            else if (setupMoveChars)
+
+            if (setupMoveChars)
             {
                 cam.transform.position = Vector3.Lerp(cam.transform.position, TurnManager.Instance.t1[0].transform.position + new Vector3(0, 2.15f, -4.5f), Time.deltaTime * 10);
                 CheckCameraForMovedChars();
@@ -52,8 +53,23 @@ namespace Managers
 
         private void MoveChars()
         {
-            Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Physics.gravity.y * Time.fixedDeltaTime * moveDistance, Input.GetAxisRaw("Vertical"));
-            TurnManager.Instance.t1[0].GetComponent<CharacterController>().Move(transform.TransformDirection(input * moveDistance * Time.fixedDeltaTime));
+            if (!TurnManager.Instance.t1[0].GetComponent<CharData>().isInCombat)
+            {
+                Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Physics.gravity.y * Time.fixedDeltaTime * moveDistance, Input.GetAxisRaw("Vertical"));
+
+                // Changes the character's animation as they move
+                if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+                    TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
+                else
+                    TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+                if (Input.GetAxisRaw("Horizontal") < 0)
+                    TurnManager.Instance.t1[0].GetComponent<SpriteRenderer>().flipX = false;
+                else if (Input.GetAxisRaw("Horizontal") > 0)
+                    TurnManager.Instance.t1[0].GetComponent<SpriteRenderer>().flipX = true;
+
+                // Moves the character
+                TurnManager.Instance.t1[0].GetComponent<CharacterController>().Move(transform.TransformDirection(input * moveDistance * Time.fixedDeltaTime));
+            }
         }
 
         private void CheckCameraForMovedChars()

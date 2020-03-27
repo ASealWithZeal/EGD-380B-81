@@ -42,6 +42,7 @@ public class CharData : MonoBehaviour
     public GameObject charUI;
     public WinCanvasScript charWinUI;
     public Stats charStats;
+    public CharAnimator charAnimator;
     public bool hasActed = false;
 
     private void Start()

@@ -679,11 +679,16 @@ namespace Managers
             CharData c = TurnManager.Instance.t1[0].GetComponent<CharData>();
 
             c.MoveCharUI(true);
+
+            TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
             while (TurnManager.Instance.t1[0].transform.position != targetPos)
             {
                 TurnManager.Instance.t1[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.t1[0].transform.position, targetPos, 0.125f);
                 yield return new WaitForSeconds(0.0125f);
             }
+
+            // TEMP - Make this combat idle when I have the animations available!
+            TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
 
             // IN FUTURE CHANGE
             if (!c.delayedAttack || c.delayTimer > 0)
@@ -708,12 +713,18 @@ namespace Managers
 
         IEnumerator MovePlayerCharacterAtStart(Vector3 targetPos, int index, bool end)
         {
+            TurnManager.Instance.playerCharsList[index].GetComponent<SpriteRenderer>().flipX = true;
+            TurnManager.Instance.playerCharsList[index].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
+
             while (TurnManager.Instance.playerCharsList[index].transform.position != targetPos)
             {
                 TurnManager.Instance.playerCharsList[index].transform.position = Vector3.MoveTowards(TurnManager.Instance.playerCharsList[index].transform.position, targetPos, 0.125f);
                 yield return new WaitForSeconds(0.0125f);
             }
-            
+
+            // TEMP - Make this combat idle when I have the animations available!
+            TurnManager.Instance.playerCharsList[index].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+
             yield return new WaitForSeconds(0.1f);
             if (end)
                 StartRound();

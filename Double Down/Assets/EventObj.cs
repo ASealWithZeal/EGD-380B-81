@@ -71,6 +71,7 @@ public class EventObj : MonoBehaviour
             && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && (type == HubEvents.Battle || type == HubEvents.Boss))
         {
             player = other.gameObject;
+            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
             box.PassEventIn(text, gameObject);
         }
 
@@ -79,6 +80,7 @@ public class EventObj : MonoBehaviour
             && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && type == HubEvents.Pass && Managers.MovementManager.Instance.movedVar)
         {
             player = other.gameObject;
+            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
             box.PassEventIn(text, gameObject);
         }
 
@@ -87,6 +89,7 @@ public class EventObj : MonoBehaviour
             && other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && (type == HubEvents.Battle || type == HubEvents.Boss))
         {
             player = other.gameObject;
+            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
             PassExistingCombat(type);
         }
     }
