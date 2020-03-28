@@ -35,15 +35,15 @@ public class EnemyUI : MonoBehaviour
         Vector2 sprite_size = objTransform.gameObject.GetComponent<SpriteRenderer>().sprite.rect.size;
 
         //convert to screen space size
-        Vector3 size = new Vector3(0, (sprite_size.y / 2.0f), 0);
+        Vector2 size = new Vector2(0, (sprite_size.y / 2.0f));
 
-        Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(objTransform.position - size);
+        Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(objTransform.position);
         Vector2 proportionalPosition = new Vector2(ViewportPosition.x * parentCanvas.GetComponent<RectTransform>().sizeDelta.x, ViewportPosition.y * parentCanvas.GetComponent<RectTransform>().sizeDelta.y);
         Vector2 actualPosition = proportionalPosition - uiOffset;
         actualPosition.y = (actualPosition.y / objTransform.localScale.y) - ((0.5f + (objTransform.localScale.y / 10)) * objTransform.localScale.y) - (2.0f - objTransform.position.z);
 
         // Set the position and remove the screen offset
-        gameObject.transform.localPosition = actualPosition;
+        gameObject.transform.localPosition = actualPosition - size;
     }
 
     IEnumerator AlterHealthBar(float newHealthPercent)

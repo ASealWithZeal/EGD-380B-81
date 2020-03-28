@@ -12,6 +12,7 @@ public class WorldGenerator : MonoBehaviour
     [Header("Wall Data")]
     public GameObject wall = null;
     public Material[] wallMats = null;
+    public float[] wallMatChances = null;
 
     [Header("Liquid Data")]
     public GameObject liquid = null;
@@ -28,16 +29,11 @@ public class WorldGenerator : MonoBehaviour
         CreateEnvironmentMats();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void CreateEnvironmentMats()
     {
         GenerateTiles(floor.transform, floorMats, floorMatChances);
         GenerateTiles(liquid.transform, liquidMats, liquidMatChances);
+        GenerateTiles(wall.transform, wallMats, wallMatChances);
     }
 
     public void GenerateTiles(Transform holder, Material[] holderMats, float[] holderChances)
@@ -54,25 +50,7 @@ public class WorldGenerator : MonoBehaviour
             for (int j = 0; j < holderMats.Length; ++j)
             {
                 if (rand >= chance && rand <= chance + holderChances[j])
-                {
-                    //if (lastMats.Count < 2)
-                    //{
-                    //    lastMats.Add(holderMats[j]);
-                    //    holder.GetChild(i).GetComponent<MeshRenderer>().material = holderMats[j];
-                    //}
-                    //else if (lastMats.Count == 2 && (lastMats[0] != holderMats[j] || lastMats[1] != holderMats[j]))
-                    //{
-                    //    lastMats.Remove(lastMats[0]);
-                    //    lastMats.Add(holderMats[j]);
-                    //    holder.GetChild(i).GetComponent<MeshRenderer>().material = holderMats[j];
-                    //}
-                    //else
-                    //{
-                    //    i = 0;
-                    //}
-            
                     holder.GetChild(i).GetComponent<MeshRenderer>().material = holderMats[j];
-                }
 
                 chance += holderChances[j];
             }

@@ -28,11 +28,18 @@ public class CharAnimator : MonoBehaviour
         {
             case AnimationClips.Idle:
                 anim.SetBool("idling", true);
+                anim.SetBool("combatIdling", false);
                 anim.SetBool("moving", false);
                 break;
             case AnimationClips.Move:
                 anim.SetBool("idling", false);
+                anim.SetBool("combatIdling", false);
                 anim.SetBool("moving", true);
+                break;
+            case AnimationClips.CombatIdle:
+                anim.SetBool("moving", false);
+                anim.SetBool("idling", false);
+                anim.SetBool("combatIdling", true);
                 break;
         }
     }

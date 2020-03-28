@@ -688,7 +688,7 @@ namespace Managers
             }
 
             // TEMP - Make this combat idle when I have the animations available!
-            TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+            TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.CombatIdle);
 
             // IN FUTURE CHANGE
             if (!c.delayedAttack || c.delayTimer > 0)
@@ -723,7 +723,7 @@ namespace Managers
             }
 
             // TEMP - Make this combat idle when I have the animations available!
-            TurnManager.Instance.playerCharsList[index].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+            TurnManager.Instance.playerCharsList[index].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.CombatIdle);
 
             yield return new WaitForSeconds(0.1f);
             if (end)

@@ -1,16 +1,25 @@
 fileFormatVersion: 2
-guid: 1b83162650e72994ca58d75508368ae4
+guid: 16c6663679f92234d9392c2d9745c77b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4139414608362264286
-    second: Amelie_Walk_0
+      213: -2971707423458460697
+    second: Amelie_Walk 1_0
   - first:
-      213: 3334136508701149995
-    second: Amelie_Walk_1
+      213: -4476613120431714945
+    second: Amelie_Walk 1_1
   - first:
-      213: 8223727640804786845
-    second: Amelie_Walk_2
+      213: 4027475299316199738
+    second: Amelie_Walk 1_2
+  - first:
+      213: 5526936712183777129
+    second: Amelie_Walk 1_3
+  - first:
+      213: 8474243215556930511
+    second: Amelie_Walk 1_4
+  - first:
+      213: 4095894203633659455
+    second: Amelie_Walk 1_5
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -95,7 +104,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Amelie_Walk_0
+      name: Amelie_Walk 1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -109,14 +118,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a8e46bcd8f90f4f44a2bcddc0ace8e68
-      internalID: 4139414608362264286
+      spriteID: 1654af58f79e86749af3f10005279a89
+      internalID: -2971707423458460697
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk_1
+      name: Amelie_Walk 1_1
       rect:
         serializedVersion: 2
         x: 24
@@ -130,14 +139,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f7babf1f6d41bdf42a2a5a879179179e
-      internalID: 3334136508701149995
+      spriteID: 612d6b22a9af9554389957cf6cd4ade0
+      internalID: -4476613120431714945
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk_2
+      name: Amelie_Walk 1_2
       rect:
         serializedVersion: 2
         x: 48
@@ -151,8 +160,71 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fabadee97feec8943aa752ec74c96ccd
-      internalID: 8223727640804786845
+      spriteID: 771f4310378b3b842924010e9bedff24
+      internalID: 4027475299316199738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Amelie_Walk 1_3
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 0
+        width: 24
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9faa69ad5ba0964c8ee1121d46968a3
+      internalID: 5526936712183777129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Amelie_Walk 1_4
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 24
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42fb1f2cc89acd8478f6452ad7863058
+      internalID: 8474243215556930511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Amelie_Walk 1_5
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 0
+        width: 24
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ae3b31c6b746b84e963e55fd5631419
+      internalID: 4095894203633659455
       vertices: []
       indices: 
       edges: []
@@ -160,7 +232,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 1bd51cd1019a359418bad79bcedea1a3
+    spriteID: a9154db92007a0d43ac00d7372549224
     internalID: 0
     vertices: []
     indices: 
