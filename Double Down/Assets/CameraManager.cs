@@ -21,7 +21,7 @@ public class CameraManager : MonoBehaviour
         else if (i == 1)
         {
             transform.position = cameraCombatPos;
-            transform.localEulerAngles = new Vector3(0, 0, 0);
+            transform.localEulerAngles = new Vector3(10, 5, 0);
         }
     }
 

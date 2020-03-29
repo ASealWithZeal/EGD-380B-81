@@ -23,10 +23,18 @@ public class WorldGenerator : MonoBehaviour
     public GameObject bridges = null;
     public Material[] bridgeMats = null;
 
+    [Header("Rock Data")]
+    public GameObject rock = null;
+    public GameObject rockPrefab = null;
+    public Material[] rockMats = null;
+    public float[] rockMatChances = null;
+    public float rockSpawnChance = 10;
+
+
     // Start is called before the first frame update
     void Start()
     {
-        CreateEnvironmentMats();
+        //CreateEnvironmentMats();
     }
 
     public void CreateEnvironmentMats()
@@ -34,6 +42,8 @@ public class WorldGenerator : MonoBehaviour
         GenerateTiles(floor.transform, floorMats, floorMatChances);
         GenerateTiles(liquid.transform, liquidMats, liquidMatChances);
         GenerateTiles(wall.transform, wallMats, wallMatChances);
+
+        GenerateEnvironmentPieces(rock.transform, liquid.transform, rockPrefab, rockMats, rockMatChances, rockSpawnChance);
     }
 
     public void GenerateTiles(Transform holder, Material[] holderMats, float[] holderChances)
@@ -44,7 +54,6 @@ public class WorldGenerator : MonoBehaviour
         {
             float rand = Random.Range(0.0f, 100.0f);
             float chance = 0.0f;
-            Debug.Log(rand);
             //holder.GetChild(i).GetComponent<MeshRenderer>().material = holderMats[0];
 
             for (int j = 0; j < holderMats.Length; ++j)
@@ -55,5 +64,30 @@ public class WorldGenerator : MonoBehaviour
                 chance += holderChances[j];
             }
         }
+    }
+
+    public void GenerateEnvironmentPieces(Transform holder, Transform parent, GameObject obj, Material[] holderMats, float[] holderChances, float spawnChance)
+    {
+        List<Material> lastMats = new List<Material>();
+        bool canSpawn = true;
+
+        int holderCount = holder.childCount;
+        for (int i = 0; i < holderCount; ++i)
+            DestroyImmediate(holder.GetChild(0).gameObject);
+
+        for (int i = 0; i < parent.childCount; ++i)
+        {
+            float rand = Random.Range(0.0f, 100.0f);
+            if (canSpawn && rand >= 0 && rand <= spawnChance)
+            {
+                GameObject n = Instantiate(obj, parent.GetChild(i).position, obj.transform.rotation * new Quaternion(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), 1), holder);
+                
+                canSpawn = false;
+            }
+            else if (!canSpawn)
+                canSpawn = true;
+        }
+
+        GenerateTiles(holder, holderMats, holderChances);
     }
 }

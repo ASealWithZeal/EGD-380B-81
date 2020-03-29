@@ -69,7 +69,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 069cc483c8241f84aa50bb000eaf1ccb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.6862745}
   m_FlipX: 0
   m_FlipY: 0
@@ -110,7 +110,7 @@ Transform:
   m_GameObject: {fileID: 330241441707957041}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.5, y: 1.5, z: 5}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 330241440888030678}
   m_Father: {fileID: 0}
@@ -154,9 +154,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 3e04b66f88f2f5344b7e2ef5cf4ec359, type: 3}
   m_Color: {r: 1, g: 0.6268611, b: 0, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 0.16, y: 0.16}
@@ -177,8 +177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30bebd9d21da08042acb03f44443fb1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 100
-  currentHP: 100
+  maxHP: 90
+  currentHP: 90
   maxTP: 15
   currentTP: 15
   atk: 8
@@ -217,11 +217,12 @@ MonoBehaviour:
   targeting: 0
   t1Pos: 0
   t2Pos: 0
-  hubPosition: {x: -7.5, y: 1, z: 5.5}
-  combatPosition: {x: 4, y: -0.25, z: -3.5}
+  hubPosition: {x: -5, y: 1, z: 2}
+  combatPosition: {x: 3.5, y: -0.25, z: -2}
   charNum: -1
   dead: 0
-  attachedEventNum: 3
+  deathTurns: 3
+  attachedEventNum: 1
   isInCombat: 0
   combatInst: -1
   learnedAbilities: 
@@ -230,11 +231,14 @@ MonoBehaviour:
   delayTimer: 0
   storedModifier: 0
   target: []
-  nonTargetSprite: []
-  targetSprite: []
+  facingDir: 1
+  colors:
+  - {r: 1, g: 0.6268611, b: 0, a: 1}
+  hasFinishedActionAnimation: 0
   charUI: {fileID: 0}
   charWinUI: {fileID: 0}
   charStats: {fileID: 330241441707957052}
+  charAnimator: {fileID: 0}
   hasActed: 0
 --- !u!114 &330241441707957042
 MonoBehaviour:

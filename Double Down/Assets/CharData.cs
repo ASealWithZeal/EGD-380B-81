@@ -34,8 +34,7 @@ public class CharData : MonoBehaviour
     public List<GameObject> target;
 
     [Header("Sprites")]
-    public Sprite[] nonTargetSprite;
-    public Sprite[] targetSprite;
+    public bool facingDir;
     public Color[] colors;
     public bool hasFinishedActionAnimation = false;
 
@@ -47,6 +46,7 @@ public class CharData : MonoBehaviour
 
     private void Start()
     {
+        facingDir = GetComponent<SpriteRenderer>().flipX;
         initialPos = gameObject.transform.localPosition;
         if (gameObject.tag == "Player")
             SetCharUI();
@@ -61,7 +61,8 @@ public class CharData : MonoBehaviour
         }
         else if (gameObject.tag == "Enemy")
         {
-            charUI.GetComponent<EnemyUI>().CreateUI(name, transform, charStats.HPPercent());
+            Vector3 objPosition = new Vector3(transform.position.x, GetComponent<EnemyAnimator>().defaultY, transform.position.z);
+            charUI.GetComponent<EnemyUI>().CreateUI(name, objPosition, gameObject, charStats.HPPercent());
         }
     }
 
@@ -73,7 +74,7 @@ public class CharData : MonoBehaviour
     public void ChangeColor()
     {
         if (!dead)
-            gameObject.GetComponent<SpriteRenderer>().color = colors[0];
+            gameObject.GetComponent<SpriteRenderer>().color = Color.white;
         else
             gameObject.GetComponent<SpriteRenderer>().color = colors[1];
     }
@@ -224,7 +225,10 @@ public class CharData : MonoBehaviour
         sr.color = new Color(storedColor.r, storedColor.g, storedColor.b, 0);
 
         if (gameObject.tag != "Player")
+        {
+            GetComponent<EnemyAnimator>().HideShadow();
             charUI.SetActive(false);
+        }
         else
             transform.position = new Vector3(-9, -0.5f, -2);
         yield return null;

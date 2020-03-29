@@ -8,7 +8,7 @@ public class EnemyUIHolder : MonoBehaviour
     public GameObject charUI;
 
     // Start is called before the first frame update
-    void Start()
+    public void CreateUI()
     {
         enemyList = GameObject.Find("EnemyChars").transform;
 

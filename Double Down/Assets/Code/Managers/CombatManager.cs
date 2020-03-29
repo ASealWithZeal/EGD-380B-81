@@ -46,6 +46,8 @@ namespace Managers
             // StartRound();
             container = GameObject.Find("_ExpContainer").GetComponent<ExpContainer>();
             winCanvas = GameObject.Find("WinCanvas").GetComponent<OverallWinCanvasScript>();
+
+            GameObject.Find("EnemyData").GetComponent<EnemyUIHolder>().CreateUI();
         }
 
         public void StartCombat()
@@ -683,7 +685,7 @@ namespace Managers
             TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
             while (TurnManager.Instance.t1[0].transform.position != targetPos)
             {
-                TurnManager.Instance.t1[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.t1[0].transform.position, targetPos, 0.125f);
+                TurnManager.Instance.t1[0].transform.position = Vector3.MoveTowards(TurnManager.Instance.t1[0].transform.position, targetPos, 0.1f);
                 yield return new WaitForSeconds(0.0125f);
             }
 
@@ -713,12 +715,11 @@ namespace Managers
 
         IEnumerator MovePlayerCharacterAtStart(Vector3 targetPos, int index, bool end)
         {
-            TurnManager.Instance.playerCharsList[index].GetComponent<SpriteRenderer>().flipX = true;
             TurnManager.Instance.playerCharsList[index].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
 
             while (TurnManager.Instance.playerCharsList[index].transform.position != targetPos)
             {
-                TurnManager.Instance.playerCharsList[index].transform.position = Vector3.MoveTowards(TurnManager.Instance.playerCharsList[index].transform.position, targetPos, 0.125f);
+                TurnManager.Instance.playerCharsList[index].transform.position = Vector3.MoveTowards(TurnManager.Instance.playerCharsList[index].transform.position, targetPos, 0.1f);
                 yield return new WaitForSeconds(0.0125f);
             }
 

@@ -202,9 +202,15 @@ namespace Managers
         private void SetCharacterHubPositions()
         {
             for (int i = 0; i < playerChars.childCount; ++i)
+            {
+                playerChars.GetChild(i).GetComponent<CharData>().facingDir = playerChars.GetChild(i).GetComponent<SpriteRenderer>().flipX;
                 playerChars.GetChild(i).GetComponent<CharData>().hubPosition = playerChars.GetChild(i).localPosition;
+            }
             for (int i = 0; i < enemyChars.childCount; ++i)
+            {
+                enemyChars.GetChild(i).GetComponent<CharData>().facingDir = enemyChars.GetChild(i).GetComponent<SpriteRenderer>().flipX;
                 enemyChars.GetChild(i).GetComponent<CharData>().hubPosition = enemyChars.GetChild(i).localPosition;
+            }
             for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
                 nonCombatPlayerChars.GetChild(i).GetComponent<CharData>().hubPosition = nonCombatPlayerChars.GetChild(i).localPosition;
             for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)
@@ -228,13 +234,26 @@ namespace Managers
         public void RetrieveCharacterHubPositions()
         {
             for (int i = 0; i < playerChars.childCount; ++i)
+            {
+                playerChars.GetChild(i).GetComponent<SpriteRenderer>().flipX = playerChars.GetChild(i).GetComponent<CharData>().facingDir;
                 playerChars.GetChild(i).localPosition = playerChars.GetChild(i).GetComponent<CharData>().hubPosition;
+            }
             for (int i = 0; i < enemyChars.childCount; ++i)
+            {
+                enemyChars.GetChild(i).GetComponent<SpriteRenderer>().flipX = enemyChars.GetChild(i).GetComponent<CharData>().facingDir;
                 enemyChars.GetChild(i).localPosition = enemyChars.GetChild(i).GetComponent<CharData>().hubPosition;
+                enemyChars.GetChild(i).GetComponent<EnemyAnimator>().UpdateAnimations();
+                enemyChars.GetChild(i).GetComponent<EnemyAnimator>().HideShadow();
+            }
             for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
                 nonCombatPlayerChars.GetChild(i).localPosition = nonCombatPlayerChars.GetChild(i).GetComponent<CharData>().hubPosition;
             for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)
+            {
+                nonCombatEnemyChars.GetChild(i).GetComponent<SpriteRenderer>().flipX = nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().facingDir;
                 nonCombatEnemyChars.GetChild(i).localPosition = nonCombatEnemyChars.GetChild(i).GetComponent<CharData>().hubPosition;
+                nonCombatEnemyChars.GetChild(i).GetComponent<EnemyAnimator>().UpdateAnimations();
+                nonCombatEnemyChars.GetChild(i).GetComponent<EnemyAnimator>().HideShadow();
+            }
 
             cam.SetCameraPos(0);
         }
@@ -242,9 +261,16 @@ namespace Managers
         public void RetrieveCharacterCombatPositions()
         {
             for (int i = 0; i < playerChars.childCount; ++i)
+            {
+                playerChars.GetChild(i).GetComponent<SpriteRenderer>().flipX = true;
                 playerChars.GetChild(i).localPosition = playerChars.GetChild(i).GetComponent<CharData>().combatPosition;
+            }
             for (int i = 0; i < enemyChars.childCount; ++i)
+            {
+                enemyChars.GetChild(i).GetComponent<SpriteRenderer>().flipX = false;
                 enemyChars.GetChild(i).localPosition = enemyChars.GetChild(i).GetComponent<CharData>().combatPosition;
+                enemyChars.GetChild(i).GetComponent<EnemyAnimator>().UpdateAnimations();
+            }
             for (int i = 0; i < nonCombatPlayerChars.childCount; ++i)
                 nonCombatPlayerChars.GetChild(i).localPosition = new Vector3(-2000f, -0.5f, -2f);
             for (int i = 0; i < nonCombatEnemyChars.childCount; ++i)

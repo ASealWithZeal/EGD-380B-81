@@ -22,7 +22,7 @@ public class EnemyUI : MonoBehaviour
         StartCoroutine(AlterHealthBar(newHealthPercent));
     }
 
-    public void CreateUI(string name, Transform objTransform, float healthPercent)
+    public void CreateUI(string name, Vector3 objPosition, GameObject obj, float healthPercent)
     {
         this.name.SetText(name);
         healthBar.fillAmount = healthPercent;
@@ -32,15 +32,15 @@ public class EnemyUI : MonoBehaviour
         // Get the position on the canvas
         Vector2 uiOffset = new Vector2(parentCanvas.GetComponent<RectTransform>().sizeDelta.x / 2f, parentCanvas.GetComponent<RectTransform>().sizeDelta.y / 2f);
 
-        Vector2 sprite_size = objTransform.gameObject.GetComponent<SpriteRenderer>().sprite.rect.size;
+        Vector2 sprite_size = obj.GetComponent<SpriteRenderer>().sprite.rect.size;
 
         //convert to screen space size
-        Vector2 size = new Vector2(0, (sprite_size.y / 2.0f));
+        Vector2 size = new Vector2(0, (sprite_size.y / 2.0f) + 15);
 
-        Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(objTransform.position);
+        Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(objPosition);
         Vector2 proportionalPosition = new Vector2(ViewportPosition.x * parentCanvas.GetComponent<RectTransform>().sizeDelta.x, ViewportPosition.y * parentCanvas.GetComponent<RectTransform>().sizeDelta.y);
         Vector2 actualPosition = proportionalPosition - uiOffset;
-        actualPosition.y = (actualPosition.y / objTransform.localScale.y) - ((0.5f + (objTransform.localScale.y / 10)) * objTransform.localScale.y) - (2.0f - objTransform.position.z);
+        //actualPosition.y = (actualPosition.y / objTransform.localScale.y) - ((0.5f + (objTransform.localScale.y / 10)) * objTransform.localScale.y) - (2.0f - objTransform.position.z);
 
         // Set the position and remove the screen offset
         gameObject.transform.localPosition = actualPosition - size;
