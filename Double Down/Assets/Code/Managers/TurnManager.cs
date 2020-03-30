@@ -252,6 +252,7 @@ namespace Managers
             CheckCharacterDeath();
             if (!t1[0].GetComponent<CharData>().dead)
             {
+                t1[0].GetComponent<CharData>().SetBonusStats();
                 if (t1[0].GetComponent<CharData>().isInCombat && CombatManager.Instance != null)
                     CombatManager.Instance.StartRound();
                 else

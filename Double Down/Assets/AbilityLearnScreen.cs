@@ -10,8 +10,35 @@ public class AbilityLearnScreen : MonoBehaviour
     public TextMeshProUGUI nameText = null;
     public TextMeshProUGUI abilityText = null;
     public Button button = null;
+    public AbilityButtons[] abilityButtons = null;
     public string defaultText = null;
     public bool done = false;
+
+    public void Setup()
+    {
+        PlayerActions p = characterData.gameObject.GetComponent<PlayerActions>();
+
+        abilityButtons[0].InitValues(p, 0);
+        for (int i = 1; i < abilityButtons.Length; ++i)
+        {
+            if (i == 1)
+            {
+                characterData.learnedAbilities[0] = true;
+                abilityButtons[i].InitValues(p, 0);
+                characterData.learnedAbilities[0] = false;
+            }
+            else
+                abilityButtons[i].InitValues(p, i - 1);
+        }
+
+        // Sets up the default text
+        defaultText = "<b>" + p.GetAbilityName(0) + ":</b> ";
+        if (p.GetAbilityActive(0))
+            defaultText += "Cost: " + p.GetAbilityCost(0).ToString() + " TP. ";
+        else
+            defaultText += "Passive. ";
+        defaultText += p.GetAbilityDescription(0);
+    }
 
     // After fading in, selects the button and changes the "ability" text
     public void Init()

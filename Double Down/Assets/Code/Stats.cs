@@ -2,6 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum MainStats
+{
+    HP = 0,
+    TP,
+    ConsumedHP,
+    ConsumedTP,
+    ATK,
+    DEF,
+    SPD
+}
+
 public class Stats : MonoBehaviour
 {
     [Header("Main Stats")]
@@ -40,6 +51,10 @@ public class Stats : MonoBehaviour
     public float atkPassives = 0.0f;
     public float defPassives = 0.0f;
     public float spdPassives = 0.0f;
+
+    [Header("Secondary Stat Passives")]
+    public int atkBonus = 0;
+    public int defBonus = 0;
 
     [Header("Other")]
     public float aggro = 0.0f;
@@ -113,7 +128,7 @@ public class Stats : MonoBehaviour
     // Returns the character's attack stat
     public int Attack()
     {
-        int i = (int)(atk * atkMod) + (int)(atk * atkPassives);
+        int i = (int)(atk * atkMod) + (int)(atk * atkPassives) + atkBonus;
         if (i <= 0)
             i = 1;
         return i;
@@ -122,7 +137,7 @@ public class Stats : MonoBehaviour
     // Returns the character's defense stat
     public int Defense()
     {
-        int i = (int)(def * defMod) + (int)(def * defPassives);
+        int i = (int)(def * defMod) + (int)(def * defPassives) + defBonus;
         if (i <= 0)
             i = 1;
         return i;
@@ -289,5 +304,46 @@ public class Stats : MonoBehaviour
         for (int i = 0; i < s.nextLevelExp.Count; ++i)
             nextLevelExp.Add(s.nextLevelExp[i]);
         lastLevelUpEXP = s.lastLevelUpEXP;
+    }
+
+    // Acquires stat bonuses earned from passive abilities
+    public void GetPassiveAbilityStats(MainStats recipient, MainStats giver, int receivedAmount, int givenAmount)
+    {
+        switch (recipient)
+        {
+            case MainStats.ATK:
+                atkBonus += CheckStatBonus(giver, receivedAmount, givenAmount);
+                break;
+            case MainStats.DEF:
+                defBonus += CheckStatBonus(giver, receivedAmount, givenAmount);
+                break;
+            case MainStats.SPD:
+                break;
+        }
+    }
+
+    public int CheckStatBonus(MainStats giver, int receivedAmount, int givenAmount)
+    {
+        switch (giver)
+        {
+            case MainStats.ConsumedHP:
+                return (receivedAmount * (((maxHP + (int)(maxHP * HPPassives)) - currentHP) / givenAmount));
+            case MainStats.ConsumedTP:
+                return (receivedAmount * (((maxTP + (int)(maxTP * TPPassives)) - currentTP) / givenAmount));
+            case MainStats.ATK:
+                return (receivedAmount * ((atk + (int)(atk * atkPassives)) / givenAmount));
+            case MainStats.DEF:
+                return (receivedAmount * ((def + (int)(def * defPassives)) / givenAmount));
+            case MainStats.SPD:
+                return (receivedAmount * ((spd + (int)(spd * spdPassives)) / givenAmount));
+            default:
+                return 0;
+        }
+    }
+
+    public void ResetBonusStats()
+    {
+        atkBonus = 0;
+        defBonus = 0;
     }
 }

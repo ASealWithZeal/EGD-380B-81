@@ -133,6 +133,18 @@ public class CharData : MonoBehaviour
             target.Add(targ[i]);
     }
 
+    // Recalculates each character's bonus stats at the beginning of each turn
+    public void SetBonusStats()
+    {
+        charStats.ResetBonusStats();
+        if (gameObject.tag == "Player")
+        {
+            for (int i = 0; i < learnedAbilities.Count; ++i)
+                if (learnedAbilities[i])
+                    GetComponent<PlayerActions>().CalculatePassiveBonus(i);
+        }
+    }
+
     public void Targeted()
     {
         transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);

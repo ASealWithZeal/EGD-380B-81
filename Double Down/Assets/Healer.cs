@@ -48,9 +48,13 @@ public class Healer : MonoBehaviour
     public string ability2Description = "User's TP permanently increases by 25%.";
 
     [Header("PassiveAbility2")]
-    public string ability3Name = "SPD +25%";
+    public string ability3Name = "Desperation";
     public bool ability3Active = false;
-    public string ability3Description = "User's SPD permanently increases by 25%.";
+    public MainStats ability3Recipient = MainStats.ATK;
+    public int ability3RecipientGains = 1;
+    public MainStats ability3Giver = MainStats.TP;
+    public int ability3GiverGives = 10;
+    public string ability3Description = "User gains +1 ATK for every 10 TP currently consumed (<i>only active during combat</i>).";
 
     // Perform a simple attack
     public void SetAttack()
@@ -131,5 +135,10 @@ public class Healer : MonoBehaviour
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);
+    }
+
+    public void GetPassiveAbility2()
+    {
+        charStats.GetPassiveAbilityStats(ability3Recipient, ability3Giver, ability3RecipientGains, ability3GiverGives);
     }
 }

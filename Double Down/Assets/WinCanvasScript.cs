@@ -9,6 +9,10 @@ public class WinCanvasScript : MonoBehaviour
     public bool done = false;
     public List<Color> fullTextColor;
 
+    [Header("Misc")]
+    public TextMeshProUGUI charName;
+    public Image charPortrait;
+
     [Header("EXP Meter")]
     public TextMeshProUGUI expText;
     public TextMeshProUGUI neededEXPText;
@@ -34,6 +38,12 @@ public class WinCanvasScript : MonoBehaviour
     public TextMeshProUGUI spdText;
     public TextMeshProUGUI spdGainText;
     
+    public void Setup()
+    {
+        charName.SetText(charStats.gameObject.GetComponent<CharData>().name);
+        //charPortrait.sprite = charStats.gameObject.GetComponent<Image>().sprite;
+    }
+
     public void Init()
     {
         levelText.SetText(charStats.level.ToString() + " (");

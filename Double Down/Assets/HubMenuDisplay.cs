@@ -145,11 +145,11 @@ public class HubMenuDisplay : MonoBehaviour
         statsString[4].SetText(charStats.Speed().ToString());
 
         // Added Stats Information
-        SetButtonData(0, charStats.maxHP, charStats.HPPassives);
-        SetButtonData(2, charStats.maxTP, charStats.TPPassives);
-        SetButtonData(4, charStats.atk, charStats.atkPassives);
-        SetButtonData(6, charStats.def, charStats.defPassives);
-        SetButtonData(8, charStats.spd, charStats.spdPassives);
+        SetButtonData(0, charStats.maxHP, 0, charStats.HPPassives);
+        SetButtonData(2, charStats.maxTP, 0, charStats.TPPassives);
+        SetButtonData(4, charStats.atk, charStats.atkBonus, charStats.atkPassives);
+        SetButtonData(6, charStats.def, charStats.defBonus, charStats.defPassives);
+        SetButtonData(8, charStats.spd, 0, charStats.spdPassives);
 
         // Abilities Information
         int a = 0;
@@ -167,7 +167,7 @@ public class HubMenuDisplay : MonoBehaviour
             }
     }
 
-    private void SetButtonData(int startButton, int stat, float mult)
+    private void SetButtonData(int startButton, int stat, int statBonus, float mult)
     {
         string s = null;
 
@@ -175,12 +175,12 @@ public class HubMenuDisplay : MonoBehaviour
         statsAddString[startButton].SetText(stat.ToString());
 
         // Enhanced Stat
-        if (stat * mult < 10)
-            s = " " + ((int)(stat * mult)).ToString() + " )";
-        else if (stat * mult < 100)
-            s = ((int)(stat * mult)).ToString() + " )";
+        if ((stat * mult) + statBonus < 10)
+            s = " " + ((int)(stat * mult) + statBonus).ToString() + " )";
+        else if ((stat * mult) + statBonus < 100)
+            s = ((int)(stat * mult) + statBonus).ToString() + " )";
         else
-            s = ((int)(stat * mult)).ToString() + ")";
+            s = ((int)(stat * mult) + statBonus).ToString() + ")";
         statsAddString[startButton + 1].SetText(s);
     }
 

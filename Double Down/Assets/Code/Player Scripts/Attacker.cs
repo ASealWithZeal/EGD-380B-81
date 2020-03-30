@@ -48,9 +48,13 @@ public class Attacker : MonoBehaviour
     public string ability2Description = "User's HP permanently increases by 25%.";
 
     [Header("PassiveAbility2")]
-    public string ability3Name = "ATK +25%";
+    public string ability3Name = "Wall of Blades";
     public bool ability3Active = false;
-    public string ability3Description = "User's ATK permanently increases by 25%.";
+    public MainStats ability3Recipient = MainStats.DEF;
+    public int ability3RecipientGains = 1;
+    public MainStats ability3Giver = MainStats.ATK;
+    public int ability3GiverGives = 3;
+    public string ability3Description = "User gains +1 DEF for every 3 points of ATK.";
 
     // Perform a simple attack
     public void SetAttack()
@@ -130,5 +134,10 @@ public class Attacker : MonoBehaviour
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         Managers.CombatManager.Instance.UseStatusAbility(3, ability1Effect, ability1Duration, true, 0.5f);
+    }
+
+    public void GetPassiveAbility2()
+    {
+        charStats.GetPassiveAbilityStats(ability3Recipient, ability3Giver, ability3RecipientGains, ability3GiverGives);
     }
 }

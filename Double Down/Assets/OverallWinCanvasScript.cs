@@ -17,6 +17,11 @@ public class OverallWinCanvasScript : MonoBehaviour
 
         theGroup.alpha = 0.0f;
         abilityGroup.alpha = 0.0f;
+
+        for (int i = 0; i < charScripts.Count; ++i)
+            charScripts[i].Setup();
+        for (int i = 0; i < charLearns.Count; ++i)
+            charLearns[i].Setup();
     }
 
     private void ResetWinCanvas(List<WinCanvasScript> w)

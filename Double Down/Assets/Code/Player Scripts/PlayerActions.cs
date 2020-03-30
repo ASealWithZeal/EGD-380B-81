@@ -285,4 +285,26 @@ public class PlayerActions : MonoBehaviour
 
         return false;
     }
+
+    public void CalculatePassiveBonus(int i)
+    {
+        switch (i)
+        {
+            case 0:
+                break;
+
+            case 1:
+                break;
+
+            case 2:
+                break;
+
+            case 3:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().GetPassiveAbility2();
+                if (character == Char.Char1)
+                    GetComponent<Healer>().GetPassiveAbility2();
+                break;
+        }
+    }
 }

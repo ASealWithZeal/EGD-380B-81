@@ -15861,6 +15861,8 @@ MonoBehaviour:
   done: 0
   fullTextColor:
   - {r: 1, g: 1, b: 0, a: 1}
+  charName: {fileID: 134679252}
+  charPortrait: {fileID: 911236331}
   expText: {fileID: 701510518}
   neededEXPText: {fileID: 1808335542}
   expMeter: {fileID: 805078846}
@@ -49572,6 +49574,8 @@ MonoBehaviour:
   done: 0
   fullTextColor:
   - {r: 1, g: 1, b: 0, a: 1}
+  charName: {fileID: 1855846755}
+  charPortrait: {fileID: 2035754108}
   expText: {fileID: 196738659}
   neededEXPText: {fileID: 126356022}
   expMeter: {fileID: 1314981806}
@@ -83548,6 +83552,12 @@ MonoBehaviour:
   nameText: {fileID: 118900038}
   abilityText: {fileID: 703536449}
   button: {fileID: 1125693483}
+  abilityButtons:
+  - {fileID: 1125693482}
+  - {fileID: 748512528}
+  - {fileID: 1211446931}
+  - {fileID: 321804416}
+  - {fileID: 1122970916}
   defaultText: '<b>Blood Draw:</b> Cost: 5 TP. Deal 1.0x damage to an enemy, then
     restore that as HP split evenly amongst all allies.'
   done: 0
@@ -154146,6 +154156,12 @@ MonoBehaviour:
   nameText: {fileID: 118900038}
   abilityText: {fileID: 703536449}
   button: {fileID: 1105149547}
+  abilityButtons:
+  - {fileID: 1105149546}
+  - {fileID: 47296087}
+  - {fileID: 263509750}
+  - {fileID: 1695649680}
+  - {fileID: 582568872}
   defaultText: '<b>Heavy Slash:</b> Cost: 6 TP. Gain -99% SPD for 1 turn. During your
     next turn, deal 2.5x damage to an enemy.'
   done: 0
@@ -157409,6 +157425,16 @@ PrefabInstance:
       propertyPath: combatPosition.x
       value: -7
       objectReference: {fileID: 0}
+    - target: {fileID: 7802881689616012631, guid: e43804b24041e4c4297ecce7b952394a,
+        type: 3}
+      propertyPath: ability3Name
+      value: Wall of Blades
+      objectReference: {fileID: 0}
+    - target: {fileID: 7802881689616012631, guid: e43804b24041e4c4297ecce7b952394a,
+        type: 3}
+      propertyPath: ability3Description
+      value: User gains +1 DEF for every 3 points of ATK.
+      objectReference: {fileID: 0}
     - target: {fileID: 7802881689616012634, guid: e43804b24041e4c4297ecce7b952394a,
         type: 3}
       propertyPath: m_FlipX
@@ -157589,6 +157615,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4647696549477024482, guid: c0aef67434970884b89838bae2baa4f6,
+        type: 3}
+      propertyPath: ability3Name
+      value: Desperation
+      objectReference: {fileID: 0}
+    - target: {fileID: 4647696549477024482, guid: c0aef67434970884b89838bae2baa4f6,
+        type: 3}
+      propertyPath: ability3Giver
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4647696549477024482, guid: c0aef67434970884b89838bae2baa4f6,
+        type: 3}
+      propertyPath: ability3Description
+      value: User +1 ATK for every 5 TP they've consumed (<i>only active during combat</i>).
+      objectReference: {fileID: 0}
+    - target: {fileID: 4647696549477024482, guid: c0aef67434970884b89838bae2baa4f6,
+        type: 3}
+      propertyPath: ability3GiverGives
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4848121415031818265, guid: c0aef67434970884b89838bae2baa4f6,
         type: 3}

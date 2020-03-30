@@ -44,8 +44,6 @@ public class RockBob : MonoBehaviour
 
         while (t.position.y < defaultY + bobVal)
         {
-            Debug.Log(t.position.y + ", " + (defaultY + bobVal));
-            Debug.Log(bobSpeed);
             t.position += new Vector3(0, bobSpeed, 0);
             yield return new WaitForSeconds(0.05f);
         }

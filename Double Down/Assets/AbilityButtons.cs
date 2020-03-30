@@ -12,11 +12,19 @@ public class AbilityButtons : MonoBehaviour, ISelectHandler
     public CharData data = null;
     public List<Color> setColors;
 
-    // Start is called before the first frame update
-    void Start()
+    public void InitValues(PlayerActions actions, int num)
     {
-        if (data.learnedAbilities[ability])
-            SetColors();
+        ability = num;
+        buttonText = "<b>" + actions.GetAbilityName(num) + ":</b> ";
+        if (actions.GetAbilityActive(num))
+            buttonText += "Cost: " + actions.GetAbilityCost(num).ToString() + " TP. ";
+        else
+            buttonText += "Passive. ";
+
+        buttonText += actions.GetAbilityDescription(num);
+
+        //if (data.learnedAbilities[ability])
+        //    SetColors();
     }
 
     // Update is called once per frame
