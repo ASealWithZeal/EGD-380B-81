@@ -238,7 +238,7 @@ public class TurnTracker : MonoBehaviour
     {
         GameObject g = Instantiate(image, t1Storage);
         //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
-        g.GetComponent<Image>().color = theImage.GetComponent<SpriteRenderer>().color;
+        //g.GetComponent<Image>().color = theImage.GetComponent<SpriteRenderer>().color;
         g.GetComponent<TurnTrackerObj>().obj = theImage;
         g.transform.position = t1Tracker[i + 1].rectTransform.position;
         g.transform.localScale = t1Tracker[i + 1].rectTransform.localScale;
@@ -286,7 +286,9 @@ public class TurnTracker : MonoBehaviour
             GameObject g = Instantiate(image, t1Storage);
             //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
             //g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
-            g.GetComponent<Image>().color = l[i].GetComponent<CharData>().GetColor();
+            //g.GetComponent<Image>().color = l[i].GetComponent<CharData>().GetColor();
+            g.GetComponent<TurnTrackerObj>().portrait.sprite = l[i].GetComponent<CharData>().combatPortrait;
+
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();
@@ -331,7 +333,9 @@ public class TurnTracker : MonoBehaviour
             GameObject g = Instantiate(image, t2Storage);
             //g.GetComponent<Image>() = i.GetComponent<CharData>().GetPortrait();
             //g.GetComponent<Image>().color = l[i].GetComponent<SpriteRenderer>().color;
-            g.GetComponent<Image>().color = l[i].GetComponent<CharData>().GetColor();
+            //g.GetComponent<Image>().color = l[i].GetComponent<CharData>().GetColor();
+            g.GetComponent<TurnTrackerObj>().portrait.sprite = l[i].GetComponent<CharData>().combatPortrait;
+
             g.GetComponent<Image>().color -= new Color(0, 0, 0, 1);
             g.GetComponent<TurnTrackerObj>().obj = l[i];
             g.GetComponent<TurnTrackerObj>().objData = l[i].GetComponent<CharData>();

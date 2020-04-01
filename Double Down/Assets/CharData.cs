@@ -35,6 +35,7 @@ public class CharData : MonoBehaviour
 
     [Header("Sprites")]
     public bool facingDir;
+    public Sprite combatPortrait;
     public Color[] colors;
     public bool hasFinishedActionAnimation = false;
 
