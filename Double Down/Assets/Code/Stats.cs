@@ -26,15 +26,16 @@ public class Stats : MonoBehaviour
     public int spd = 10;
     
     // Stat Modifiers
-    private float atkMod = 1;
-    private float defMod = 1;
-    private float spdMod = 1;
+    [HideInInspector] public float atkMod = 1;
+    [HideInInspector] public float defMod = 1;
+    [HideInInspector] public float spdMod = 1;
 
     // Modifier Turns
-    private int atkModTurns = 0;
-    private int defModTurns = 0;
-    private int spdModTurns = 0;
-    private int aggroModTurns = 0;
+    [HideInInspector] public int atkModTurns = 0;
+    [HideInInspector] public int defModTurns = 0;
+    [HideInInspector] public int spdModTurns = 0;
+    [HideInInspector] public int aggroModTurns = 0;
+    [HideInInspector] public bool defending = false;
 
     [Header("Level Gains")]
     public int HPGain = 25;
@@ -57,7 +58,7 @@ public class Stats : MonoBehaviour
     public int defBonus = 0;
 
     [Header("Other")]
-    public float aggro = 0.0f;
+    public float aggro = 1.0f;
 
     [Header("Level and Experience")]
     public int level = 1;
@@ -90,6 +91,15 @@ public class Stats : MonoBehaviour
             currentHP = 0;
         else if (currentHP > MaxHP())
             currentHP = MaxHP();
+    }
+
+    public void ReduceTP(int i)
+    {
+        currentTP -= i;
+        if (currentTP <= 0)
+            currentTP = 0;
+        else if (currentTP > MaxTP())
+            currentTP = MaxTP();
     }
 
     public int MaxHP()
@@ -194,33 +204,56 @@ public class Stats : MonoBehaviour
         aggroModTurns--;
         if (aggroModTurns <= 0)
         {
-            aggro = 0.0f;
+            aggro = 1;
             aggroModTurns = 0;
         }
     }
 
     public void DestroyMods()
     {
-        atkMod = defMod = spdMod = 1.0f;
-        aggro = 0.0f;
+        atkMod = defMod = spdMod = aggro = 1.0f;
         atkModTurns = defModTurns = spdModTurns = aggroModTurns = 0;
     }
 
     public void SetAtkMod(float mod, int turns)
     {
-        atkMod = mod;
+        atkMod += mod;
+
+        if (atkMod >= 1.5f)
+            atkMod = 1.5f;
+        else if (atkMod <= 0.5f)
+            atkMod = 0.5f;
+        else if (atkMod == 1.0f)
+            turns = 0;
+
         atkModTurns = turns;
     }
 
     public void SetDefMod(float mod, int turns)
     {
-        defMod = mod;
+        defMod += mod;
+
+        if (defMod >= 1.5f)
+            defMod = 1.5f;
+        else if (defMod <= 0.5f)
+            defMod = 0.5f;
+        else if (defMod == 1.0f)
+            turns = 0;
+
         defModTurns = turns;
     }
 
     public void SetSpdMod(float mod, int turns)
     {
-        spdMod = mod;
+        spdMod += mod;
+
+        if (spdMod >= 1.5f)
+            spdMod = 1.5f;
+        else if (spdMod <= 0.5f)
+            spdMod = 0.5f;
+        else if (spdMod == 1.0f)
+            turns = 0;
+
         spdModTurns = turns;
     }
 
@@ -306,6 +339,41 @@ public class Stats : MonoBehaviour
         lastLevelUpEXP = s.lastLevelUpEXP;
     }
 
+    public void GetPassiveAbilityStats(MainStats recipient, float additiveValue)
+    {
+        bool @bool = false;
+        switch (recipient)
+        {
+            case MainStats.HP:
+                if (currentHP == MaxHP())
+                    @bool = true;
+                HPPassives += additiveValue;
+                if (@bool)
+                    currentHP = MaxHP();
+                break;
+
+            case MainStats.TP:
+                if (currentTP == MaxTP())
+                    @bool = true;
+                TPPassives += additiveValue;
+                if (@bool)
+                    currentTP = MaxTP();
+                break;
+
+            case MainStats.ATK:
+                atkPassives += additiveValue;
+                break;
+
+            case MainStats.DEF:
+                defPassives += additiveValue;
+                break;
+
+            case MainStats.SPD:
+                spdPassives += additiveValue;
+                break;
+        }
+    }
+
     // Acquires stat bonuses earned from passive abilities
     public void GetPassiveAbilityStats(MainStats recipient, MainStats giver, int receivedAmount, int givenAmount)
     {
@@ -345,5 +413,11 @@ public class Stats : MonoBehaviour
     {
         atkBonus = 0;
         defBonus = 0;
+
+        HPPassives = 0;
+        TPPassives = 0;
+        atkPassives = 0;
+        defPassives = 0;
+        spdPassives = 0;
     }
 }

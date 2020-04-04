@@ -71,7 +71,7 @@ public class EventObj : MonoBehaviour
             && !other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && (type == HubEvents.Battle || type == HubEvents.Boss))
         {
             player = other.gameObject;
-            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.CombatIdle);
             box.PassEventIn(text, gameObject);
         }
 
@@ -89,7 +89,7 @@ public class EventObj : MonoBehaviour
             && other.gameObject.GetComponent<CharData>().isInCombat && other.gameObject.tag == "Player" && (type == HubEvents.Battle || type == HubEvents.Boss))
         {
             player = other.gameObject;
-            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+            Managers.TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.CombatIdle);
             PassExistingCombat(type);
         }
     }
@@ -108,8 +108,7 @@ public class EventObj : MonoBehaviour
 
     public void PassExistingCombat(HubEvents type)
     {
-        Debug.Log("HERE");
-        Managers.TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = false;
+        //Managers.TurnManager.Instance.t1[0].GetComponent<CharacterController>().enabled = false;
         Managers.CombatTransitionManager.Instance.EnterExistingCombatInstance(type, eventNum, player, enemies);
     }
 }

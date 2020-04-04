@@ -81,7 +81,14 @@ public class Healer : MonoBehaviour
         // Animation
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
-        Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true, 0.5f);
+
+        if (!GetComponent<CharData>().learnedAbilities[2])
+            Managers.CombatManager.Instance.UseStatusAbility(4, 0, 0, true, 0.5f);
+        else
+        {
+            Managers.CombatManager.Instance.UseStatusAbility(4, 0, 0, false, 0.5f);
+            Managers.CombatManager.Instance.RestoreTechPoints((int)(charStats.MaxTP() * 0.15f), new Vector3());
+        }
     }
 
     // Uses Blood Draw
@@ -99,11 +106,11 @@ public class Healer : MonoBehaviour
 
         // Deals damage as absorption
         GetComponent<CharData>().DisplayActionAnimation();
-        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod);
+        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod, true, new Vector3());
 
         // Restores health to all allies
         Managers.CombatManager.Instance.SetTarget((int)ability0HealTarget);
-        Managers.CombatManager.Instance.RestoreHealth(damage / Managers.TurnManager.Instance.playerCharsList.Count);
+        Managers.CombatManager.Instance.RestoreHealth(damage / Managers.TurnManager.Instance.playerCharsList.Count, true, new Vector3());
     }
     public void PerformAbility0Upgrade()
     {
@@ -114,11 +121,11 @@ public class Healer : MonoBehaviour
 
         // Deals damage as absorption
         GetComponent<CharData>().DisplayActionAnimation();
-        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod);
+        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod, true, new Vector3());
 
         // Restores health to all allies
         Managers.CombatManager.Instance.SetTarget((int)ability0UpgradeHealTarget);
-        Managers.CombatManager.Instance.RestoreHealth((int)((damage * 1.2f) / Managers.TurnManager.Instance.playerCharsList.Count));
+        Managers.CombatManager.Instance.RestoreHealth((int)((damage * 1.2f) / Managers.TurnManager.Instance.playerCharsList.Count), true, new Vector3());
     }
 
     // Uses Adrenalinjection
@@ -134,7 +141,20 @@ public class Healer : MonoBehaviour
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
-        Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);
+        //Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);
+
+        // Deals damage as absorption
+        int damage = Managers.CombatManager.Instance.DamageUserAsAbsorb(charStats.currentHP / 2, true, new Vector3(-0.2f, 0.33f, 0));
+        int tpDamage = Managers.CombatManager.Instance.DamageUserAsAbsorb(charStats.currentTP / 2, false, new Vector3(0.2f, -0.33f, 0));
+
+        // Restores health to the target ally
+        Managers.CombatManager.Instance.RestoreHealth(damage, false, new Vector3(-0.2f, 0.33f, 0));
+        Managers.CombatManager.Instance.RestoreTechPoints(tpDamage, new Vector3(0.2f, -0.33f, 0));
+    }
+
+    public void GetPassiveAbility1()
+    {
+        //charStats.GetPassiveAbilityStats(MainStats.TP, 0.25f);
     }
 
     public void GetPassiveAbility2()

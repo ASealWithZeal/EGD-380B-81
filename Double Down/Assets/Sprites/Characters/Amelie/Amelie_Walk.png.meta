@@ -1,25 +1,25 @@
 fileFormatVersion: 2
-guid: 16c6663679f92234d9392c2d9745c77b
+guid: 8a2fed4f20ae0484b8b151b52abe94d6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2971707423458460697
-    second: Amelie_Walk 1_0
+      213: 4139414608362264286
+    second: Amelie_Walk_0
   - first:
-      213: -4476613120431714945
-    second: Amelie_Walk 1_1
+      213: 3334136508701149995
+    second: Amelie_Walk_1
   - first:
-      213: 4027475299316199738
-    second: Amelie_Walk 1_2
+      213: 8223727640804786845
+    second: Amelie_Walk_2
   - first:
-      213: 5526936712183777129
-    second: Amelie_Walk 1_3
+      213: 4190866813817846827
+    second: Amelie_Walk_3
   - first:
-      213: 8474243215556930511
-    second: Amelie_Walk 1_4
+      213: -5399895250618784706
+    second: Amelie_Walk_4
   - first:
-      213: 4095894203633659455
-    second: Amelie_Walk 1_5
+      213: 1730563474767339516
+    second: Amelie_Walk_5
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -81,7 +81,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -93,7 +93,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -104,7 +104,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Amelie_Walk 1_0
+      name: Amelie_Walk_0
       rect:
         serializedVersion: 2
         x: 0
@@ -118,14 +118,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1654af58f79e86749af3f10005279a89
-      internalID: -2971707423458460697
+      spriteID: d60e28e1f6abf434aad92fc2f94662e6
+      internalID: 4139414608362264286
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk 1_1
+      name: Amelie_Walk_1
       rect:
         serializedVersion: 2
         x: 24
@@ -139,14 +139,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 612d6b22a9af9554389957cf6cd4ade0
-      internalID: -4476613120431714945
+      spriteID: ba2b2b13c1b215e4583d85ea6f82cead
+      internalID: 3334136508701149995
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk 1_2
+      name: Amelie_Walk_2
       rect:
         serializedVersion: 2
         x: 48
@@ -160,14 +160,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 771f4310378b3b842924010e9bedff24
-      internalID: 4027475299316199738
+      spriteID: 02c66bb45059a9d4283891797f148743
+      internalID: 8223727640804786845
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk 1_3
+      name: Amelie_Walk_3
       rect:
         serializedVersion: 2
         x: 72
@@ -181,14 +181,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d9faa69ad5ba0964c8ee1121d46968a3
-      internalID: 5526936712183777129
+      spriteID: 085fa58e3d2c637449c422f0f4db8434
+      internalID: 4190866813817846827
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk 1_4
+      name: Amelie_Walk_4
       rect:
         serializedVersion: 2
         x: 96
@@ -202,14 +202,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 42fb1f2cc89acd8478f6452ad7863058
-      internalID: 8474243215556930511
+      spriteID: f20e9082e028f254bb364e9fee1a3b86
+      internalID: -5399895250618784706
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Amelie_Walk 1_5
+      name: Amelie_Walk_5
       rect:
         serializedVersion: 2
         x: 120
@@ -223,8 +223,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4ae3b31c6b746b84e963e55fd5631419
-      internalID: 4095894203633659455
+      spriteID: 4ea49ca601bd1984ebe30d5d707ffc6d
+      internalID: 1730563474767339516
       vertices: []
       indices: 
       edges: []
@@ -232,7 +232,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: a9154db92007a0d43ac00d7372549224
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 

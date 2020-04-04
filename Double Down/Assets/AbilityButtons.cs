@@ -47,7 +47,7 @@ public class AbilityButtons : MonoBehaviour, ISelectHandler
     public void SelectPassiveButton(int passive)
     {
         SetColors();
-        transform.parent.GetComponent<AbilityLearnScreen>().LearnPassiveAbility(ability, passive);
+        transform.parent.GetComponent<AbilityLearnScreen>().LearnAbility(ability);
     }
 
     private void SetColors()

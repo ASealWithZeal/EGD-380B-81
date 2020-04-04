@@ -41,7 +41,8 @@ public class WinCanvasScript : MonoBehaviour
     public void Setup()
     {
         charName.SetText(charStats.gameObject.GetComponent<CharData>().name);
-        //charPortrait.sprite = charStats.gameObject.GetComponent<Image>().sprite;
+        charPortrait.color = Color.white;
+        charPortrait.sprite = charStats.gameObject.GetComponent<CharData>().normalPortrait;
     }
 
     public void Init()
@@ -61,11 +62,6 @@ public class WinCanvasScript : MonoBehaviour
         ResetText(spdGainText);
 
         levelUpGroup.alpha = 0.0f;
-    }
-
-    public void ResetValues()
-    {
-        Init();
     }
 
     private void ResetText(TextMeshProUGUI txt)

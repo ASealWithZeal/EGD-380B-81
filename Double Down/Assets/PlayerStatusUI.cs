@@ -21,6 +21,10 @@ public class PlayerStatusUI : MonoBehaviour
     public TextMeshProUGUI name;
     public TextMeshProUGUI level;
 
+    // Buff Data
+    public List<UIBuffs> buffs;
+    public GameObject buffObject;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -161,5 +165,72 @@ public class PlayerStatusUI : MonoBehaviour
         }
 
         yield return null;
+    }
+
+    // Adds a new buff OR updates a pre-existing buff if one already exists
+    public void UpdateBuffUI(BuffType changedStat, int countdown, float value)
+    {
+        // Checks at the beginning if any buffs were destroyed last turn, then removes them
+        CheckDestroyedBuffs();
+
+        // If the value is not 1, see if it's possible to create a new buff object
+        // Otherwise, update the buff as normal
+        if (value != 1)
+            AddNewBuff(changedStat, countdown, value);
+        else
+            UpdateBuff(changedStat, countdown, value);
+    }
+
+    private void AddNewBuff(BuffType changedStat, int countdown, float value)
+    {
+        bool @bool = true;
+        for (int i = 0; i < buffs.Count; ++i)
+            if (buffs[i].buffType == changedStat)
+                @bool = false;
+
+        if (@bool)
+        {
+            GameObject g = Instantiate(buffObject, transform);
+            g.GetComponent<RectTransform>().localPosition = new Vector2(90 + (40 * buffs.Count), -18);
+            g.GetComponent<UIBuffs>().Init(gameObject, countdown, value, changedStat);
+
+            buffs.Add(g.GetComponent<UIBuffs>());
+        }
+        else
+            UpdateBuff(changedStat, countdown, value);
+    }
+
+    // Updates the image of the corresponding buff
+    public void UpdateBuff(BuffType changedStat, int countdown, float value)
+    {
+        for (int i = 0; i < buffs.Count; ++i)
+            if (buffs[i].buffType == changedStat)
+                buffs[i].UpdateImage(countdown, value);
+    }
+
+    private void CheckDestroyedBuffs()
+    {
+        for (int i = 0; i < buffs.Count; ++i)
+            if (buffs[i].destroyed)
+            {
+                Destroy(buffs[i].gameObject);
+                buffs.Remove(buffs[i]);
+                i = 0;
+            }
+    }
+
+    public void MoveBuffs()
+    {
+        CheckDestroyedBuffs();
+        for (int i = 0; i < buffs.Count; ++i)
+            buffs[i].GetComponent<RectTransform>().localPosition = new Vector2(90 + (40 * i), -18);
+    }
+
+    public void DestroyAllBuffs()
+    {
+        Debug.Log("H");
+        int c = buffs.Count;
+        for (int i = 0; i < c; ++i)
+            buffs[0].DestroyImmediately();
     }
 }

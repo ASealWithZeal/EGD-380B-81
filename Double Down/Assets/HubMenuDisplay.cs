@@ -117,7 +117,8 @@ public class HubMenuDisplay : MonoBehaviour
         // General Information
         charNameData[0].SetText(charData.name);
         charNameData[1].SetText("Lv " + charStats.level.ToString());
-        charPortrait.color = charData.colors[0];
+        charPortrait.color = Color.white;
+        charPortrait.sprite = charData.normalPortrait;
 
 
         // Level Information

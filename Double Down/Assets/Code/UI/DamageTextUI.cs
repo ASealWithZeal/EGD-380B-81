@@ -25,23 +25,29 @@ public class DamageTextUI : MonoBehaviour
         uiOffset = new Vector2(parentCanvas.GetComponent<RectTransform>().sizeDelta.x / 2f, parentCanvas.GetComponent<RectTransform>().sizeDelta.y / 2f);
     }
 
-    public void DamageNumbers(int damage, Transform target, bool canEnd)
+    public void DamageNumbers(int damage, bool hp, Vector3 position, bool canEnd)
     {
-        StartCoroutine(SpawnDamageNumbers(damage, target, canEnd));
+        StartCoroutine(SpawnDamageNumbers(damage, hp, position, canEnd));
     }
 
-    public IEnumerator SpawnDamageNumbers(int damage, Transform target, bool canEnd)
+    public IEnumerator SpawnDamageNumbers(int damage, bool hp, Vector3 position, bool canEnd)
     {
-        Color currentColor;
+        Color currentColor = textColors[0];
 
-        if (damage < 0)
+        if (damage < 0 && hp)
         {
             damage = Mathf.Abs(damage);
             currentColor = textColors[1];
         }
 
-        else
+        else if (damage > 0 && hp)
             currentColor = textColors[0];
+
+        else
+        {
+            damage = Mathf.Abs(damage);
+            currentColor = textColors[2];
+        }
 
         string dam = damage.ToString();
         float textOffset = (dam.Length - 1) * 0.5f;
@@ -59,7 +65,7 @@ public class DamageTextUI : MonoBehaviour
             newText.GetComponent<TextMeshProUGUI>().SetText(dam[i].ToString());
 
             // Get the position on the canvas
-            Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(target.position);
+            Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(position);
             Vector2 proportionalPosition = new Vector2(ViewportPosition.x * parentCanvas.GetComponent<RectTransform>().sizeDelta.x, ViewportPosition.y * parentCanvas.GetComponent<RectTransform>().sizeDelta.y);
 
             // Set the position and remove the screen offset

@@ -10,6 +10,7 @@ public enum Targeting
     ThreeRandomEnemies,
     OneAlly,
     AllAllies,
+    OneDifferentAlly,
     User
 }
 
@@ -29,6 +30,7 @@ namespace Managers
 
         public int DAMAGE_MULT = 10;
         private bool oneTarget = false;
+        private bool otherTarget = false;
         private bool doneAttacking = false;
         private int newTarget = 0;
         private float storedMod = 0.0f;
@@ -72,8 +74,13 @@ namespace Managers
             endingTurn = false;
             if (TurnManager.Instance.t1[0].tag == "Player")
             {
-                // Ticks down the characters modifier changes
-                TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                // Ticks down the character's modifier changes
+                if (TurnManager.Instance.t1[0].GetComponent<Stats>().defending == true)
+                {
+                    TurnManager.Instance.t1[0].GetComponent<Stats>().defending = false;
+                    TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.CombatIdle);
+                }
+
                 TurnManager.Instance.t1[0].GetComponent<CharData>().delayTimer--;
                 origPos = TurnManager.Instance.t1[0].transform.position;
                 StartCoroutine(MovePlayerCharacter(moveTarget.position));
@@ -81,8 +88,12 @@ namespace Managers
         
             else
             {
-                // Ticks down the characters modifier changes
-                TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                // Ticks down the character's modifier changes
+                if (TurnManager.Instance.t1[0].GetComponent<Stats>().defending == true)
+                {
+                    TurnManager.Instance.t1[0].GetComponent<Stats>().defending = false;
+                }
+
                 TurnManager.Instance.t1[0].GetComponent<CharData>().delayTimer--;
                 Act(0);
             }
@@ -152,13 +163,22 @@ namespace Managers
                 {
                     canMoveOn = false;
                     for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+                    {
+                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().DestroyMods();
                         TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count);
+                    }
                     winCanvas.ShowWinCanvas(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst, container.CheckForBossEvent());
                 }
                 else if (TurnManager.Instance.playerCharsList.Count == 0)
                 {
                     canMoveOn = false;
                     Invoke("EndCombatLoss", 0.75f);
+                }
+
+                else if (TurnManager.Instance.t1[0].tag == "Player" && TurnManager.Instance.t1[0].GetComponent<PlayerActions>().CheckEndTurnEffects())
+                {
+                    canMoveOn = false;
+                    Invoke("CallEndOfTurnEffect", 0.5f);
                 }
 
                 if (canMoveOn)
@@ -169,11 +189,15 @@ namespace Managers
 
                     if (TurnManager.Instance.t1[0].tag == "Player")
                     {
+                        TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                        TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeCharUIBuffDisplay();
                         StartCoroutine(MovePlayerCharacter(origPos));
                     }
 
                     else
                     {
+                        TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                        TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeCharUIBuffDisplay();
                         TurnManager.Instance.EndRound();
                     }
                 }
@@ -181,6 +205,11 @@ namespace Managers
 
             else
                 DealDamage(storedMod);
+        }
+
+        private void CallEndOfTurnEffect()
+        {
+            TurnManager.Instance.t1[0].GetComponent<PlayerActions>().UseEndOfTurnEffect();
         }
 
         private void EndCombatLoss()
@@ -235,10 +264,10 @@ namespace Managers
 
                 else if (oneTarget && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S)))
                 {
-                    if (moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
+                    if (!otherTarget && moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
                         TargetDown(TurnManager.Instance.playerCharsList);
 
-                    else if (moveTargets[0].tag != "Player" && TurnManager.Instance.enemyCharsList.Count > 1)
+                    else if (!otherTarget && moveTargets[0].tag != "Player" && TurnManager.Instance.enemyCharsList.Count > 1)
                         TargetDown(TurnManager.Instance.enemyCharsList);
                 }
 
@@ -264,6 +293,15 @@ namespace Managers
                 else if (l[i] == moveTargets[0] && i == 0)
                     num = l.Count - 1;
             }
+
+            if (otherTarget && l[num] == TurnManager.Instance.t1[0])
+            {
+                if (num > 0)
+                    num -= 1;
+                else if (num == 0)
+                    num = l.Count - 1;
+            }
+
             moveTargets[0].GetComponent<CharData>().Targeted();
             TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[0]);
             SetTarget(l[num]);
@@ -280,6 +318,15 @@ namespace Managers
                 else if (l[i] == moveTargets[0] && i == l.Count - 1)
                     num = 0;
             }
+
+            if (otherTarget && l[num] == TurnManager.Instance.t1[0])
+            {
+                if (num < l.Count - 1)
+                    num += 1;
+                else if (num == l.Count - 1)
+                    num = 0;
+            }
+
             moveTargets[0].GetComponent<CharData>().Targeted();
             TurnManager.Instance.tracker.HighlightSelectedTrackers(moveTargets[0]);
             SetTarget(l[num]);
@@ -314,6 +361,7 @@ namespace Managers
                     else
                         EnemySetPlayerTarget();
 
+                    otherTarget = false;
                     oneTarget = true;
                     break;
 
@@ -326,6 +374,7 @@ namespace Managers
                         for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
                             moveTargets.Add(TurnManager.Instance.playerCharsList[i]);
 
+                    otherTarget = false;
                     oneTarget = false;
                     break;
 
@@ -338,6 +387,7 @@ namespace Managers
                         for (int i = 0; i < 2; ++i)
                             EnemySetPlayerTarget();
 
+                    otherTarget = false;
                     oneTarget = true;
                     break;
 
@@ -350,6 +400,7 @@ namespace Managers
                         for (int i = 0; i < 3; ++i)
                             EnemySetPlayerTarget();
 
+                    otherTarget = false;
                     oneTarget = true;
                     break;
 
@@ -360,6 +411,7 @@ namespace Managers
                     else
                         moveTargets.Add(TurnManager.Instance.enemyCharsList[Random.Range(0, TurnManager.Instance.enemyCharsList.Count)]);
 
+                    otherTarget = false;
                     oneTarget = true;
                     break;
 
@@ -372,6 +424,18 @@ namespace Managers
                         for (int i = 0; i < TurnManager.Instance.enemyCharsList.Count; ++i)
                             moveTargets.Add(TurnManager.Instance.enemyCharsList[i]);
 
+                    otherTarget = false;
+                    oneTarget = false;
+                    break;
+
+                // Target the user
+                case (int)Targeting.OneDifferentAlly:
+                    if (TurnManager.Instance.t1[0] != TurnManager.Instance.playerCharsList[0])
+                        moveTargets.Add(TurnManager.Instance.playerCharsList[0]);
+                    else
+                        moveTargets.Add(TurnManager.Instance.playerCharsList[1]);
+
+                    otherTarget = true;
                     oneTarget = false;
                     break;
 
@@ -379,6 +443,7 @@ namespace Managers
                 case (int)Targeting.User:
                     moveTargets.Add(TurnManager.Instance.t1[0]);
 
+                    otherTarget = false;
                     oneTarget = false;
                     break;
             }
@@ -401,7 +466,7 @@ namespace Managers
             List<GameObject> tempList = new List<GameObject>();
             for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
             {
-                if (TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().aggro > 0)
+                if (TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().aggro > 1)
                 {
                     tempList.Add(TurnManager.Instance.playerCharsList[i]);
                     set = true;
@@ -472,7 +537,7 @@ namespace Managers
                 if (!oneTarget && i != targ - 1)
                     numEnd = false;
 
-                dText.DamageNumbers(damage, moveTargets[i].transform, numEnd);
+                dText.DamageNumbers(damage, true, moveTargets[i].transform.position, numEnd);
             }
 
             if (!oneTarget || newTarget == moveTargets.Count - 1)
@@ -496,14 +561,14 @@ namespace Managers
                 moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
                 moveTargets[i].GetComponent<CharData>().ChangeHP();
 
-                dText.DamageNumbers(damage, moveTargets[i].transform, false);
+                dText.DamageNumbers(damage, true, moveTargets[i].transform.position, false);
             }
             
             StartCoroutine(EndNonDamageTextDisplay(textDuration, false));
         }
 
         // Deals damage to the current target(s) based on a shared modifier
-        public int DealDamageWithAbsorb(float modifier)
+        public int DealDamageWithAbsorb(float modifier, bool hp, Vector3 offset)
         {
             int damage = 0;
             int targ = 1;
@@ -515,11 +580,11 @@ namespace Managers
                 damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
             }
 
-            StartCoroutine(DealDamageWithAbsorbCoroutine(modifier, damage));
+            StartCoroutine(DealDamageWithAbsorbCoroutine(modifier, damage, hp, offset));
             return damage;
         }
 
-        IEnumerator DealDamageWithAbsorbCoroutine(float modifier, int damage)
+        IEnumerator DealDamageWithAbsorbCoroutine(float modifier, int damage, bool hp, Vector3 offset)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
@@ -530,22 +595,59 @@ namespace Managers
 
             for (int i = 0; i < targ; ++i)
             {
-                moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
-                moveTargets[i].GetComponent<CharData>().ChangeHP();
+                if (hp)
+                {
+                    moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                    moveTargets[i].GetComponent<CharData>().ChangeHP();
+                }
+                else
+                {
+                    moveTargets[i].GetComponent<Stats>().ReduceTP(damage);
+                    moveTargets[i].GetComponent<CharData>().ChangeTP();
+                }
 
-                dText.DamageNumbers(damage, moveTargets[i].transform, false);
+                dText.DamageNumbers(damage, true, moveTargets[i].transform.position + offset, false);
             }
 
             yield return null;
         }
 
-        // Restores health to all specified targets
-        public void RestoreHealth(int amount)
+        // Deals damage to the current target(s) based on a shared modifier
+        public int DamageUserAsAbsorb(int num, bool hp, Vector3 offset)
         {
-            StartCoroutine(RestoreHealthCoroutine(amount));
+            int damage = num;
+            StartCoroutine(DamageUserAsAbsorbCoroutine(num, hp, offset));
+            return damage;
         }
 
-        IEnumerator RestoreHealthCoroutine(int amount)
+        IEnumerator DamageUserAsAbsorbCoroutine(int damage, bool hp, Vector3 offset)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            if (hp)
+            {
+                TurnManager.Instance.t1[0].GetComponent<Stats>().ReduceHP(damage);
+                TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeHP();
+            }
+            else
+            {
+                TurnManager.Instance.t1[0].GetComponent<Stats>().ReduceTP(damage);
+                TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeTP();
+            }
+
+            dText.DamageNumbers(damage, true, TurnManager.Instance.t1[0].transform.position + offset, false);
+
+            yield return null;
+        }
+
+        // Restores health to all specified targets
+        public void RestoreHealth(int amount, bool done, Vector3 offset)
+        {
+            StartCoroutine(RestoreHealthCoroutine(amount, done, offset));
+        }
+
+        IEnumerator RestoreHealthCoroutine(int amount, bool done, Vector3 offset)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
@@ -560,10 +662,41 @@ namespace Managers
                 moveTargets[i].GetComponent<Stats>().ReduceHP(-amount);
                 moveTargets[i].GetComponent<CharData>().ChangeHP();
 
+                if (i == targ - 1 && done)
+                    canEnd = true;
+
+                dText.DamageNumbers(-amount, true, moveTargets[i].transform.position + offset, canEnd);
+            }
+
+            doneAttacking = true;
+            yield return null;
+        }
+
+        // Restores health to all specified targets
+        public void RestoreTechPoints(int amount, Vector3 offset)
+        {
+            StartCoroutine(RestoreTechPointsCoroutine(amount, offset));
+        }
+
+        IEnumerator RestoreTechPointsCoroutine(int amount, Vector3 offset)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            int targ = 1;
+            bool canEnd = false;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = 0; i < targ; ++i)
+            {
+                moveTargets[i].GetComponent<Stats>().ReduceTP(-amount);
+                moveTargets[i].GetComponent<CharData>().ChangeTP();
+
                 if (i == targ - 1)
                     canEnd = true;
 
-                dText.DamageNumbers(-amount, moveTargets[i].transform, canEnd);
+                dText.DamageNumbers(-amount, false, moveTargets[i].transform.position + offset, canEnd);
             }
 
             doneAttacking = true;
@@ -584,17 +717,28 @@ namespace Managers
             int targ = 1;
             if (!oneTarget)
                 targ = moveTargets.Count;
-
+            
             for (int i = 0; i < targ; ++i)
             {
+                int additive = length;
+                if (moveTargets[i] == TurnManager.Instance.t1[0])
+                    additive++;
+
                 if (type == 0)
-                    moveTargets[i].GetComponent<Stats>().SetAtkMod(mod, length);
+                    moveTargets[i].GetComponent<Stats>().SetAtkMod(mod, additive);
                 if (type == 1)
-                    moveTargets[i].GetComponent<Stats>().SetDefMod(mod, length);
+                    moveTargets[i].GetComponent<Stats>().SetDefMod(mod, additive);
                 if (type == 2)
-                    moveTargets[i].GetComponent<Stats>().SetSpdMod(mod, length);
+                    moveTargets[i].GetComponent<Stats>().SetSpdMod(mod, additive);
                 if (type == 3)
-                    moveTargets[i].GetComponent<Stats>().SetAggro(mod, length);
+                    moveTargets[i].GetComponent<Stats>().SetAggro(mod, additive);
+                if (type == 4)
+                {
+                    moveTargets[i].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Defend);
+                    moveTargets[i].GetComponent<Stats>().defending = true;
+                }
+
+                moveTargets[i].GetComponent<CharData>().ChangeCharUIBuffDisplay();
             }
 
             if (endTurn)
@@ -636,7 +780,7 @@ namespace Managers
 
             for (int i = 0; i < moveTargets.Count; ++i)
                 moveTargets.Remove(moveTargets[i]);
-
+            
             for (int i = 0; i < c.target.Count; ++i)
             {
                 if (c.target[i] == null && c.target.Count == 1)
@@ -668,6 +812,9 @@ namespace Managers
             float i = ((a.Attack() * (a.Attack() / 2)) * (1 + (1 - (0.3f * a.level))) * DAMAGE_MULT) / t.Defense();
             i *= mod;
             i *= Random.Range(0.8f, 1.0f);
+
+            if (t.defending)
+                i /= 2;
             return (int)i;
         }
 

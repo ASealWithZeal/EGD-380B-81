@@ -204,6 +204,9 @@ MonoBehaviour:
   - {r: 1, g: 0.48235294, b: 0, a: 1}
   parentCanvas: {fileID: 0}
   name: {fileID: 7949630720632746719}
+  buffs: []
+  buffObject: {fileID: 9217484889120943037, guid: 29549cfc4a111c040be76c4187b281c9,
+    type: 3}
 --- !u!1 &7949630720632746717
 GameObject:
   m_ObjectHideFlags: 0

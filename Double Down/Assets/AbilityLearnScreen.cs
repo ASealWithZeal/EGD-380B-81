@@ -66,32 +66,32 @@ public class AbilityLearnScreen : MonoBehaviour
         }
     }
 
-    public void LearnPassiveAbility(int i, int p)
-    {
-        if (!characterData.learnedAbilities[i])
-        {
-            characterData.learnedAbilities[i] = true;
-
-            switch (p)
-            {
-                case 0:
-                    characterData.gameObject.GetComponent<Stats>().HPPassives += 0.25f;
-                    break;
-                case 1:
-                    characterData.gameObject.GetComponent<Stats>().TPPassives += 0.25f;
-                    break;
-                case 2:
-                    characterData.gameObject.GetComponent<Stats>().atkPassives += 0.25f;
-                    break;
-                case 3:
-                    characterData.gameObject.GetComponent<Stats>().defPassives += 0.25f;
-                    break;
-                case 4:
-                    characterData.gameObject.GetComponent<Stats>().spdPassives += 0.25f;
-                    break;
-            }
-            
-            done = true;
-        }
-    }
+    //public void LearnPassiveAbility(int i, int p)
+    //{
+    //    if (!characterData.learnedAbilities[i])
+    //    {
+    //        characterData.learnedAbilities[i] = true;
+    //
+    //        switch (p)
+    //        {
+    //            case 0:
+    //                characterData.gameObject.GetComponent<Stats>().HPPassives += 0.25f;
+    //                break;
+    //            case 1:
+    //                characterData.gameObject.GetComponent<Stats>().TPPassives += 0.25f;
+    //                break;
+    //            case 2:
+    //                characterData.gameObject.GetComponent<Stats>().atkPassives += 0.25f;
+    //                break;
+    //            case 3:
+    //                characterData.gameObject.GetComponent<Stats>().defPassives += 0.25f;
+    //                break;
+    //            case 4:
+    //                characterData.gameObject.GetComponent<Stats>().spdPassives += 0.25f;
+    //                break;
+    //        }
+    //        
+    //        done = true;
+    //    }
+    //}
 }

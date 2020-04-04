@@ -11,6 +11,12 @@ public class PlayerCombatMenuManager : MonoBehaviour
     public CanvasGroup menuGroup;
     public CanvasGroup abilitiesGroup;
 
+    private void Update()
+    {
+        if (abilitiesGroup.alpha == 1 && Input.GetKeyDown(KeyCode.Escape))
+            StartCoroutine(ShowAbilitiesMenu(false, Managers.TurnManager.Instance.t1[0]));
+    }
+
     public void MakeButtonVisible(bool inter)
     {
         StartCoroutine(MakeMenuVisible(inter));
@@ -128,9 +134,12 @@ public class PlayerCombatMenuManager : MonoBehaviour
         {
             for (int i = 0; i < playerAbilitiesMenu.Count; ++i)
             {
-                if (i == 0 && Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(0))
+                if (i == 0 && Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(0)
+                    && (Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityTarget(0) != Targeting.OneDifferentAlly || Managers.TurnManager.Instance.playerCharsList.Count > 1))
                     playerAbilitiesMenu[0].GetComponent<Button>().interactable = inter;
-                else if (i > 0 && chara.GetComponent<CharData>().learnedAbilities[i] && Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i))
+
+                else if (i > 0 && chara.GetComponent<CharData>().learnedAbilities[i] && Managers.TurnManager.Instance.t1[0].GetComponent<Stats>().currentTP >= Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityCost(i)
+                    && (Managers.TurnManager.Instance.t1[0].GetComponent<PlayerActions>().GetAbilityTarget(i) != Targeting.OneDifferentAlly || Managers.TurnManager.Instance.playerCharsList.Count > 1))
                     playerAbilitiesMenu[i].GetComponent<Button>().interactable = inter;
             }
             playerAbilitiesMenu[playerAbilitiesMenu.Count - 1].GetComponent<Button>().interactable = inter;

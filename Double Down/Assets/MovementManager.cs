@@ -57,19 +57,27 @@ namespace Managers
             {
                 Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), Physics.gravity.y * Time.fixedDeltaTime * moveDistance, Input.GetAxisRaw("Vertical"));
 
-                // Changes the character's animation as they move
-                if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
-                    TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
-                else
-                    TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
-                if (Input.GetAxisRaw("Horizontal") < 0)
-                    TurnManager.Instance.t1[0].GetComponent<SpriteRenderer>().flipX = false;
-                else if (Input.GetAxisRaw("Horizontal") > 0)
-                    TurnManager.Instance.t1[0].GetComponent<SpriteRenderer>().flipX = true;
+                AnimateChars();
 
                 // Moves the character
                 TurnManager.Instance.t1[0].GetComponent<CharacterController>().Move(transform.TransformDirection(input * moveDistance * Time.fixedDeltaTime));
             }
+        }
+
+        // Animates characters as they move or stand still
+        private void AnimateChars()
+        {
+            // Changes the character's animation as they move
+            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+                TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Move);
+            else
+                TurnManager.Instance.t1[0].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
+
+            // Determines whether a character's sprite is flipped or unflipped
+            if (Input.GetAxisRaw("Horizontal") < 0)
+                TurnManager.Instance.t1[0].GetComponent<SpriteRenderer>().flipX = false;
+            else if (Input.GetAxisRaw("Horizontal") > 0)
+                TurnManager.Instance.t1[0].GetComponent<SpriteRenderer>().flipX = true;
         }
 
         private void CheckCameraForMovedChars()

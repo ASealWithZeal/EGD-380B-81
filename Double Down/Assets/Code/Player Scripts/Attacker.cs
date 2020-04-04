@@ -43,9 +43,10 @@ public class Attacker : MonoBehaviour
     public Targeting ability1Target;
 
     [Header("PassiveAbility1")]
-    public string ability2Name = "HP +25%";
+    public string ability2Name = "Patience";
     public bool ability2Active = false;
-    public string ability2Description = "User's HP permanently increases by 25%.";
+    public string ability2Description = "If the user ends a turn without dealing damage, gain +25% ATK for 1 turn.";
+    public bool ability2Trigger = false;
 
     [Header("PassiveAbility2")]
     public string ability3Name = "Wall of Blades";
@@ -64,6 +65,9 @@ public class Attacker : MonoBehaviour
     }
     public void PerformAttack()
     {
+        if (GetComponent<CharData>().learnedAbilities[2])
+            ability2Trigger = false;
+
         // Animation
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(attackName);
@@ -78,10 +82,13 @@ public class Attacker : MonoBehaviour
     }
     public void PerformDefend()
     {
+        if (GetComponent<CharData>().learnedAbilities[2])
+            ability2Trigger = true;
+
         // Animation
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
-        Managers.CombatManager.Instance.UseStatusAbility(1, 2.0f, 1, true, 0.5f);
+        Managers.CombatManager.Instance.UseStatusAbility(4, 0, 0, true, 0.5f);
     }
 
     // Uses Heavy Slash
@@ -92,6 +99,9 @@ public class Attacker : MonoBehaviour
     }
     public void PerformAbility0()
     {
+        if (GetComponent<CharData>().learnedAbilities[2])
+            ability2Trigger = true;
+
         // Animation
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
@@ -100,11 +110,14 @@ public class Attacker : MonoBehaviour
         Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, false, 0.5f);
 
         // Adds the self-debuff
-        Managers.CombatManager.Instance.SetTarget(6);
-        Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, true, 0.5f);
+        Managers.CombatManager.Instance.SetTarget((int)Targeting.User);
+        Managers.CombatManager.Instance.UseStatusAbility(2, -0.99f, 1, true, 0.5f);
     }
     public void PerformAbility0Upgrade()
     {
+        if (GetComponent<CharData>().learnedAbilities[2])
+            ability2Trigger = true;
+
         // Animation
         charStats.currentTP -= ability0UpgradeCost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
@@ -114,8 +127,8 @@ public class Attacker : MonoBehaviour
         Managers.CombatManager.Instance.UseDelayedAbility(ability0UpgradeName, ability0UpgradeMod, 1, false, 0.5f);
 
         // Adds the self-debuff
-        Managers.CombatManager.Instance.SetTarget(6);
-        Managers.CombatManager.Instance.UseStatusAbility(2, 0.01f, 1, false, 0.5f);
+        Managers.CombatManager.Instance.SetTarget((int)Targeting.User);
+        Managers.CombatManager.Instance.UseStatusAbility(2, -0.99f, 1, false, 0.5f);
         Managers.CombatManager.Instance.UseStatusAbility(1, ability0UpgradeDefMod, 1, true, 0.5f);
     }
 
@@ -127,6 +140,9 @@ public class Attacker : MonoBehaviour
     }
     public void PerformAbility1()
     {
+        if (GetComponent<CharData>().learnedAbilities[2])
+            ability2Trigger = true;
+
         // Animation
         charStats.currentTP -= ability1Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
@@ -134,6 +150,23 @@ public class Attacker : MonoBehaviour
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         Managers.CombatManager.Instance.UseStatusAbility(3, ability1Effect, ability1Duration, true, 0.5f);
+    }
+
+    public void GetPassiveAbility1()
+    {
+        //charStats.GetPassiveAbilityStats(MainStats.HP, 0.25f);
+    }
+
+    public void UsePassiveAbility1()
+    {
+        if (ability2Trigger)
+        {
+            GetComponent<CharData>().DisplayActionAnimation();
+            Managers.CombatManager.Instance.DisplayAbilityName(ability2Name);
+            Managers.CombatManager.Instance.UseStatusAbility(0, 0.25f, 1, true, 0.5f);
+
+            ability2Trigger = false;
+        }
     }
 
     public void GetPassiveAbility2()

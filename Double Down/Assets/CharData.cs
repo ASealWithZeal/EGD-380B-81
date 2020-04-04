@@ -36,6 +36,7 @@ public class CharData : MonoBehaviour
     [Header("Sprites")]
     public bool facingDir;
     public Sprite combatPortrait;
+    public Sprite normalPortrait;
     public Color[] colors;
     public bool hasFinishedActionAnimation = false;
 
@@ -64,12 +65,32 @@ public class CharData : MonoBehaviour
         {
             Vector3 objPosition = new Vector3(transform.position.x, GetComponent<EnemyAnimator>().defaultY, transform.position.z);
             charUI.GetComponent<EnemyUI>().CreateUI(name, objPosition, gameObject, charStats.HPPercent());
+            ChangeCharUIBuffDisplay();
         }
     }
 
     public void ChangeCharUIDisplay()
     {
         charUI.GetComponent<PlayerStatusUI>().SetNewHP(name, charStats.level, charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
+    }
+
+    public void ChangeCharUIBuffDisplay()
+    {
+        if (gameObject.tag == "Player")
+        {
+            charUI.GetComponent<PlayerStatusUI>().UpdateBuffUI(BuffType.ATK, charStats.atkModTurns, charStats.atkMod);
+            charUI.GetComponent<PlayerStatusUI>().UpdateBuffUI(BuffType.DEF, charStats.defModTurns, charStats.defMod);
+            charUI.GetComponent<PlayerStatusUI>().UpdateBuffUI(BuffType.SPD, charStats.spdModTurns, charStats.spdMod);
+            charUI.GetComponent<PlayerStatusUI>().UpdateBuffUI(BuffType.Aggro, charStats.aggroModTurns, charStats.aggro);
+            charUI.GetComponent<PlayerStatusUI>().MoveBuffs();
+        }
+        else
+        {
+            charUI.GetComponent<EnemyUI>().UpdateBuffUI(BuffType.ATK, charStats.atkModTurns, charStats.atkMod);
+            charUI.GetComponent<EnemyUI>().UpdateBuffUI(BuffType.DEF, charStats.defModTurns, charStats.defMod);
+            charUI.GetComponent<EnemyUI>().UpdateBuffUI(BuffType.SPD, charStats.spdModTurns, charStats.spdMod);
+            charUI.GetComponent<EnemyUI>().MoveBuffs();
+        }
     }
 
     public void ChangeColor()
@@ -98,6 +119,12 @@ public class CharData : MonoBehaviour
             ChangeHP();
             ChangeTP();
         }
+    }
+
+    public void DestroyBuffUI()
+    {
+        if (gameObject.tag == "Player")
+            charUI.GetComponent<PlayerStatusUI>().DestroyAllBuffs();
     }
 
     public void ChangeHP()
@@ -143,6 +170,7 @@ public class CharData : MonoBehaviour
             for (int i = 0; i < learnedAbilities.Count; ++i)
                 if (learnedAbilities[i])
                     GetComponent<PlayerActions>().CalculatePassiveBonus(i);
+            charUI.GetComponent<PlayerStatusUI>().SetNewHP(name, charStats.level, charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
         }
     }
 
@@ -210,8 +238,15 @@ public class CharData : MonoBehaviour
         if (dead)
         {
             GetComponent<SpriteRenderer>().color = colors[1];
+            GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Idle);
             transform.position = initialPos;
         }
+    }
+
+    public void ResetInfo()
+    {
+        delayedAttack = false;
+        delayTimer = 99;
     }
 
     private void ResetOnDeath()
@@ -221,6 +256,10 @@ public class CharData : MonoBehaviour
         deathTurns = 3;
 
         delayedAttack = false;
+        delayTimer = 99;
+
+        charStats.DestroyMods();
+        DestroyBuffUI();
     }
 
     IEnumerator DeathAnim()

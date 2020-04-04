@@ -121,7 +121,9 @@ namespace Managers
             {
                 players[i].GetComponent<CharData>().isInCombat = false;
                 players[i].GetComponent<CharData>().combatInst = -1;
+                players[i].GetComponent<CharData>().ResetInfo();
                 players[i].GetComponent<Stats>().DestroyMods();
+                players[i].GetComponent<CharData>().DestroyBuffUI();
 
                 if (!players[i].GetComponent<CharData>().dead)
                 {
@@ -161,7 +163,9 @@ namespace Managers
             {
                 players[i].GetComponent<CharData>().isInCombat = false;
                 players[i].GetComponent<CharData>().combatInst = -1;
+                players[i].GetComponent<CharData>().ResetInfo();
                 players[i].GetComponent<Stats>().DestroyMods();
+                players[i].GetComponent<CharData>().DestroyBuffUI();
             }
 
             // Adds all "missing" characters to the combat list

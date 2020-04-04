@@ -38,9 +38,17 @@ public class BossEnemy : MonoBehaviour
 
     [Header("Special 3")]
     public string special3Name = "The magpie releases a burning mist.";
-    public string special3Name2 = "It sacrifices its defenses for more power!";
+    public float special3Mod = 0.25f;
+    public int special3Length = -10;
     public bool special3Used = false;
     public Targeting special3Target;
+
+    [Header("Special 4")]
+    public string special4Name = "The magpie's wingbeats grow faster, still!";
+    public float special4Mod = 0.25f;
+    public int special4Length = -10;
+    public bool special4Used = false;
+    public Targeting special4Target;
 
     public void Act()
     {
@@ -57,8 +65,21 @@ public class BossEnemy : MonoBehaviour
                 UsePyre();
         }
 
-        // After using Burning Mist, use these skills:
-        else if (special3Used)
+        // After using Special3, use these skills:
+        else if (special3Used && !special4Used && charStats.currentHP > (0.25f * charStats.MaxHP()))
+        {
+            if (chance >= 0 && chance < attackPercent2)
+                Attack();
+            else if (chance >= attackPercent2 && chance < attackPercent2 + special0Percent2)
+                UseFeatherStorm();
+            else if (chance >= attackPercent2 + special0Percent2 && chance < attackPercent2 + special0Percent2 + special1Percent2)
+                UsePyre();
+            else if (chance >= attackPercent2 + special0Percent2 + special1Percent2 && chance < 100)
+                UsePyrea();
+        }
+
+        // After using Special4, use these skills:
+        else if (special4Used)
         {
             if (chance >= 0 && chance < attackPercent2)
                 Attack();
@@ -71,8 +92,12 @@ public class BossEnemy : MonoBehaviour
         }
 
         // At 50% HP or less, use this skill once:
-        else
+        else if (!special3Used && charStats.currentHP <= (0.5f * charStats.MaxHP()) && charStats.currentHP > (0.25f * charStats.MaxHP()))
             UseBurningMist();
+
+        // At 25% HP or less, use this skill once:
+        else
+            UseSpecial4();
     }
 
     // Perform a simple attack
@@ -112,10 +137,23 @@ public class BossEnemy : MonoBehaviour
     {
         // Animation
         special3Used = true;
-        charStats.atk += 2;
-        charStats.def -= 2;
+        //charStats.atk += 2;
+        //charStats.def -= 2;
         Managers.CombatManager.Instance.DisplayAbilityName(special3Name);
         Managers.CombatManager.Instance.SetTarget((int)special3Target);
-        Managers.CombatManager.Instance.UseStatusAbility(-1, 0, 0, true, 2.0f);
+        Managers.CombatManager.Instance.UseStatusAbility(0, special3Mod, special3Length, false, 2.0f);
+        Managers.CombatManager.Instance.UseStatusAbility(2, special3Mod, special3Length, true, 2.0f);
+    }
+
+    public void UseSpecial4()
+    {
+        // Animation
+        special4Used = true;
+        //charStats.atk += 2;
+        //charStats.def -= 2;
+        Managers.CombatManager.Instance.DisplayAbilityName(special4Name);
+        Managers.CombatManager.Instance.SetTarget((int)special4Target);
+        Managers.CombatManager.Instance.UseStatusAbility(0, special4Mod, special4Length, false, 2.0f);
+        Managers.CombatManager.Instance.UseStatusAbility(2, special4Mod, special4Length, true, 2.0f);
     }
 }

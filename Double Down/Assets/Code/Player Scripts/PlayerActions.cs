@@ -286,6 +286,89 @@ public class PlayerActions : MonoBehaviour
         return false;
     }
 
+    public Targeting GetAbilityTarget(int i)
+    {
+        switch (i)
+        {
+            case 0:
+                if (character == Char.Char0)
+                    return GetComponent<Attacker>().ability0Target;
+                else if (character == Char.Char1)
+                    return GetComponent<Healer>().ability0Target;
+                break;
+
+            case 1:
+                if (character == Char.Char0)
+                    return GetComponent<Attacker>().ability1Target;
+                else if (character == Char.Char1)
+                    return GetComponent<Healer>().ability1Target;
+                break;
+
+            case 2:
+                break;
+
+            case 3:
+                break;
+        }
+
+        return Targeting.User;
+    }
+
+
+    // Checks if a character can use an "End of Turn" effect and returns true if so
+    public bool CheckEndTurnEffects()
+    {
+        bool returnBool = false;
+
+        // Runs through each of a character's abilities to determine if any triggers are hit
+        for (int i = 0; i < 4; ++i)
+        {
+            switch (i)
+            {
+                case 0:
+                    break;
+
+                case 1:
+                    break;
+
+                case 2:
+                    if (character == Char.Char0)
+                        returnBool = GetComponent<Attacker>().ability2Trigger;
+                    break;
+
+                case 3:
+                    break;
+            }
+        }
+
+        return returnBool;
+    }
+
+    // Forces a character to use each of their "End of Turn" effects
+    public void UseEndOfTurnEffect()
+    {
+        // Runs through each of a character's abilities to determine if any triggers are hit
+        for (int i = 0; i < 4; ++i)
+        {
+            switch (i)
+            {
+                case 0:
+                    break;
+
+                case 1:
+                    break;
+
+                case 2:
+                    if (character == Char.Char0 && GetComponent<Attacker>().ability2Trigger)
+                        GetComponent<Attacker>().UsePassiveAbility1();
+                    break;
+
+                case 3:
+                    break;
+            }
+        }
+    }
+
     public void CalculatePassiveBonus(int i)
     {
         switch (i)
@@ -297,6 +380,10 @@ public class PlayerActions : MonoBehaviour
                 break;
 
             case 2:
+                if (character == Char.Char0)
+                    GetComponent<Attacker>().GetPassiveAbility1();
+                if (character == Char.Char1)
+                    GetComponent<Healer>().GetPassiveAbility1();
                 break;
 
             case 3:
