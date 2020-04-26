@@ -27,6 +27,8 @@ public class CharData : MonoBehaviour
     public List<bool> learnedAbilities = new List<bool>();
 
     [Header("Delayed Attack Info")]
+    public GameObject animationObject;
+    public Targeting delayedTargeting;
     public string delayedAbilityName;
     public bool delayedAttack;
     public int delayTimer;
@@ -39,6 +41,7 @@ public class CharData : MonoBehaviour
     public Sprite normalPortrait;
     public Color[] colors;
     public bool hasFinishedActionAnimation = false;
+    public GameObject particleEffects;
 
     public GameObject charUI;
     public WinCanvasScript charWinUI;
@@ -61,7 +64,7 @@ public class CharData : MonoBehaviour
             charUI.GetComponent<PlayerStatusUI>().SetNewHP(name, charStats.level, charStats.currentHP, charStats.MaxHP(), charStats.currentTP, charStats.MaxTP());
             charWinUI?.Init();
         }
-        else if (gameObject.tag == "Enemy")
+        else
         {
             Vector3 objPosition = new Vector3(transform.position.x, GetComponent<EnemyAnimator>().defaultY, transform.position.z);
             charUI.GetComponent<EnemyUI>().CreateUI(name, objPosition, gameObject, charStats.HPPercent());
@@ -147,11 +150,13 @@ public class CharData : MonoBehaviour
     }
 
     // Sets up the user so they can pull off a delayed attack when relevant
-    public void SetDelayedAttack(string name, int timer, float mod, List<GameObject> targ)
+    public void SetDelayedAttack(GameObject animObj, Targeting targeting, string name, int timer, float mod, List<GameObject> targ)
     {
         for (int i = 0; i < target.Count; ++i)
             target.Remove(target[0]);
 
+        animationObject = animObj;
+        delayedTargeting = targeting;
         delayedAbilityName = name;
         delayedAttack = true;
         delayTimer = timer;
@@ -203,8 +208,6 @@ public class CharData : MonoBehaviour
         yield return null;
     }
 
-
-
     public void KillChar()
     {
         StartCoroutine(DeathAnim());
@@ -243,10 +246,50 @@ public class CharData : MonoBehaviour
         }
     }
 
+    public void CreateParticles()
+    {
+        if (particleEffects != null)
+        {
+            particleEffects.SetActive(true);
+            for (int i = 0; i < particleEffects.transform.childCount; ++i)
+                particleEffects.transform.GetChild(i).GetComponent<ParticleSystem>().Play();
+        }
+    }
+
+    public void DestroyParticles()
+    {
+        if (particleEffects != null)
+        {
+            for (int i = 0; i < particleEffects.transform.childCount; ++i)
+                particleEffects.transform.GetChild(i).GetComponent<ParticleSystem>().Stop();
+            particleEffects.SetActive(false);
+        }
+    }
+
+    public void ChangeParticleSize(float size)
+    {
+        if (particleEffects != null)
+        {
+            if (!particleEffects.activeSelf)
+            {
+                particleEffects.SetActive(true);
+                for (int i = 0; i < particleEffects.transform.childCount; ++i)
+                    particleEffects.transform.GetChild(i).GetComponent<ParticleSystem>().Play();
+            }
+            for (int i = 0; i < particleEffects.transform.childCount; ++i)
+            {
+                var main = particleEffects.transform.GetChild(i).GetComponent<ParticleSystem>().main;
+                main.startSize = size;
+            }
+        }
+    }
+
     public void ResetInfo()
     {
         delayedAttack = false;
         delayTimer = 99;
+
+        DestroyParticles();
     }
 
     private void ResetOnDeath()
@@ -257,6 +300,7 @@ public class CharData : MonoBehaviour
 
         delayedAttack = false;
         delayTimer = 99;
+        DestroyParticles();
 
         charStats.DestroyMods();
         DestroyBuffUI();
@@ -269,20 +313,44 @@ public class CharData : MonoBehaviour
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
 
         Color storedColor = sr.color;
-        while (sr.color.a > 0)
-        {
-            sr.color -= new Color(0.07f, 0.07f, 0.07f, 0.1f);
-            yield return new WaitForSeconds(0.025f);
-        }
-        sr.color = new Color(storedColor.r, storedColor.g, storedColor.b, 0);
 
-        if (gameObject.tag != "Player")
+        if (gameObject.tag != "Boss")
+        {
+            Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.CharDeath, 0.125f);
+
+            while (sr.color.a > 0)
+            {
+                sr.color -= new Color(0.07f, 0.07f, 0.07f, 0.1f);
+                yield return new WaitForSeconds(0.025f);
+            }
+            sr.color = new Color(storedColor.r, storedColor.g, storedColor.b, 0);
+
+            if (gameObject.tag != "Player")
+            {
+                GetComponent<EnemyAnimator>().HideShadow();
+                while (!charUI.GetComponent<EnemyUI>().HealthDrained())
+                    yield return new WaitForSeconds(0.025f);
+
+                charUI.SetActive(false);
+            }
+
+            else
+                transform.position = new Vector3(-9, -0.5f, -2);
+        }
+
+        else
         {
             GetComponent<EnemyAnimator>().HideShadow();
+
+            while (!charUI.GetComponent<EnemyUI>().HealthDrained())
+                yield return new WaitForSeconds(0.025f);
             charUI.SetActive(false);
+            GetComponent<EnemyAnimator>().BossDeathAnim();
+            yield return new WaitForSeconds(GetComponent<Animation>().clip.length + 0.1f);
+            transform.position = initialPos;
         }
-        else
-            transform.position = new Vector3(-9, -0.5f, -2);
+
+        
         yield return null;
     }
 

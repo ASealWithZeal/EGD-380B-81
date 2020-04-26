@@ -79,6 +79,11 @@ public class ScreenTransitionCanvas : MonoBehaviour
     IEnumerator ExitSceneWipe(string scene)
     {
         yield return new WaitForSeconds(0.1f);
+        
+        if (scene != "Hub")
+            Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.ScreenTransition, 0.1f);
+        else
+            Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.ScreenTransition2, 0.1f);
         while (wipeImage.transform.localPosition.x < 0)
         {
             wipeImage.transform.localPosition += new Vector3(25, 0, 0);

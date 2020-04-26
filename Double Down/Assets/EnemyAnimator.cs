@@ -11,6 +11,11 @@ public class EnemyAnimator : MonoBehaviour
     public float shadowDistance = -0.8f;
     private CharData data = null;
 
+    public ScreenFlashEffect sf;
+    public Color flashColor;
+    public float flashIntensity;
+    public float flashLength;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -80,5 +85,44 @@ public class EnemyAnimator : MonoBehaviour
         yield return new WaitForSeconds(0.02f);
         canFly = true;
         yield return null;
+    }
+
+    public void BossDeathAnim()
+    {
+        GetComponent<Animation>().Play();
+        StartCoroutine(BossDeathCoroutine());
+    }
+
+    IEnumerator BossDeathCoroutine()
+    {
+        yield return new WaitForSeconds(2.5f);
+
+        Vector3 pos = transform.localPosition;
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        int i = 5;
+        while (sr.color.a > 0)
+        {
+            if (i == 5)
+            {
+                Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.BossFade, 0.35f);
+                i = 0;
+            }
+
+            transform.localPosition = pos + new Vector3(-0.1f, 0, 0);
+            yield return new WaitForSeconds(0.02f);
+
+            transform.localPosition = pos + new Vector3(0.1f, 0, 0);
+            yield return new WaitForSeconds(0.02f);
+
+            i++;
+        }
+
+        yield return null;
+    }
+
+    public void FlashScreen()
+    {
+        Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.BossFlash, 0.35f);
+        sf.Flash(flashColor, flashIntensity, flashLength);
     }
 }

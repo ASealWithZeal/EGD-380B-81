@@ -204,6 +204,8 @@ public class HubMenuDisplay : MonoBehaviour
 
     IEnumerator OpeningMenu()
     {
+        Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.CursorSelect, 0.15f);
+
         menuPage = 0;
         pageArray[0].SetActive(true);
         while (theGroup.alpha < 1)
@@ -214,7 +216,7 @@ public class HubMenuDisplay : MonoBehaviour
 
         for (int i = 0; i < statButtons.Count; ++i)
             statButtons[i].interactable = true;
-        yield return new WaitForSeconds(0.0125f);
+        yield return new WaitForSeconds(0.02f);
         statButtons[0].Select();
 
         open = true;
@@ -223,6 +225,8 @@ public class HubMenuDisplay : MonoBehaviour
 
     IEnumerator ClosingMenu()
     {
+        Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.CursorExit, 0.25f);
+
         for (int i = 0; i < statButtons.Count; ++i)
             statButtons[i].interactable = false;
         for (int i = 0; i < abilitiesButtons.Count; ++i)
@@ -230,14 +234,14 @@ public class HubMenuDisplay : MonoBehaviour
             abilitiesButtons[i].interactable = false;
             abilitiesButtons[i].gameObject.SetActive(false);
         }
-        for (int i = 0; i < pageArray.Length; ++i)
-            pageArray[i].SetActive(false);
 
         while (theGroup.alpha > 0)
         {
             theGroup.alpha -= 0.1f;
             yield return new WaitForSeconds(0.0125f);
         }
+        for (int i = 0; i < pageArray.Length; ++i)
+            pageArray[i].SetActive(false);
 
         Managers.MovementManager.Instance.canMoveChars = true;
 

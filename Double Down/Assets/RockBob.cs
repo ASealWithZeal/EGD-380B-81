@@ -38,8 +38,7 @@ public class RockBob : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
         }
         t.position = new Vector3(t.position.x, defaultY - bobVal, t.position.z);
-
-        Debug.Log("HERE");
+        
         yield return new WaitForSeconds(0.05f);
 
         while (t.position.y < defaultY + bobVal)

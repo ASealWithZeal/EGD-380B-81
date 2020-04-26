@@ -19,6 +19,8 @@ namespace Managers
     public class CombatManager : Singleton<CombatManager>
     {
         public GameObject combatMenu;
+        public GameObject animDrawer;
+        private GameObject anim;
         public Transform moveTarget;
         public DamageTextUI dText = null;
         public AbilityNameDisplay aDisplay = null;
@@ -26,7 +28,7 @@ namespace Managers
         public ExpContainer container = null;
         public List<Vector3> positions = null;
 
-        private List<GameObject> moveTargets = new List<GameObject>();
+        [HideInInspector] public List<GameObject> moveTargets = new List<GameObject>();
 
         public int DAMAGE_MULT = 10;
         private bool oneTarget = false;
@@ -130,86 +132,112 @@ namespace Managers
         public void FollowUpAction()
         {
             if (doneAttacking)
-            {
-                aDisplay.ChangeDisplayOpacity(false);
-
-                endingTurn = true;
-                bool canMoveOn = true;
-                for (int i = 0; i < TurnManager.Instance.combatChars.Count; ++i)
-                {
-                    if (TurnManager.Instance.combatChars[i].GetComponent<Stats>().HP() <= 0)
-                    {
-                        if (TurnManager.Instance.combatChars[i].tag == "Player")
-                        {
-                            TurnManager.Instance.playerCharsList.Remove(TurnManager.Instance.combatChars[i]);
-                            //TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatPlayer.transform;
-                        }
-                        else
-                        {
-                            // Increases the battle's EXP point gain
-                            container.AddWinExp(TurnManager.Instance.combatChars[i].GetComponent<Stats>().exp);
-                            TurnManager.Instance.enemyCharsList.Remove(TurnManager.Instance.combatChars[i]);
-                            TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatEnemies.transform;
-                        }
-
-                        TurnManager.Instance.combatChars[i].GetComponent<CharData>().KillChar();
-                        TurnManager.Instance.combatChars.Remove(TurnManager.Instance.combatChars[i]);
-
-                        i = -1;
-                    }
-                }
-
-                if (TurnManager.Instance.enemyCharsList.Count == 0)
-                {
-                    canMoveOn = false;
-                    for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
-                    {
-                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().DestroyMods();
-                        TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count);
-                    }
-                    winCanvas.ShowWinCanvas(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst, container.CheckForBossEvent());
-                }
-                else if (TurnManager.Instance.playerCharsList.Count == 0)
-                {
-                    canMoveOn = false;
-                    Invoke("EndCombatLoss", 0.75f);
-                }
-
-                else if (TurnManager.Instance.t1[0].tag == "Player" && TurnManager.Instance.t1[0].GetComponent<PlayerActions>().CheckEndTurnEffects())
-                {
-                    canMoveOn = false;
-                    Invoke("CallEndOfTurnEffect", 0.5f);
-                }
-
-                if (canMoveOn)
-                {
-                    for (int i = 0; i < moveTargets.Count; ++i)
-                        moveTargets.Remove(moveTargets[i]);
-                    newTarget = 0;
-
-                    if (TurnManager.Instance.t1[0].tag == "Player")
-                    {
-                        TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
-                        TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeCharUIBuffDisplay();
-                        StartCoroutine(MovePlayerCharacter(origPos));
-                    }
-
-                    else
-                    {
-                        TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
-                        TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeCharUIBuffDisplay();
-                        TurnManager.Instance.EndRound();
-                    }
-                }
-            }
+                EndTurn();
 
             else
-                DealDamage(storedMod);
+                DealDamage(anim, storedMod);
+        }
+
+        // Ends the current turn
+        private void EndTurn()
+        {
+            aDisplay.ChangeDisplayOpacity(false);
+            endingTurn = true;
+            bool canMoveOn = true;
+
+            CheckForDeath();
+
+            // If every enemy is dead, players win the battle
+            if (TurnManager.Instance.enemyCharsList.Count == 0)
+            {
+                canMoveOn = false;
+                if (!container.CheckForBossEvent())
+                    Invoke("EndCombatWin", 0.5f);
+                else
+                    Invoke("EndCombatWin", 8f);
+            }
+
+            // If every player character is dead, they lose the battle
+            else if (TurnManager.Instance.playerCharsList.Count == 0)
+            {
+                canMoveOn = false;
+                Invoke("EndCombatLoss", 0.75f);
+            }
+
+            // If a player character can perform an "end-of-turn" effect, do so
+            else if (TurnManager.Instance.t1[0].tag == "Player" && TurnManager.Instance.t1[0].GetComponent<PlayerActions>().CheckEndTurnEffects())
+            {
+                canMoveOn = false;
+                Invoke("CallEndOfTurnEffect", 0.5f);
+            }
+
+            // If none of the above is true, just end the turn here
+            if (canMoveOn)
+            {
+                int num = moveTargets.Count;
+                for (int i = 0; i < num; ++i)
+                    moveTargets.Remove(moveTargets[0]);
+                newTarget = 0;
+
+                // Ticks player moidifiers and moves them to their original position
+                if (TurnManager.Instance.t1[0].tag == "Player")
+                {
+                    TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                    TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeCharUIBuffDisplay();
+                    StartCoroutine(MovePlayerCharacter(origPos));
+                }
+
+                // Ticks enemy modifiers
+                else
+                {
+                    TurnManager.Instance.t1[0].GetComponent<Stats>().TickModifierChanges();
+                    TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeCharUIBuffDisplay();
+                    TurnManager.Instance.EndRound();
+                }
+            }
+        }
+
+        // Checks each character at the end of a turn to see if they've died
+        private void CheckForDeath()
+        {
+            for (int i = 0; i < TurnManager.Instance.combatChars.Count; ++i)
+            {
+                if (TurnManager.Instance.combatChars[i].GetComponent<Stats>().HP() <= 0)
+                {
+                    if (TurnManager.Instance.combatChars[i].tag == "Player")
+                    {
+                        TurnManager.Instance.playerCharsList.Remove(TurnManager.Instance.combatChars[i]);
+                        //TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatPlayer.transform;
+                    }
+                    else
+                    {
+                        // Increases the battle's EXP point gain
+                        container.AddWinExp(TurnManager.Instance.combatChars[i].GetComponent<Stats>().exp);
+                        TurnManager.Instance.enemyCharsList.Remove(TurnManager.Instance.combatChars[i]);
+                        TurnManager.Instance.combatChars[i].transform.parent = TurnManager.Instance.nonCombatEnemies.transform;
+                    }
+
+                    TurnManager.Instance.combatChars[i].GetComponent<CharData>().KillChar();
+                    TurnManager.Instance.combatChars.Remove(TurnManager.Instance.combatChars[i]);
+
+                    i = -1;
+                }
+            }
         }
 
         private void CallEndOfTurnEffect()
         {
             TurnManager.Instance.t1[0].GetComponent<PlayerActions>().UseEndOfTurnEffect();
+        }
+
+        private void EndCombatWin()
+        {
+            for (int i = 0; i < TurnManager.Instance.playerCharsList.Count; ++i)
+            {
+                TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().DestroyMods();
+                TurnManager.Instance.playerCharsList[i].GetComponent<Stats>().GainEXP(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count);
+            }
+            winCanvas.ShowWinCanvas(container.GetWinExp() / TurnManager.Instance.playerCharsList.Count, TurnManager.Instance.playerCharsList[0].GetComponent<CharData>().combatInst, container.CheckForBossEvent());
         }
 
         private void EndCombatLoss()
@@ -248,10 +276,15 @@ namespace Managers
             if (settingTarget)
             {
                 if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                {
+                    SoundEffectManager.Instance.PlaySoundClip(SFX.CursorSelect, 0.15f);
                     PerformAction();
+                }
 
                 else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.RightControl))
                 {
+                    SoundEffectManager.Instance.PlaySoundClip(SFX.CursorExit, 0.25f);
+
                     for (int i = 0; i < moveTargets.Count; ++i)
                     {
                         moveTargets[i].GetComponent<CharData>().Targeted();
@@ -264,6 +297,8 @@ namespace Managers
 
                 else if (oneTarget && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S)))
                 {
+                    SoundEffectManager.Instance.PlaySoundClip(SFX.CursorMove, 0.25f);
+
                     if (!otherTarget && moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
                         TargetDown(TurnManager.Instance.playerCharsList);
 
@@ -273,6 +308,8 @@ namespace Managers
 
                 else if (oneTarget && (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.W)))
                 {
+                    SoundEffectManager.Instance.PlaySoundClip(SFX.CursorMove, 0.25f);
+
                     if (moveTargets[0].tag == "Player" && TurnManager.Instance.playerCharsList.Count > 1)
                         TargetUp(TurnManager.Instance.playerCharsList);
 
@@ -349,8 +386,9 @@ namespace Managers
 
         public void SetTarget(int targetType)
         {
-            for (int i = 0; i < moveTargets.Count; ++i)
-                moveTargets.Remove(moveTargets[i]);
+            int num = moveTargets.Count;
+            for (int i = 0; i < num; ++i)
+                moveTargets.Remove(moveTargets[0]);
 
             switch (targetType)
             {
@@ -451,8 +489,9 @@ namespace Managers
 
         private void SetTarget(GameObject newTarget)
         {
-            for (int i = 0; i < moveTargets.Count; ++i)
-                moveTargets.Remove(moveTargets[i]);
+            int num = moveTargets.Count;
+            for (int i = 0; i < num; ++i)
+                moveTargets.Remove(moveTargets[0]);
 
             moveTargets.Add(newTarget);
             newTarget.GetComponent<CharData>().Targeted();
@@ -511,12 +550,12 @@ namespace Managers
         }
 
         // Deals damage to the current target(s) based on a shared modifier
-        public void DealDamage(float modifier)
+        public void DealDamage(GameObject animObj, float modifier)
         {
-            StartCoroutine(DealDamageCoroutine(modifier));
+            StartCoroutine(DealDamageCoroutine(animObj, modifier));
         }
 
-        IEnumerator DealDamageCoroutine(float modifier)
+        IEnumerator DealDamageCoroutine(GameObject animObj, float modifier)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
@@ -530,22 +569,174 @@ namespace Managers
             {
                 int damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
 
-                moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
-                moveTargets[i].GetComponent<CharData>().ChangeHP();
+                //moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                //moveTargets[i].GetComponent<CharData>().ChangeHP();
 
                 bool numEnd = true;
                 if (!oneTarget && i != targ - 1)
                     numEnd = false;
 
-                dText.DamageNumbers(damage, true, moveTargets[i].transform.position, numEnd);
+                //dText.DamageNumbers(damage, true, moveTargets[i].transform.position, numEnd);
+
+                animDrawer.GetComponent<AbilityEffectsGenerator>().CreateAnimation(animObj, moveTargets[i], damage, 0, numEnd, 0);
             }
 
             if (!oneTarget || newTarget == moveTargets.Count - 1)
                 doneAttacking = true;
             else
+            {
+                anim = animObj;
                 newTarget++;
+            }
 
             yield return null;
+        }
+
+        // Deals damage to the current target(s) based on a shared modifier
+        public void DealDamage(GameObject animObj, int damage, bool end)
+        {
+            StartCoroutine(DealDamageCoroutine(animObj, damage, end));
+        }
+
+        IEnumerator DealDamageCoroutine(GameObject animObj, int damage, bool end)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            int targ = newTarget + 1;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = newTarget; i < targ; ++i)
+            {
+                bool numEnd = false;
+                if (end)
+                {
+                    numEnd = true;
+                    if (!oneTarget && i != targ - 1)
+                        numEnd = false;
+                }
+
+                animDrawer.GetComponent<AbilityEffectsGenerator>().CreateAnimation(animObj, moveTargets[i], damage, 0, numEnd, 0);
+            }
+
+            if (!oneTarget || newTarget == moveTargets.Count - 1)
+                doneAttacking = true;
+            else
+            {
+                anim = animObj;
+                newTarget++;
+            }
+
+            yield return null;
+        }
+
+        public void InflictDamageOnTarget(int damage, GameObject target, bool end)
+        {
+            target.GetComponent<Stats>().ReduceHP(damage);
+            target.GetComponent<CharData>().ChangeHP();
+            dText.DamageNumbers(damage, true, target.transform.position, end);
+        }
+
+        // Deals damage to the current target(s) based on a shared modifier
+        public void DealTPDamage(GameObject animObj, int damage, bool end)
+        {
+            StartCoroutine(DealTPDamageCoroutine(animObj, damage, end));
+        }
+
+        IEnumerator DealTPDamageCoroutine(GameObject animObj, int damage, bool end)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            int targ = newTarget + 1;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = newTarget; i < targ; ++i)
+            {
+                bool numEnd = false;
+                if (end)
+                {
+                    numEnd = true;
+                    if (!oneTarget && i != targ - 1)
+                        numEnd = false;
+                }
+                
+                animDrawer.GetComponent<AbilityEffectsGenerator>().CreateAnimation(animObj, moveTargets[i], 0, damage, numEnd, 1);
+            }
+
+            if (!oneTarget || newTarget == moveTargets.Count - 1)
+                doneAttacking = true;
+            else
+            {
+                anim = animObj;
+                newTarget++;
+            }
+
+            yield return null;
+        }
+
+        public void InflictTPDamageOnTarget(int damage, GameObject target, bool end)
+        {
+            target.GetComponent<Stats>().ReduceTP(damage);
+            target.GetComponent<CharData>().ChangeTP();
+            dText.DamageNumbers(damage, false, target.transform.position, end);
+        }
+
+        // Deals damage to the current target(s) based on a shared modifier
+        public void DealHybridDamage(GameObject animObj, GameObject target, int hpDamage, int tpDamage, bool end)
+        {
+            StartCoroutine(DealHybridDamageCoroutine(animObj, target, hpDamage, tpDamage, end));
+        }
+
+        IEnumerator DealHybridDamageCoroutine(GameObject animObj, GameObject target, int hpDamage, int tpDamage, bool end)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            if (target == null)
+            {
+                int targ = newTarget + 1;
+                if (!oneTarget)
+                    targ = moveTargets.Count;
+
+                for (int i = newTarget; i < targ; ++i)
+                {
+                    bool numEnd = false;
+                    if (end)
+                    {
+                        numEnd = true;
+                        if (!oneTarget && i != targ - 1)
+                            numEnd = false;
+                    }
+
+                    animDrawer.GetComponent<AbilityEffectsGenerator>().CreateAnimation(animObj, moveTargets[i], hpDamage, tpDamage, numEnd, 2);
+                }
+            }
+            else
+                animDrawer.GetComponent<AbilityEffectsGenerator>().CreateAnimation(animObj, target, hpDamage, tpDamage, end, 2);
+
+            if (!oneTarget || newTarget == moveTargets.Count - 1)
+                doneAttacking = true;
+            else
+            {
+                anim = animObj;
+                newTarget++;
+            }
+
+            yield return null;
+        }
+
+        public void InflictHybridDamageOnTarget(int damage, int tpDamage, GameObject target, bool end)
+        {
+            target.GetComponent<Stats>().ReduceHP(damage);
+            target.GetComponent<CharData>().ChangeHP();
+            dText.DamageNumbers(damage, true, target.transform.position + new Vector3(-0.2f, 0.33f, 0), false);
+
+            target.GetComponent<Stats>().ReduceTP(tpDamage);
+            target.GetComponent<CharData>().ChangeTP();
+            dText.DamageNumbers(tpDamage, false, target.transform.position + new Vector3(0.2f, -0.33f, 0), end);
         }
 
         // Deal damage AS A START / END OF TURN EFFECT
@@ -568,7 +759,7 @@ namespace Managers
         }
 
         // Deals damage to the current target(s) based on a shared modifier
-        public int DealDamageWithAbsorb(float modifier, bool hp, Vector3 offset)
+        public int DealDamageWithAbsorb(GameObject animObj, float modifier, bool hp, Vector3 offset)
         {
             int damage = 0;
             int targ = 1;
@@ -580,11 +771,11 @@ namespace Managers
                 damage = DamageFormula(TurnManager.Instance.t1[0].GetComponent<Stats>(), moveTargets[i].GetComponent<Stats>(), modifier);
             }
 
-            StartCoroutine(DealDamageWithAbsorbCoroutine(modifier, damage, hp, offset));
+            StartCoroutine(DealDamageWithAbsorbCoroutine(animObj, modifier, damage, hp, offset));
             return damage;
         }
 
-        IEnumerator DealDamageWithAbsorbCoroutine(float modifier, int damage, bool hp, Vector3 offset)
+        IEnumerator DealDamageWithAbsorbCoroutine(GameObject animObj, float modifier, int damage, bool hp, Vector3 offset)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
@@ -597,38 +788,44 @@ namespace Managers
             {
                 if (hp)
                 {
-                    moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
-                    moveTargets[i].GetComponent<CharData>().ChangeHP();
+                    //moveTargets[i].GetComponent<Stats>().ReduceHP(damage);
+                    //moveTargets[i].GetComponent<CharData>().ChangeHP();
+
+                    DealDamage(animObj, damage, false);
                 }
                 else
                 {
-                    moveTargets[i].GetComponent<Stats>().ReduceTP(damage);
-                    moveTargets[i].GetComponent<CharData>().ChangeTP();
+                    //moveTargets[i].GetComponent<Stats>().ReduceTP(damage);
+                    //moveTargets[i].GetComponent<CharData>().ChangeTP();
+
+                    
                 }
 
-                dText.DamageNumbers(damage, true, moveTargets[i].transform.position + offset, false);
+                //dText.DamageNumbers(damage, true, moveTargets[i].transform.position + offset, false);
             }
 
             yield return null;
         }
 
         // Deals damage to the current target(s) based on a shared modifier
-        public int DamageUserAsAbsorb(int num, bool hp, Vector3 offset)
+        public int DamageUserAsAbsorb(GameObject animObj, int num, bool hp, Vector3 offset)
         {
             int damage = num;
-            StartCoroutine(DamageUserAsAbsorbCoroutine(num, hp, offset));
+            StartCoroutine(DamageUserAsAbsorbCoroutine(animObj, num, hp, offset));
             return damage;
         }
 
-        IEnumerator DamageUserAsAbsorbCoroutine(int damage, bool hp, Vector3 offset)
+        IEnumerator DamageUserAsAbsorbCoroutine(GameObject animObj, int damage, bool hp, Vector3 offset)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
 
             if (hp)
             {
-                TurnManager.Instance.t1[0].GetComponent<Stats>().ReduceHP(damage);
-                TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeHP();
+                //TurnManager.Instance.t1[0].GetComponent<Stats>().ReduceHP(damage);
+                //TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeHP();
+
+                DealDamage(animObj, damage, false);
             }
             else
             {
@@ -636,36 +833,54 @@ namespace Managers
                 TurnManager.Instance.t1[0].GetComponent<CharData>().ChangeTP();
             }
 
-            dText.DamageNumbers(damage, true, TurnManager.Instance.t1[0].transform.position + offset, false);
+            //dText.DamageNumbers(damage, true, TurnManager.Instance.t1[0].transform.position + offset, false);
 
             yield return null;
         }
 
-        // Restores health to all specified targets
-        public void RestoreHealth(int amount, bool done, Vector3 offset)
+        // Deals damage to the current target(s) based on a shared modifier
+        public Vector2Int DamageUserAsAbsorb(GameObject animObj, int hpNum, int tpNum)
         {
-            StartCoroutine(RestoreHealthCoroutine(amount, done, offset));
+            StartCoroutine(DamageUserAsAbsorbCoroutine(animObj, hpNum, tpNum));
+            return new Vector2Int(hpNum, tpNum);
         }
 
-        IEnumerator RestoreHealthCoroutine(int amount, bool done, Vector3 offset)
+        IEnumerator DamageUserAsAbsorbCoroutine(GameObject animObj, int hpDamage, int tpDamage)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            DealHybridDamage(animObj, TurnManager.Instance.t1[0], hpDamage, tpDamage, false);
+            yield return null;
+        }
+
+        // Restores health to all specified targets
+        public void RestoreHealth(GameObject animObj, int amount, bool done, Vector3 offset)
+        {
+            StartCoroutine(RestoreHealthCoroutine(animObj, amount, done, offset));
+        }
+
+        IEnumerator RestoreHealthCoroutine(GameObject animObj, int amount, bool done, Vector3 offset)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
 
             int targ = 1;
-            bool canEnd = false;
             if (!oneTarget)
                 targ = moveTargets.Count;
 
             for (int i = 0; i < targ; ++i)
             {
-                moveTargets[i].GetComponent<Stats>().ReduceHP(-amount);
-                moveTargets[i].GetComponent<CharData>().ChangeHP();
+                //moveTargets[i].GetComponent<Stats>().ReduceHP(-amount);
+                //moveTargets[i].GetComponent<CharData>().ChangeHP();
 
-                if (i == targ - 1 && done)
-                    canEnd = true;
+                bool canEnd = true;
+                if (!oneTarget && i != targ - 1)
+                    canEnd = false;
 
-                dText.DamageNumbers(-amount, true, moveTargets[i].transform.position + offset, canEnd);
+                //dText.DamageNumbers(-amount, true, moveTargets[i].transform.position + offset, canEnd);
+
+                DealDamage(animObj, -amount, canEnd);
             }
 
             doneAttacking = true;
@@ -673,12 +888,12 @@ namespace Managers
         }
 
         // Restores health to all specified targets
-        public void RestoreTechPoints(int amount, Vector3 offset)
+        public void RestoreTechPoints(GameObject animObj, int amount, Vector3 offset)
         {
-            StartCoroutine(RestoreTechPointsCoroutine(amount, offset));
+            StartCoroutine(RestoreTechPointsCoroutine(animObj, amount, offset));
         }
 
-        IEnumerator RestoreTechPointsCoroutine(int amount, Vector3 offset)
+        IEnumerator RestoreTechPointsCoroutine(GameObject animObj, int amount, Vector3 offset)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
@@ -690,13 +905,42 @@ namespace Managers
 
             for (int i = 0; i < targ; ++i)
             {
-                moveTargets[i].GetComponent<Stats>().ReduceTP(-amount);
-                moveTargets[i].GetComponent<CharData>().ChangeTP();
+                //moveTargets[i].GetComponent<Stats>().ReduceTP(-amount);
+                //moveTargets[i].GetComponent<CharData>().ChangeTP();
 
                 if (i == targ - 1)
                     canEnd = true;
 
-                dText.DamageNumbers(-amount, false, moveTargets[i].transform.position + offset, canEnd);
+                DealTPDamage(animObj, -amount, canEnd);
+                //dText.DamageNumbers(-amount, false, moveTargets[i].transform.position + offset, canEnd);
+            }
+
+            doneAttacking = true;
+            yield return null;
+        }
+
+        // Restores health to all specified targets
+        public void RestoreHybrid(GameObject animObj, int hpNum, int tpNum)
+        {
+            StartCoroutine(RestoreHybridCoroutine(animObj, hpNum, tpNum));
+        }
+
+        IEnumerator RestoreHybridCoroutine(GameObject animObj, int hpNum, int tpNum)
+        {
+            while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
+                yield return new WaitForSeconds(0.02f);
+
+            int targ = 1;
+            bool canEnd = false;
+            if (!oneTarget)
+                targ = moveTargets.Count;
+
+            for (int i = 0; i < targ; ++i)
+            {
+                if (i == targ - 1)
+                    canEnd = true;
+
+                DealHybridDamage(animObj, null, -hpNum, -tpNum, canEnd);
             }
 
             doneAttacking = true;
@@ -704,12 +948,12 @@ namespace Managers
         }
 
         // Performs an ability with a non-damaging effect
-        public void UseStatusAbility(int type, float mod, int length, bool endTurn, float textDuration)
+        public void UseStatusAbility(GameObject animObj, List<int> type, List<float> mod, List<int> length, bool endTurn, float textDuration)
         {
-            StartCoroutine(UseStatusAbilityCoroutine(type, mod, length, endTurn, textDuration));
+            StartCoroutine(UseStatusAbilityCoroutine(animObj, type, mod, length, endTurn, textDuration));
         }
 
-        IEnumerator UseStatusAbilityCoroutine(int type, float mod, int length, bool endTurn, float textDuration)
+        IEnumerator UseStatusAbilityCoroutine(GameObject animObj, List<int> type, List<float> mod, List<int> length, bool endTurn, float textDuration)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
@@ -720,47 +964,74 @@ namespace Managers
             
             for (int i = 0; i < targ; ++i)
             {
-                int additive = length;
-                if (moveTargets[i] == TurnManager.Instance.t1[0])
-                    additive++;
-
-                if (type == 0)
-                    moveTargets[i].GetComponent<Stats>().SetAtkMod(mod, additive);
-                if (type == 1)
-                    moveTargets[i].GetComponent<Stats>().SetDefMod(mod, additive);
-                if (type == 2)
-                    moveTargets[i].GetComponent<Stats>().SetSpdMod(mod, additive);
-                if (type == 3)
-                    moveTargets[i].GetComponent<Stats>().SetAggro(mod, additive);
-                if (type == 4)
-                {
-                    moveTargets[i].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Defend);
-                    moveTargets[i].GetComponent<Stats>().defending = true;
-                }
-
-                moveTargets[i].GetComponent<CharData>().ChangeCharUIBuffDisplay();
+                //if (type == 0)
+                //    moveTargets[i].GetComponent<Stats>().SetAtkMod(mod, additive);
+                //if (type == 1)
+                //    moveTargets[i].GetComponent<Stats>().SetDefMod(mod, additive);
+                //if (type == 2)
+                //    moveTargets[i].GetComponent<Stats>().SetSpdMod(mod, additive);
+                //if (type == 3)
+                //    moveTargets[i].GetComponent<Stats>().SetAggro(mod, additive);
+                //if (type == 4)
+                //{
+                //    moveTargets[i].GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Defend);
+                //    moveTargets[i].GetComponent<Stats>().defending = true;
+                //}
+                //
+                //moveTargets[i].GetComponent<CharData>().ChangeCharUIBuffDisplay();
+                
+                animDrawer.GetComponent<AbilityEffectsGenerator>().CreateAnimation(animObj, moveTargets[i], type, mod, length, endTurn, textDuration);
             }
 
-            if (endTurn)
-                StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
             yield return null;
         }
 
-        // Prepares to let the user perform a delayed attack
-        public void UseDelayedAbility(string name, float mod, int delay, bool endTurn, float textDuration)
+        public void InflictStatusOnTarget(GameObject target, List<int> type, List<float> mod, List<int> additive, bool endTurn, float textDuration)
         {
-            StartCoroutine(UseDelayedAbilityCoroutine(name, mod, delay, endTurn, textDuration));
+            for (int i = 0; i < type.Count; ++i)
+            {
+                if (target == TurnManager.Instance.t1[0])
+                    additive[i]++;
+
+                if (type[i] == 0)
+                    target.GetComponent<Stats>().SetAtkMod(mod[i], additive[i]);
+                if (type[i] == 1)
+                    target.GetComponent<Stats>().SetDefMod(mod[i], additive[i]);
+                if (type[i] == 2)
+                    target.GetComponent<Stats>().SetSpdMod(mod[i], additive[i]);
+                if (type[i] == 3)
+                    target.GetComponent<Stats>().SetAggro(mod[i], additive[i]);
+                if (type[i] == 4)
+                {
+                    target.GetComponent<CharAnimator>().PlayAnimations(AnimationClips.Defend);
+                    target.GetComponent<Stats>().defending = true;
+                }
+            }
+            
+            target.GetComponent<CharData>().ChangeCharUIBuffDisplay();
+            if (endTurn)
+                StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
         }
 
-        IEnumerator UseDelayedAbilityCoroutine(string name, float mod, int delay, bool endTurn, float textDuration)
+        // Prepares to let the user perform a delayed attack
+        public void UseDelayedAbility(GameObject animObj, Targeting targeting, string name, float mod, int delay, bool endTurn, float textDuration, float particleDelay)
+        {
+            StartCoroutine(UseDelayedAbilityCoroutine(animObj, targeting, name, mod, delay, endTurn, textDuration, particleDelay));
+        }
+
+        IEnumerator UseDelayedAbilityCoroutine(GameObject animObj, Targeting targeting, string name, float mod, int delay, bool endTurn, float textDuration, float particleDelay)
         {
             while (!TurnManager.Instance.t1[0].GetComponent<CharData>().hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
 
-            TurnManager.Instance.t1[0].GetComponent<CharData>().SetDelayedAttack(name, delay, mod, moveTargets);
+            TurnManager.Instance.t1[0].GetComponent<CharData>().SetDelayedAttack(animObj, targeting, name, delay, mod, moveTargets);
 
             if (endTurn)
                 StartCoroutine(EndNonDamageTextDisplay(textDuration, endTurn));
+
+            yield return new WaitForSeconds(particleDelay);
+            TurnManager.Instance.t1[0].GetComponent<CharData>().CreateParticles();
+
             yield return null;
         }
 
@@ -778,20 +1049,39 @@ namespace Managers
             while (!c.hasFinishedActionAnimation)
                 yield return new WaitForSeconds(0.02f);
 
-            for (int i = 0; i < moveTargets.Count; ++i)
-                moveTargets.Remove(moveTargets[i]);
-            
-            for (int i = 0; i < c.target.Count; ++i)
-            {
-                if (c.target[i] == null && c.target.Count == 1)
-                    c.target[i] = TurnManager.Instance.enemyCharsList[0];
+            int num = moveTargets.Count;
+            for (int i = 0; i < num; ++i)
+                moveTargets.Remove(moveTargets[0]);
 
-                moveTargets.Add(c.target[i]);
+            if (TurnManager.Instance.t1[0].tag == "Player")
+            {
+                for (int i = 0; i < c.target.Count; ++i)
+                {
+                    if (c.target[i].GetComponent<CharData>().dead && c.target.Count == 1)
+                        c.target[i] = TurnManager.Instance.enemyCharsList[0];
+
+                    moveTargets.Add(c.target[i]);
+                }
             }
 
+            // Resets enemy targets, just in case new players join the encounter
+            else
+            {
+                SetTarget((int)c.delayedTargeting);
+                num = c.target.Count;
+                for (int i = 0; i < num; ++i)
+                    c.target.Remove(c.target[0]);
+
+                for (int i = 0; i < moveTargets.Count; ++i)
+                    c.target.Add(moveTargets[i]);
+            }
+            
             if (c.target.Count > 1)
                 oneTarget = false;
-            DealDamage(c.storedModifier);
+            DealDamage(c.animationObject, c.storedModifier);
+
+            yield return new WaitForSeconds(c.animationObject.GetComponent<Animation>().clip.length);
+            TurnManager.Instance.t1[0].GetComponent<CharData>().DestroyParticles();
 
             yield return null;
         }

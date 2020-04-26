@@ -10,6 +10,7 @@ public class Attacker : MonoBehaviour
     public string attackName = "Attack";
     public float attackMod = 1.0f;
     public Targeting attackTarget;
+    public GameObject attackAnim;
 
     [Header("Defend")]
     public string defendName = "Defend";
@@ -24,6 +25,8 @@ public class Attacker : MonoBehaviour
     public int ability0Delay = 1;
     public int ability0Cost = 6;
     public Targeting ability0Target;
+    public GameObject ability0SetupAnim;
+    public GameObject ability0ActionAnim;
 
     [Header("Ability0 Upgrade")]
     public string ability0UpgradeName = "Guard Overhead";
@@ -32,6 +35,8 @@ public class Attacker : MonoBehaviour
     public float ability0UpgradeDefMod = 1.25f;
     public int ability0UpgradeCost = 8;
     public Targeting ability0UpgradeTarget;
+    public GameObject ability0UpgradeSetupAnim;
+    public GameObject ability0UpgradeActionAnim;
 
     [Header("Ability1")]
     public string ability1Name = "Provoke";
@@ -41,12 +46,14 @@ public class Attacker : MonoBehaviour
     public float ability1Effect = 1.0f;
     public int ability1Duration = 3;
     public Targeting ability1Target;
+    public GameObject ability1Anim;
 
     [Header("PassiveAbility1")]
     public string ability2Name = "Patience";
     public bool ability2Active = false;
     public string ability2Description = "If the user ends a turn without dealing damage, gain +25% ATK for 1 turn.";
     public bool ability2Trigger = false;
+    public GameObject ability2Anim;
 
     [Header("PassiveAbility2")]
     public string ability3Name = "Wall of Blades";
@@ -71,7 +78,9 @@ public class Attacker : MonoBehaviour
         // Animation
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(attackName);
-        Managers.CombatManager.Instance.DealDamage(attackMod);
+        Managers.CombatManager.Instance.DealDamage(attackAnim, attackMod);
+        //GameObject g = Instantiate(attackAnim, GameObject.Find("_AbilityDrawCanvas").transform);
+        //GameObject.Find("_AbilityDrawCanvas").GetComponent<AbilityEffectsGenerator>().CreateAnimation(attackAnim, Managers.CombatManager.Instance.moveTargets[0].transform.position);
     }
 
     // Guards for a turn, raising defense
@@ -86,9 +95,16 @@ public class Attacker : MonoBehaviour
             ability2Trigger = true;
 
         // Animation
+        List<int> type = new List<int>();
+        type.Add(4);
+        List<float> mod = new List<float>();
+        mod.Add(0);
+        List<int> length = new List<int>();
+        length.Add(0);
+
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
-        Managers.CombatManager.Instance.UseStatusAbility(4, 0, 0, true, 0.5f);
+        Managers.CombatManager.Instance.UseStatusAbility(null, type, mod, length, true, 0.5f);
     }
 
     // Uses Heavy Slash
@@ -107,11 +123,18 @@ public class Attacker : MonoBehaviour
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
         GetComponent<CharData>().DisplayActionAnimation();
-        Managers.CombatManager.Instance.UseDelayedAbility(ability0Name, ability0Mod, 1, false, 0.5f);
+        Managers.CombatManager.Instance.UseDelayedAbility(ability0ActionAnim, ability0Target, ability0Name, ability0Mod, 1, false, 0.5f, ability0SetupAnim.GetComponent<Animation>().clip.length);
 
         // Adds the self-debuff
+        List<int> type = new List<int>();
+        type.Add(2);
+        List<float> mod = new List<float>();
+        mod.Add(-0.99f);
+        List<int> length = new List<int>();
+        length.Add(1);
+
         Managers.CombatManager.Instance.SetTarget((int)Targeting.User);
-        Managers.CombatManager.Instance.UseStatusAbility(2, -0.99f, 1, true, 0.5f);
+        Managers.CombatManager.Instance.UseStatusAbility(ability0SetupAnim, type, mod, length, true, 0.5f);
     }
     public void PerformAbility0Upgrade()
     {
@@ -124,12 +147,18 @@ public class Attacker : MonoBehaviour
 
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability0UpgradeName);
-        Managers.CombatManager.Instance.UseDelayedAbility(ability0UpgradeName, ability0UpgradeMod, 1, false, 0.5f);
+        Managers.CombatManager.Instance.UseDelayedAbility(ability0UpgradeActionAnim, ability0UpgradeTarget, ability0UpgradeName, ability0UpgradeMod, 1, false, 0.5f, ability0UpgradeSetupAnim.GetComponent<Animation>().clip.length);
 
         // Adds the self-debuff
+        List<int> type = new List<int>();
+        type.Add(2);        type.Add(1);
+        List<float> mod = new List<float>();
+        mod.Add(-0.99f);    mod.Add(ability0UpgradeMod);
+        List<int> length = new List<int>();
+        length.Add(1);      length.Add(1);
+
         Managers.CombatManager.Instance.SetTarget((int)Targeting.User);
-        Managers.CombatManager.Instance.UseStatusAbility(2, -0.99f, 1, false, 0.5f);
-        Managers.CombatManager.Instance.UseStatusAbility(1, ability0UpgradeDefMod, 1, true, 0.5f);
+        Managers.CombatManager.Instance.UseStatusAbility(ability0UpgradeSetupAnim, type, mod, length, true, 0.5f);
     }
 
     // Uses Provoke
@@ -149,7 +178,16 @@ public class Attacker : MonoBehaviour
 
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
-        Managers.CombatManager.Instance.UseStatusAbility(3, ability1Effect, ability1Duration, true, 0.5f);
+
+        // Adds the self-debuff
+        List<int> type = new List<int>();
+        type.Add(3);
+        List<float> mod = new List<float>();
+        mod.Add(ability1Effect);
+        List<int> length = new List<int>();
+        length.Add(ability1Duration);
+
+        Managers.CombatManager.Instance.UseStatusAbility(ability1Anim, type, mod, length, true, 0.5f);
     }
 
     public void GetPassiveAbility1()
@@ -163,7 +201,16 @@ public class Attacker : MonoBehaviour
         {
             GetComponent<CharData>().DisplayActionAnimation();
             Managers.CombatManager.Instance.DisplayAbilityName(ability2Name);
-            Managers.CombatManager.Instance.UseStatusAbility(0, 0.25f, 1, true, 0.5f);
+
+            List<int> type = new List<int>();
+            type.Add(0);
+            List<float> mod = new List<float>();
+            mod.Add(0.25f);
+            List<int> length = new List<int>();
+            length.Add(1);
+
+            Managers.CombatManager.Instance.SetTarget((int)Targeting.User);
+            Managers.CombatManager.Instance.UseStatusAbility(ability2Anim, type, mod, length, true, 0.5f);
 
             ability2Trigger = false;
         }

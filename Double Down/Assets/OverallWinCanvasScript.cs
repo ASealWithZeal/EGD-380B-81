@@ -62,6 +62,7 @@ public class OverallWinCanvasScript : MonoBehaviour
             else
                 nonTempScript.Add(charScripts[i]);
         }
+
         
         for (int i = 0; i < tempScript.Count; ++i)
             tempScript[i].UpdateUI(earnedEXP);

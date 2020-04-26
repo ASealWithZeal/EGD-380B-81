@@ -87,6 +87,13 @@ public class EnemyUI : MonoBehaviour
         return c;
     }
 
+    public bool HealthDrained()
+    {
+        if (healthBar.fillAmount > 0)
+            return false;
+        else
+            return true;
+    }
 
     public void UpdateBuffUI(BuffType changedStat, int countdown, float value)
     {

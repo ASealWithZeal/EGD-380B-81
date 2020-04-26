@@ -14,7 +14,10 @@ public class PlayerCombatMenuManager : MonoBehaviour
     private void Update()
     {
         if (abilitiesGroup.alpha == 1 && Input.GetKeyDown(KeyCode.Escape))
+        {
+            Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.CursorExit, 0.25f);
             StartCoroutine(ShowAbilitiesMenu(false, Managers.TurnManager.Instance.t1[0]));
+        }
     }
 
     public void MakeButtonVisible(bool inter)

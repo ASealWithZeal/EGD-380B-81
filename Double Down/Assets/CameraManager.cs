@@ -11,6 +11,8 @@ public class CameraManager : MonoBehaviour
     private GameObject lerpTarget = null;
     private Vector3 lerpOffset;
 
+    private bool shaking = false;
+
     public void SetCameraPos(int i)
     {
         if (i == 0)
@@ -61,5 +63,32 @@ public class CameraManager : MonoBehaviour
         lerping = true;
         lerpTarget = target;
         lerpOffset = offset;
+    }
+
+    public void ShakeScreen(float intensity)
+    {
+        if (!shaking)
+        {
+            shaking = true;
+            StartCoroutine(ShakeScreenCoroutine(intensity));
+        }
+    }
+
+    IEnumerator ShakeScreenCoroutine(float intensity)
+    {
+        float shakeTime = 0.1f;
+        Vector3 position = transform.localPosition;
+        while (shakeTime > 0)
+        {
+            transform.localPosition = position;
+            Vector3 move = new Vector3(Random.insideUnitSphere.x * intensity, Random.insideUnitSphere.y * intensity, 0);
+            transform.position += move;
+            shakeTime -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+
+        shaking = false;
+        transform.localPosition = position;
+        yield return null;
     }
 }

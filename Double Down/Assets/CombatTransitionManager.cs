@@ -33,6 +33,14 @@ namespace Managers
             container.SetCombatInst(combatInst);
             container.battleType = type;
 
+            if (!MusicManager.Instance.CheckBossThemePlaying())
+            {
+                if (type == HubEvents.Battle)
+                    MusicManager.Instance.ChangeScene(SceneType.Combat);
+                else
+                    MusicManager.Instance.ChangeToBossTheme();
+            }
+
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;
             for (int i = 0; i < temp; ++i)
@@ -60,6 +68,13 @@ namespace Managers
         {
             container.SetCombatInst(combatInst);
             container.battleType = type;
+            if (!MusicManager.Instance.CheckBossThemePlaying())
+            {
+                if (type == HubEvents.Battle)
+                    MusicManager.Instance.ChangeScene(SceneType.Combat);
+                else
+                    MusicManager.Instance.ChangeToBossTheme();
+            }
 
             // Temporarily removes all player characters from the combat list
             int temp = playerChars.childCount;
@@ -98,6 +113,8 @@ namespace Managers
         {
             SetCharacterCombatPositions();
             cam.StoreCameraCombatPos();
+            if (!MusicManager.Instance.CheckBossThemePlaying())
+                MusicManager.Instance.ChangeScene(SceneType.Hub);
 
             // Adds all player characters back to the combat list
             int temp = nonCombatPlayerChars.childCount;
@@ -115,6 +132,12 @@ namespace Managers
         public void DestroyCombatInstance(List<GameObject> players)
         {
             container.FlushWinExp();
+            ResetCharacterCombatPositions();
+
+            if (!MusicManager.Instance.CheckBossThemePlaying())
+                MusicManager.Instance.ChangeScene(SceneType.Hub);
+            //else
+            //    MusicManager.Instance.ChangeToNormalTheme();
 
             // Sets all involved characters as not currently being involved in combat
             for (int i = 0; i < players.Count; ++i)
@@ -146,8 +169,7 @@ namespace Managers
                 enemyChars.GetChild(0).GetComponent<CharData>().FullRestore();
                 enemyChars.GetChild(0).parent = nonCombatEnemyChars;
             }
-
-            ResetCharacterCombatPositions();
+            
             //cam.StoreCameraCombatPos();
             transitionUI.ExitScene("Hub");
         }
@@ -157,6 +179,12 @@ namespace Managers
         public void ResetCombatInstance(List<GameObject> players)
         {
             container.FlushWinExp();
+            ResetCharacterCombatPositions();
+
+            if (!MusicManager.Instance.CheckBossThemePlaying())
+                MusicManager.Instance.ChangeScene(SceneType.Hub);
+            else
+                MusicManager.Instance.ChangeToNormalTheme();
 
             // Sets all involved characters as not currently being involved in combat
             for (int i = 0; i < players.Count; ++i)
@@ -197,8 +225,7 @@ namespace Managers
 
                 enemyChars.GetChild(0).parent = nonCombatEnemyChars;
             }
-
-            ResetCharacterCombatPositions();
+            
             //cam.StoreCameraCombatPos();
             transitionUI.ExitScene("Hub");
         }

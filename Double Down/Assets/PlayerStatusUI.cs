@@ -228,9 +228,11 @@ public class PlayerStatusUI : MonoBehaviour
 
     public void DestroyAllBuffs()
     {
-        Debug.Log("H");
         int c = buffs.Count;
         for (int i = 0; i < c; ++i)
+        {
             buffs[0].DestroyImmediately();
+            buffs.Remove(buffs[0]);
+        }
     }
 }

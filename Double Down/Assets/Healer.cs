@@ -10,6 +10,7 @@ public class Healer : MonoBehaviour
     public string attackName = "Attack";
     public float attackMod = 1.0f;
     public Targeting attackTarget;
+    public GameObject attackAnim;
 
     [Header("Defend")]
     public string defendName = "Defend";
@@ -23,6 +24,8 @@ public class Healer : MonoBehaviour
     public int ability0Cost = 5;
     public Targeting ability0Target;
     public Targeting ability0HealTarget;
+    public GameObject ability0DamageAnim;
+    public GameObject ability0HealingAnim;
 
     [Header("Ability0 Upgrade")]
     public string ability0UpgradeName = "Overdraw";
@@ -32,6 +35,8 @@ public class Healer : MonoBehaviour
     public int ability0UpgradeCost = 7;
     public Targeting ability0UpgradeTarget;
     public Targeting ability0UpgradeHealTarget;
+    public GameObject ability0UpgradeDamageAnim;
+    public GameObject ability0UpgradeHealingAnim;
 
     [Header("Ability1")]
     public string ability1Name = "Injection";
@@ -41,11 +46,14 @@ public class Healer : MonoBehaviour
     public float ability1Effect = 1.25f;
     public int ability1Duration = 3;
     public Targeting ability1Target;
+    public GameObject ability1Animation;
+    public GameObject ability1HealAnimation;
 
     [Header("PassiveAbility1")]
     public string ability2Name = "TP +25%";
     public bool ability2Active = false;
     public string ability2Description = "User's TP permanently increases by 25%.";
+    public GameObject ability2Animation;
 
     [Header("PassiveAbility2")]
     public string ability3Name = "Desperation";
@@ -67,7 +75,7 @@ public class Healer : MonoBehaviour
         // Animation
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(attackName);
-        Managers.CombatManager.Instance.DealDamage(attackMod);
+        Managers.CombatManager.Instance.DealDamage(attackAnim, attackMod);
     }
 
     // Guards for a turn, raising defense
@@ -82,13 +90,27 @@ public class Healer : MonoBehaviour
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(defendName);
 
+        List<int> type = new List<int>();
+        type.Add(4);
+        List<float> mod = new List<float>();
+        mod.Add(0);
+        List<int> length = new List<int>();
+        length.Add(0);
+
         if (!GetComponent<CharData>().learnedAbilities[2])
-            Managers.CombatManager.Instance.UseStatusAbility(4, 0, 0, true, 0.5f);
+            Managers.CombatManager.Instance.UseStatusAbility(null, type, mod, length, true, 0.5f);
         else
         {
-            Managers.CombatManager.Instance.UseStatusAbility(4, 0, 0, false, 0.5f);
-            Managers.CombatManager.Instance.RestoreTechPoints((int)(charStats.MaxTP() * 0.15f), new Vector3());
+            Managers.CombatManager.Instance.UseStatusAbility(null, type, mod, length, false, 0.5f);
+            Managers.CombatManager.Instance.RestoreTechPoints(ability2Animation, (int)(charStats.MaxTP() * 0.25f), new Vector3());
+
+            if (GetComponent<CharData>().learnedAbilities[3])
+                Invoke("SetParticlesFromRefresh", ability2Animation.GetComponent<Animation>().clip.length + 0.01f);
         }
+    }
+    private void SetParticlesFromRefresh()
+    {
+        GetComponent<CharData>().ChangeParticleSize(0.1f * Mathf.FloorToInt((charStats.MaxTP() - charStats.currentTP) / 5));
     }
 
     // Uses Blood Draw
@@ -102,30 +124,41 @@ public class Healer : MonoBehaviour
         // Animation
         charStats.currentTP -= ability0Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
+        if (GetComponent<CharData>().learnedAbilities[3])
+            GetComponent<CharData>().ChangeParticleSize(0.1f * Mathf.FloorToInt((charStats.MaxTP() - charStats.currentTP) / 5));
         Managers.CombatManager.Instance.DisplayAbilityName(ability0Name);
 
         // Deals damage as absorption
         GetComponent<CharData>().DisplayActionAnimation();
-        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod, true, new Vector3());
+        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(ability0DamageAnim, attackMod, true, new Vector3());
 
         // Restores health to all allies
         Managers.CombatManager.Instance.SetTarget((int)ability0HealTarget);
-        Managers.CombatManager.Instance.RestoreHealth(damage / Managers.TurnManager.Instance.playerCharsList.Count, true, new Vector3());
+        //Managers.CombatManager.Instance.RestoreHealth(ability0HealingAnim, damage / Managers.TurnManager.Instance.playerCharsList.Count, true, new Vector3());
+        StartCoroutine(PerformAbility0Heal(damage, 1.0f, ability0HealingAnim, ability0DamageAnim.GetComponent<Animation>().clip.length));
     }
     public void PerformAbility0Upgrade()
     {
         // Animation
         charStats.currentTP -= ability0UpgradeCost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
+        if (GetComponent<CharData>().learnedAbilities[3])
+            GetComponent<CharData>().ChangeParticleSize(0.1f * Mathf.FloorToInt((charStats.MaxTP() - charStats.currentTP) / 5));
         Managers.CombatManager.Instance.DisplayAbilityName(ability0UpgradeName);
 
         // Deals damage as absorption
         GetComponent<CharData>().DisplayActionAnimation();
-        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(attackMod, true, new Vector3());
+        int damage = Managers.CombatManager.Instance.DealDamageWithAbsorb(ability0UpgradeDamageAnim, attackMod, true, new Vector3());
 
         // Restores health to all allies
         Managers.CombatManager.Instance.SetTarget((int)ability0UpgradeHealTarget);
-        Managers.CombatManager.Instance.RestoreHealth((int)((damage * 1.2f) / Managers.TurnManager.Instance.playerCharsList.Count), true, new Vector3());
+        //Managers.CombatManager.Instance.RestoreHealth(ability0UpgradeHealingAnim, (int)((damage * 1.2f) / Managers.TurnManager.Instance.playerCharsList.Count), true, new Vector3());
+        StartCoroutine(PerformAbility0Heal(damage, 1.2f, ability0UpgradeHealingAnim, ability0UpgradeDamageAnim.GetComponent<Animation>().clip.length));
+    }
+    IEnumerator PerformAbility0Heal(int healAmount, float healMod, GameObject anim, float length)
+    {
+        yield return new WaitForSeconds(length * 0.75f);
+        Managers.CombatManager.Instance.RestoreHealth(anim, (int)((healAmount * healMod) / Managers.TurnManager.Instance.playerCharsList.Count), true, new Vector3());
     }
 
     // Uses Adrenalinjection
@@ -139,17 +172,28 @@ public class Healer : MonoBehaviour
         // Animation
         charStats.currentTP -= ability1Cost;
         charStats.gameObject.GetComponent<CharData>().ChangeTP();
+        if (GetComponent<CharData>().learnedAbilities[3])
+            GetComponent<CharData>().ChangeParticleSize(0.1f * Mathf.FloorToInt((charStats.MaxTP() - charStats.currentTP) / 5));
+
         GetComponent<CharData>().DisplayActionAnimation();
         Managers.CombatManager.Instance.DisplayAbilityName(ability1Name);
         //Managers.CombatManager.Instance.UseStatusAbility(0, ability1Effect, 3, true, 0.5f);
 
         // Deals damage as absorption
-        int damage = Managers.CombatManager.Instance.DamageUserAsAbsorb(charStats.currentHP / 2, true, new Vector3(-0.2f, 0.33f, 0));
-        int tpDamage = Managers.CombatManager.Instance.DamageUserAsAbsorb(charStats.currentTP / 2, false, new Vector3(0.2f, -0.33f, 0));
+        Vector2Int damage = Managers.CombatManager.Instance.DamageUserAsAbsorb(ability1Animation, charStats.currentHP / 2, charStats.currentTP / 2);
+        //int tpDamage = Managers.CombatManager.Instance.DamageUserAsAbsorb(ability1Animation, charStats.currentTP / 2, false, new Vector3(0.2f, -0.33f, 0));
 
         // Restores health to the target ally
-        Managers.CombatManager.Instance.RestoreHealth(damage, false, new Vector3(-0.2f, 0.33f, 0));
-        Managers.CombatManager.Instance.RestoreTechPoints(tpDamage, new Vector3(0.2f, -0.33f, 0));
+        //Managers.CombatManager.Instance.RestoreHealth(null, damage, false, new Vector3(-0.2f, 0.33f, 0));
+        //Managers.CombatManager.Instance.RestoreTechPoints(ability2Animation, tpDamage, new Vector3(0.2f, -0.33f, 0));
+        //Managers.CombatManager.Instance.RestoreHybrid(ability1Animation, damage.x, damage.y);
+
+        StartCoroutine(PerformAbility1Heal(damage.x, damage.y, ability1HealAnimation, ability1Animation.GetComponent<Animation>().clip.length));
+    }
+    IEnumerator PerformAbility1Heal(int hpHealAmount, int tpHealAmount, GameObject anim, float length)
+    {
+        yield return new WaitForSeconds(length * 0.75f);
+        Managers.CombatManager.Instance.RestoreHybrid(anim, hpHealAmount, tpHealAmount);
     }
 
     public void GetPassiveAbility1()

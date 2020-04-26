@@ -116,6 +116,8 @@ public class WinCanvasScript : MonoBehaviour
 
         while (levelingUp && charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1)
         {
+            Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.GainEXP, 0.25f);
+
             levelingUp = false;
             neededEXPText.SetText((charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp] - cStartingEXP).ToString());
             n = charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp] - cStartingEXP;
@@ -130,21 +132,22 @@ public class WinCanvasScript : MonoBehaviour
                 fill = 1.0f;
             }
 
-            float elapser = (e * ((1 / fill - expMeter.fillAmount) * Managers.TurnManager.Instance.tracker.timeIncrements));
+            float elapser = (cEXP * ((1 / (fill - expMeter.fillAmount)) * 0.008f));
             while (expMeter.fillAmount < fill)
             {
                 expMeter.fillAmount += 0.01f;
                 if (e > 0)
                     e -= elapser;
-                if (n > 0)
-                    n -= elapser;
+                else
+                    e = 0;
                 expText.SetText("+" + Mathf.FloorToInt(e).ToString());
                 neededEXPText.SetText(Mathf.FloorToInt(n).ToString());
-                yield return new WaitForSeconds(Managers.TurnManager.Instance.tracker.timeIncrements);
+                yield return new WaitForSeconds(0.0125f);
             }
 
             // Normalizes the displayed text
-            expText.SetText("+0");
+            if (fill < 1.0f)
+                expText.SetText("+0");
             if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1)
                 neededEXPText.SetText(((charStats.nextLevelExp[(charStats.startingLevel - 1) + levelUp]) - charStats.exp).ToString());
             else
@@ -153,16 +156,20 @@ public class WinCanvasScript : MonoBehaviour
 
             if (cEXP - charStats.nextLevelExp[(charStats.startingLevel - 1)] == 0)
             {
+                Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.GainLevel, 0.25f);
                 expMeter.fillAmount = 0;
+                expText.SetText("+0");
                 levelingUp = false;
             }
             else if (charStats.startingLevel + levelUp < charStats.nextLevelExp.Count + 1 && cEXP - charStats.nextLevelExp[(charStats.startingLevel - 1)] != 0 && levelingUp)
             {
+                Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.GainLevel, 0.25f);
                 expMeter.fillAmount = 0;
                 cEXP = Mathf.Abs(cEXP - charStats.nextLevelExp[(charStats.startingLevel - 1)]);
             }
             if (charStats.startingLevel + levelUp == charStats.nextLevelExp.Count + 1)
             {
+                Managers.SoundEffectManager.Instance.PlaySoundClip(SFX.GainLevel, 0.25f);
                 expMeter.fillAmount = 1;
                 expText.SetText("+0");
                 neededEXPText.SetText("--");

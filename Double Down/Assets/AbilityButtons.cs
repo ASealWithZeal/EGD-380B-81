@@ -11,6 +11,7 @@ public class AbilityButtons : MonoBehaviour, ISelectHandler
     public int ability;
     public CharData data = null;
     public List<Color> setColors;
+    public Sprite pressedSprite;
 
     public void InitValues(PlayerActions actions, int num)
     {
@@ -41,12 +42,14 @@ public class AbilityButtons : MonoBehaviour, ISelectHandler
     public void SelectAbilityButton()
     {
         SetColors();
+        Invoke("DisableClickSound", 0.1f);
         transform.parent.GetComponent<AbilityLearnScreen>().LearnAbility(ability);
     }
 
     public void SelectPassiveButton(int passive)
     {
         SetColors();
+        Invoke("DisableClickSound", 0.1f);
         transform.parent.GetComponent<AbilityLearnScreen>().LearnAbility(ability);
     }
 
@@ -57,6 +60,12 @@ public class AbilityButtons : MonoBehaviour, ISelectHandler
 
         ColorBlock colors = button.colors;
         colors.pressedColor = setColors[1];
+        button.image.sprite = pressedSprite;
         button.colors = colors;
+    }
+
+    private void DisableClickSound()
+    {
+        GetComponent<ButtonAudio>().canClick = false;
     }
 }
